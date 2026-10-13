@@ -88,6 +88,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .hours tr.today td { font-weight: 800; }
 .small { font-size: 15px; }
 .where p { margin-top: 14px; }
+.where .map { direction: ltr; unicode-bidi: isolate; display: block; width: 100%; max-width: 520px; height: auto; margin-top: 20px; font-family: 'Nunito', -apple-system, sans-serif; }
+.where .findp { font-weight: 700; font-size: 18px; margin-top: 16px; }
 
 /* ── menu ── */
 .pagehead { padding: 40px 0 14px; }
