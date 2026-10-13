@@ -6,7 +6,8 @@
   - `/order/` order ahead: pick-up time, here or to go, pay at the counter
   - `/pos/` the POS: register, payment, kitchen/bar screens, manager screens
 - `supabase/001_schema.sql` — database (already run on project tuthebxguxvogmiowhcx)
-- `supabase/002_seed_menu.sql` — the SAMPLE menu (already loaded; edit or delete in POS › Manage › Menu)
+- `supabase/002_seed_menu.sql` — the SAMPLE menu (superseded by 005; edit or delete in POS › Manage › Menu)
+- `supabase/005_real_menu.sql` — the real menu from the cafe's boards, 45 items in 9 languages (already applied to the live project)
 - `supabase/003_online_orders.sql` + `004_tighten_online_functions.sql` — v1.1: open/closed switch, online ordering, real hours (both already applied to the live project)
 
 ## Online orders (v1.1)
