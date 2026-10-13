@@ -264,3 +264,18 @@ button[disabled] { opacity: .45; cursor: default; }
   #receipt .rr { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-justify-content: space-between; justify-content: space-between; }
   #receipt .rr.big { font-weight: 700; font-size: 14px; }
 }
+
+/* v1.1 · online orders and open/closed */
+.rail .cat.webon { background: #EC5C97; border-color: #EC5C97; color: #FFFFFF; }
+.card.web { max-width: 760px; }
+.card.web.ready { border-color: #9BCFDB; }
+.card.web .num { width: 56px; font-family: 'Baloo 2', sans-serif; font-size: 22px; color: #D06E8B; }
+.card.web small { display: block; color: #86606B; font-size: 13px; }
+.card.web .amt { width: 90px; text-align: right; font-weight: 800; }
+.wl { margin: 10px 0 6px 56px; padding: 0 0 0 18px; }
+.wl em { font-style: normal; color: #B55573; font-weight: 800; }
+.wnote { margin: 0 0 10px 56px; color: #86606B; }
+.webtag { margin: 0 0 8px; padding: 8px 12px; border-radius: 12px; background: #FDEDF1; color: #9A4D69; font-weight: 800; font-size: 14px; }
+.bigstate { font-family: 'Baloo 2', 'Nunito', sans-serif; font-size: 30px; font-weight: 800; margin: 0 0 12px; }
+.bigstate.closed { color: #B55573; }
+.bigstate.open { color: #3E8E7E; }
