@@ -1,10 +1,24 @@
 # Josie's Cafe — website + POS (MVP)
 
-- `site/` — the whole website, static files, no build step. Publish this folder as josiescafe.com.
-  - `/` home + menu in 10 languages (reads the menu from Supabase)
+- The whole website is static files, no build step. Publish the repo root as josiescafe.com.
+  - `/` home: open/closed right now, hours, where to find us (10 languages)
+  - `/menu/` the menu, read live from the same tables the POS edits (sold out shows straight away)
+  - `/order/` order ahead: pick-up time, here or to go, pay at the counter
   - `/pos/` the POS: register, payment, kitchen/bar screens, manager screens
 - `supabase/001_schema.sql` — database (already run on project tuthebxguxvogmiowhcx)
 - `supabase/002_seed_menu.sql` — the SAMPLE menu (already loaded; edit or delete in POS › Manage › Menu)
+- `supabase/003_online_orders.sql` + `004_tighten_online_functions.sql` — v1.1: open/closed switch, online ordering, real hours (both already applied to the live project)
+
+## Online orders (v1.1)
+1. A customer orders on `/order/`. `place_online_order` re-prices everything from the menu (the browser's prices
+   are never trusted), checks the cafe is open at the pick-up time, and saves an **open** (unpaid) order numbered W1, W2…
+2. The register shows **Online orders · n** in the left rail. Tickets reach the kitchen/bar screens **20 minutes before
+   pick-up**, marked ONLINE with the time.
+3. At pick-up: Online orders › **Take payment** → normal cash/card screen. The customer's page flips to "Ready" when
+   the stations bump it, and to "Enjoy" once paid.
+4. **Manage › Open / closed**: close for today or through a date (with a note for the website), reopen, or pause
+   online orders. Regular hours stay in Manage › Money & hours.
+Limits: max 3 open online orders per phone number, 20 of an item, 30 lines; pick-up 10 minutes to 7 days ahead.
 
 ## Works on old devices
 Plain ES5 JavaScript, XMLHttpRequest, flexbox with -webkit- prefixes, no CSS grid or `gap`.

@@ -4,52 +4,63 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Josie's Cafe · Utila, Honduras</title>
-<meta name="description" content="Josie's Cafe in Utila, Honduras: coffee, breakfast and lunch. Menu in many languages.">
-<meta name="theme-color" content="#FCE3E8">
+<meta name="description" content="Josie's Cafe in Utila, Honduras: coffee, breakfast and lunch from early morning. Menu and order ahead in many languages.">
+<meta name="theme-color" content="#FBF8F4">
 <link rel="apple-touch-icon" href="/img/icon-180.png">
 <link rel="icon" href="/img/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@600&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
 <link rel="stylesheet" href="/css/site.css">
 </head>
-<body>
+<body data-page="home">
 <header class="top">
-  <a class="brand" href="/"><img src="/img/logo.png" alt="" width="34" height="40"><span>Josie's</span></a>
-  <label class="langpick"><span class="sr" data-t="lang">Language</span>
-    <select id="lang" aria-label="Language"></select>
-  </label>
+  <div class="wrap flex center-y">
+    <a class="brandlink" href="/"><img src="/img/logo-full.png" alt="Josie's Cafe" width="42" height="56"></a>
+    <div class="flex center-y">
+      <nav class="nav" aria-label="Main">
+        <a href="/" class="home on" data-t="home">Home</a><a href="/menu/" data-t="menu">Menu</a><a href="/order/" class="cta"><span data-t="order">Order</span><span class="count" id="navCount" style="display:none">0</span></a>
+      </nav>
+      <label class="langpick"><span class="sr" data-t="lang">Language</span><select id="lang" aria-label="Language"></select></label>
+    </div>
+  </div>
 </header>
 
 <main>
-  <section class="hero">
-    <img class="logo" src="/img/logo.png" alt="Josie's Cafe" width="206" height="240">
-    <p class="tagline" data-t="tagline">Coffee · Breakfast · Lunch</p>
-    <p id="status" class="status"><span class="dot"></span>&nbsp;</p>
-    <a class="cta" href="#menu" data-t="menu">Menu</a>
-  </section>
-
-  <section class="info">
-    <div class="card">
-      <h2 data-t="hours">Hours</h2>
-      <table class="hours"><tbody id="hours"></tbody></table>
-    </div>
-    <div class="card">
-      <h2 data-t="find">Find us</h2>
-      <p id="address" class="addr">Utila, Honduras</p>
-      <a class="maplink" href="https://maps.google.com/?q=Josie%27s+Cafe+Utila+Honduras" target="_blank" rel="noopener" data-t="map">Open in Maps</a>
-    </div>
-  </section>
-
-  <section class="menu" id="menu">
-    <h2 class="menu-title" data-t="menu">Menu</h2>
-    <p class="note" data-t="prices">Prices in lempiras (L).</p>
-    <nav id="catnav" class="catnav" aria-label="Menu sections"></nav>
-    <div id="menu-list"></div>
-    <p class="counter" data-t="counter">Order at the counter.</p>
-  </section>
+  <div class="wrap">
+    <section class="hero flex">
+      <div class="copy">
+        <h1 class="line"><span class="a" data-t="little">A little bit</span><span class="hand bounce" data-t="ofhome">of home.</span></h1>
+        <p id="status" class="status"><span class="dot"></span>&nbsp;</p>
+        <div id="closedNote" class="note" style="display:none"><span class="hand"></span></div>
+        <p class="lead" data-t="lead">Coffee, breakfast and lunch on Utila. We open early, so you can eat before your dive and still make the boat.</p>
+        <div class="acts"><a class="btn" href="/order/" data-t="orderAhead">Order ahead</a><a class="btn soft" href="/menu/" data-t="seeMenu">See the menu</a></div>
+      </div>
+      <div class="art"><img src="/img/morning.svg" alt="" width="500" height="400"></div>
+    </section>
+    <section class="three flex">
+      <div><div class="tile"><img src="/img/tile-sunrise.svg" alt=""><h3 data-t="b1h">Before your dive</h3><p data-t="b1p">Order tonight, pick it up on your way to the dock.</p></div></div>
+      <div><div class="tile"><img src="/img/tile-umbrella.svg" alt=""><h3 data-t="b2h">Stay a while</h3><p data-t="b2p">Benches, plants and Wi-Fi. Bring a book. Nobody's rushing you.</p></div></div>
+      <div><div class="tile"><img src="/img/tile-table.svg" alt=""><h3 data-t="b3h">Lunch, too</h3><p data-t="b3p">Sandwiches, salads and smoothies until we close.</p></div></div>
+    </section>
+    <section class="visit flex">
+      <div>
+        <span class="kicker" data-t="hours">Hours</span>
+        <h2 data-t="hoursH">Mornings, mostly</h2>
+        <table class="hours"><tbody id="hours"></tbody></table>
+        <p class="muted small" style="margin-top:12px" data-t="hnTime">Honduras time.</p>
+      </div>
+      <div class="where">
+        <span class="kicker" data-t="find">Find us</span>
+        <h2 data-t="findH">In Utila Town</h2>
+        <p id="address">Utila, Honduras</p>
+        <p data-t="pay">We take lempiras, US dollars and cards.</p>
+        <p><a class="btn soft" href="https://maps.google.com/?q=Josie%27s+Cafe+Utila+Honduras" target="_blank" rel="noopener" data-t="map">Open in Maps</a></p>
+      </div>
+    </section>
+  </div>
 </main>
 
-<footer class="foot">© <span id="year">2026</span> Josie's Cafe · Utila, Honduras</footer>
+<footer class="foot"><div class="wrap">© <span id="year">2026</span> Josie's Cafe · <span data-t="tagline">Coffee · Breakfast · Lunch</span> · Utila, Honduras</div></footer>
 
 <script src="/js/api.js"></script>
 <script src="/js/site.js"></script>

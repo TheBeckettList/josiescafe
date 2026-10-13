@@ -4,7 +4,7 @@
 (function (w, d, JC) {
   'use strict';
 
-  var APP_VERSION = '1.0.0';
+  var APP_VERSION = '1.1.0';
   var app = d.getElementById('app');
 
   /* ───────────────────────── state ───────────────────────── */
@@ -23,8 +23,9 @@
     last: null,                                      // last completed order (Done screen)
     online: false, syncing: false, syncErr: '',
     showTicket: false,
-    manage: { tab: 'menu', cat: null },
+    manage: { tab: 'site', cat: null },
     station: { tickets: [], loaded: false, err: '' },
+    web: { list: JC.get('pos.web', []), err: '' },   // online orders waiting to be picked up and paid
     report: null
   };
 
@@ -151,7 +152,7 @@
     if (S.syncing || !S.queue.length || !S.session) { return; }
     S.syncing = true;
     var job = S.queue[0];
-    api('POST', 'rpc/sync_order', { p: job }, function (err, data, status) {
+    api('POST', job.kind === 'online' ? 'rpc/pay_online_order' : 'rpc/sync_order', { p: job }, function (err, data, status) {
       S.syncing = false;
       if (!err) {
         S.queue.shift(); save('queue');
@@ -183,6 +184,61 @@
       if (S.online !== was) { paintStatus(); }
       if (S.online) { syncNext(); }
     });
+  }
+
+  /* ───────────────────────── online orders (josiescafe.com/order) ───────────────────────── */
+  function webPoll() {
+    if (!S.session || !S.device || S.device.mode !== 'register') { return; }
+    api('GET', 'orders?select=id,number,customer_name,customer_phone,note,order_type,total,togo_total,pickup_at,created_at,bar_done_at,kitchen_done_at,' +
+      'order_items(item_id,name,qty,unit_price,togo_charge,note,station)&source=eq.online&status=eq.open&order=pickup_at.asc', null, function (err, data) {
+      if (err) { S.web.err = S.online ? 'Couldn’t load online orders.' : 'Offline · showing the last online orders.'; }
+      else {
+        var paying = {}, i;
+        for (i = 0; i < S.queue.length; i++) { if (S.queue[i].kind === 'online') { paying[S.queue[i].order.id] = true; } }
+        S.web.err = ''; S.web.list = (data || []).filter(function (o) { return !paying[o.id]; }); save('web');
+      }
+      if (S.view === 'web' || (S.view === 'register' && !S.showTicket)) { render(); }
+    });
+  }
+  function webCount() { return S.web.list.length; }
+  function vWeb() {
+    var h = header('Online orders', 'back') + '<div class="list-wrap"><p class="muted">Ordered on josiescafe.com. They pay here when they pick up. ' +
+      'Tickets show on the kitchen and bar screens 20 minutes before pick-up.</p>';
+    if (S.web.err) { h += '<p class="msg">' + esc(S.web.err) + '</p>'; }
+    if (!S.web.list.length) { h += '<div class="card"><p class="muted">No online orders waiting.</p></div>'; }
+    S.web.list.forEach(function (o) {
+      var ready = o.bar_done_at && o.kitchen_done_at, pick = new Date(o.pickup_at), today = JC.today(),
+        pd = pick.getFullYear() + '-' + ('0' + (pick.getMonth() + 1)).slice(-2) + '-' + ('0' + pick.getDate()).slice(-2);
+      h += '<div class="card web' + (ready ? ' ready' : '') + '"><div class="row"><b class="num">' + esc(o.number) + '</b><span class="grow"><b>' + esc(o.customer_name || '') + '</b>' +
+        '<small>Pick up ' + (pd === today ? '' : pd + ' ') + timeStr(o.pickup_at) + ' · ' + (o.order_type === 'togo' ? 'To go' : 'For here') + ' · ' + esc(o.customer_phone || '') + '</small></span>' +
+        '<span class="pill ' + (ready ? 'ok' : 'warn') + '">' + (ready ? 'Ready' : 'Not ready') + '</span><span class="amt">' + money(o.total) + '</span></div><ul class="wl">';
+      (o.order_items || []).forEach(function (i) { h += '<li>' + i.qty + ' × ' + esc(i.name) + (i.note ? ' <em>' + esc(i.note) + '</em>' : '') + '</li>'; });
+      h += '</ul>' + (o.note ? '<p class="wnote">“' + esc(o.note) + '”</p>' : '') + '<div class="row">' +
+        '<button class="btn primary" data-act="webpay" data-arg="' + o.id + '">Take payment</button><span class="grow"></span>' +
+        (S.staff && S.staff.role === 'manager' ? '<button class="btn soft" data-act="webvoid" data-arg="' + o.id + '">Cancel order</button>' : '') + '</div></div>';
+    });
+    return h + '</div>';
+  }
+  function webPay(id) {
+    var o = byId(S.web.list, id);
+    if (!o) { return; }
+    if (S.cart.lines.length && !w.confirm('Replace the order on the register with ' + o.number + '?')) { return; }
+    S.cart = { name: o.customer_name || '', online: { id: o.id, number: o.number }, lines: (o.order_items || []).map(function (i) {
+      var it = i.item_id ? byId(S.data.items, i.item_id) : null;
+      return { key: JC.uuid(), item_id: i.item_id, label: it ? nm(it.name) : i.name, name: i.name, price: Number(i.unit_price),
+        togo: it ? togoFor(it) : Number(i.togo_charge || 0), station: i.station, qty: i.qty, note: i.note || '' };
+    }) };
+    save('cart');
+    startPay();
+    S.pay.type = o.order_type; S.pay.step = 'method';
+    render();
+  }
+  function webVoid(id) {
+    if (!w.confirm('Cancel this online order? The customer sees that it was cancelled.')) { return; }
+    api('PATCH', 'orders?id=eq.' + id, { status: 'void', bar_done_at: new Date().toISOString(), kitchen_done_at: new Date().toISOString() }, function (err) {
+      if (err) { w.alert(S.online ? 'Couldn’t cancel. Try again.' : 'Cancelling needs internet.'); return; }
+      S.web.list = S.web.list.filter(function (o) { return o.id !== id; }); save('web'); render();
+    }, { Prefer: 'return=minimal' });
   }
 
   /* ───────────────────────── money math ───────────────────────── */
@@ -247,6 +303,7 @@
     else if (v === 'pay') { h = vPay(); }
     else if (v === 'done') { h = vDone(); }
     else if (v === 'orders') { h = vOrders(); }
+    else if (v === 'web') { h = vWeb(); }
     else if (v === 'station') { h = vStation(); }
     else if (v === 'manage') { h = vManage(); }
     else if (v === 'menu') { h = vMenuSheet(); }
@@ -334,7 +391,8 @@
     html = header('', null) + '<div class="reg' + (S.showTicket ? ' show-ticket' : '') + '">' +
       '<nav class="rail">' + cats.map(function (k) {
         return '<button class="cat' + (k.id === S.cat ? ' on' : '') + '" data-act="cat" data-arg="' + k.id + '"><span class="sw" style="background:' + esc(k.color) + '"></span>' + esc(nm(k.name)) + '</button>';
-      }).join('') + '<span class="grow"></span><button class="cat soft" data-act="orders">Recent orders</button></nav>' +
+      }).join('') + '<span class="grow"></span><button class="cat soft' + (webCount() ? ' webon' : '') + '" data-act="web">Online orders' + (webCount() ? ' · ' + webCount() : '') + '</button>' +
+      '<button class="cat soft" data-act="orders">Recent orders</button></nav>' +
       '<main class="items"><h1>' + esc(c ? nm(c.name) : 'No menu yet') + '</h1><div class="grid">';
     for (i = 0; i < items.length; i++) {
       var it = items[i], cnt = 0, j;
@@ -353,8 +411,13 @@
     var t = totals(S.cart, 'here'), lines = S.cart.lines, i, l, h;
     h = '<aside class="ticket"><div class="tk-head"><input id="cust" class="cust" placeholder="Customer name" value="' + esc(S.cart.name) + '" autocomplete="off">' +
       '<button class="btn ghost close-ticket" data-act="ticket">' + icon('x') + '</button></div><div class="lines">';
+    if (S.cart.online) { h += '<p class="webtag">Online order ' + esc(S.cart.online.number) + ' · paid as ordered</p>'; }
     for (i = 0; i < lines.length; i++) {
       l = lines[i];
+      if (S.cart.online) {
+        h += '<div class="line"><span class="ln"><b>' + esc(l.label) + '</b>' + (l.note ? '<em>' + esc(l.note) + '</em>' : '') + '</span><span class="q">' + l.qty + '</span><span class="lt">' + money(l.price * l.qty) + '</span></div>';
+        continue;
+      }
       h += '<div class="line"><button class="ln" data-act="note" data-arg="' + i + '"><b>' + esc(l.label) + '</b>' +
         (l.note ? '<em>' + esc(l.note) + '</em>' : '<small>tap to add a note</small>') + '</button>' +
         '<button class="qb" data-act="dec" data-arg="' + i + '" aria-label="Remove one">−</button><span class="q">' + l.qty + '</span>' +
@@ -369,6 +432,7 @@
   function addItem(id) {
     var it = byId(S.data.items, id), i, l;
     if (!it || !it.available) { return; }
+    if (S.cart.online) { w.alert('Finish or clear online order ' + S.cart.online.number + ' first.'); return; }
     for (i = 0; i < S.cart.lines.length; i++) {
       l = S.cart.lines[i];
       if (l.item_id === id && !l.note) { l.qty += 1; save('cart'); render(); return; }
@@ -466,8 +530,11 @@
     });
     given = p.method === 'card' ? t.grand : (p.method === 'cash_usd' ? r2(Number(p.given) * rt) : Number(p.given));
     change = p.method === 'card' ? 0 : r2(given - t.total);
+    var web = S.cart.online || null;
+    if (web) { id = web.id; hasBar = false; hasKitchen = false; }
     var job = {
-      order: { id: id, device: S.device.code, number: nextNumber(), customer_name: S.cart.name || null, order_type: p.type,
+      kind: web ? 'online' : 'pos',
+      order: { id: id, device: S.device.code, number: web ? web.number : nextNumber(), customer_name: S.cart.name || null, order_type: p.type,
         status: 'paid', subtotal: t.sub, togo_total: t.togo, tax: t.tax, tip: t.tip, total: t.grand,
         staff_name: S.staff ? S.staff.name : null, created_at: now, paid_at: now, has_bar: hasBar, has_kitchen: hasKitchen },
       items: items,
@@ -476,6 +543,7 @@
         card_ref: p.ref || null, created_at: now }]
     };
     S.queue.push(job); save('queue');
+    if (web) { S.web.list = S.web.list.filter(function (o) { return o.id !== web.id; }); save('web'); }
     S.orders.unshift({ order: job.order, items: items, payments: job.payments, lines: S.cart.lines.slice(), change: change, synced: false });
     if (S.orders.length > 150) { S.orders.length = 150; }
     save('orders');
@@ -558,8 +626,10 @@
   function stationPoll() {
     var st = S.device.mode, since = new Date(Date.now() - 12 * 3600000).toISOString(),
       col = st === 'bar' ? 'bar_done_at' : 'kitchen_done_at';
-    api('GET', 'orders?select=id,number,customer_name,order_type,created_at,order_items(name,qty,note,station,item_id)' +
-      '&status=eq.paid&' + col + '=is.null&created_at=gte.' + encodeURIComponent(since) + '&order=created_at.asc', null, function (err, data) {
+    var soon = new Date(Date.now() + 20 * 60000).toISOString();
+    api('GET', 'orders?select=id,number,customer_name,order_type,source,pickup_at,created_at,order_items(name,qty,note,station,item_id)' +
+      '&status=in.(paid,open)&' + col + '=is.null&created_at=gte.' + encodeURIComponent(new Date(Date.now() - 8 * 86400000).toISOString()) +
+      '&and=' + encodeURIComponent('(or(pickup_at.is.null,pickup_at.lte."' + soon + '"),or(source.eq.online,created_at.gte."' + since + '"))') + '&order=created_at.asc', null, function (err, data) {
       S.station.loaded = true;
       if (err) { S.station.err = S.online ? 'Could not load tickets' : 'Offline · showing the last tickets'; }
       else {
@@ -567,7 +637,11 @@
         S.station.tickets = (data || []).map(function (o) {
           o.order_items = (o.order_items || []).filter(function (i) { return i.station === st; });
           return o;
-        }).filter(function (o) { return o.order_items.length; });
+        }).filter(function (o) { return o.order_items.length; }).sort(function (a, b) {
+          var x = a.pickup_at ? new Date(a.pickup_at).getTime() - 20 * 60000 : new Date(a.created_at).getTime(),
+            y = b.pickup_at ? new Date(b.pickup_at).getTime() - 20 * 60000 : new Date(b.created_at).getTime();
+          return x - y;
+        });
       }
       if (S.view === 'station') { render(); }
     });
@@ -579,9 +653,10 @@
       (S.station.err ? '<span class="pill warn">' + esc(S.station.err) + '</span>' : '') +
       '<button class="btn ghost" data-act="devset">Device</button></header><div class="tickets">';
     S.station.tickets.forEach(function (o) {
-      var mins = Math.floor((now - new Date(o.created_at).getTime()) / 60000), tone = mins >= 15 ? 'late' : mins >= 8 ? 'warm' : 'fresh';
+      var start = o.pickup_at ? new Date(o.pickup_at).getTime() - 20 * 60000 : new Date(o.created_at).getTime(),
+        mins = Math.max(0, Math.floor((now - start) / 60000)), tone = mins >= 15 ? 'late' : mins >= 8 ? 'warm' : 'fresh';
       h += '<article class="tk ' + tone + '"><div class="tkh"><div><b>' + esc(o.customer_name || 'Order ' + o.number) + '</b><small>Order ' + esc(o.number) +
-        (o.order_type === 'togo' ? ' · <span class="togo">TO GO</span>' : '') + '</small></div><span class="age">' + mins + ' min</span></div><ul>';
+        (o.order_type === 'togo' ? ' · <span class="togo">TO GO</span>' : '') + (o.source === 'online' ? ' · <span class="togo">ONLINE · pick up ' + timeStr(o.pickup_at) + '</span>' : '') + '</small></div><span class="age">' + mins + ' min</span></div><ul>';
       o.order_items.forEach(function (i) {
         var it = i.item_id ? byId(S.data.items, i.item_id) : null;
         h += '<li><b>' + i.qty + ' × ' + esc(it ? nm(it.name) : i.name) + '</b>' + (i.note ? '<em>' + esc(i.note) + '</em>' : '') + '</li>';
@@ -601,16 +676,48 @@
   /* ───────────────────────── manage (manager only) ───────────────────────── */
   function vManage() {
     var m = S.manage, h = header('Manage', 'back') + '<div class="manage"><nav class="rail">' +
-      [['menu', 'Menu'], ['staff', 'Staff'], ['money', 'Money & hours'], ['today', 'Today'], ['device', 'This device']].map(function (t) {
+      [['site', 'Open / closed'], ['menu', 'Menu'], ['staff', 'Staff'], ['money', 'Money & hours'], ['today', 'Today'], ['device', 'This device']].map(function (t) {
         return '<button class="cat' + (m.tab === t[0] ? ' on' : '') + '" data-act="mtab" data-arg="' + t[0] + '">' + t[1] + '</button>';
       }).join('') + '</nav><main class="mbody">';
     if (!S.online && m.tab !== 'device') { h += '<p class="msg">You’re offline. Changes here need internet.</p>'; }
-    if (m.tab === 'menu') { h += mMenu(); }
+    if (m.tab === 'site') { h += mSite(); }
+    else if (m.tab === 'menu') { h += mMenu(); }
     else if (m.tab === 'staff') { h += mStaff(); }
     else if (m.tab === 'money') { h += mMoney(); }
     else if (m.tab === 'today') { h += mToday(); }
     else { h += mDevice(); }
     return h + '</main></div>';
+  }
+
+  function mSite() {
+    var st = settings(), today = JC.today(), closed = !!(st.closed_until && today <= st.closed_until), tomorrow = new Date(), h;
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    var tm = tomorrow.getFullYear() + '-' + ('0' + (tomorrow.getMonth() + 1)).slice(-2) + '-' + ('0' + tomorrow.getDate()).slice(-2);
+    h = '<h1>Open / closed</h1><p class="muted">What josiescafe.com says right now. Regular hours are in Money &amp; hours.</p>';
+    h += '<div class="card form"><p class="lbl">Right now</p><p class="bigstate ' + (closed ? 'closed' : 'open') + '">' +
+      (closed ? (st.closed_until === today ? 'Closed today' : 'Closed through ' + esc(st.closed_until)) : 'Normal hours') + '</p>';
+    if (closed) {
+      h += (st.closed_note ? '<p>Note on the website: “' + esc(st.closed_note) + '”</p>' : '') +
+        '<button class="btn primary big" data-act="reopen">We’re open again</button>';
+    } else {
+      h += '<label>Note for customers (optional)<input id="s_note" maxlength="90" placeholder="Boat’s late, back tomorrow!"></label>' +
+        '<div class="row"><button class="btn primary big" data-act="closetoday">Close for today</button></div>' +
+        '<div class="row2" style="margin-top:12px"><label>Or closed through<input id="s_until" type="date" min="' + today + '" value="' + tm + '"></label>' +
+        '<label>&nbsp;<button class="btn soft" data-act="closeuntil" style="width:100%">Close through this day</button></label></div>';
+    }
+    h += '</div><div class="card form"><p class="lbl">Online orders</p><div class="row"><span class="grow">' +
+      (st.online_orders === false ? 'Paused. The website says to come to the counter.' : 'On. People can order ahead on josiescafe.com.') + '</span>' +
+      '<button class="btn ' + (st.online_orders === false ? 'primary' : 'soft') + '" data-act="weborders">' + (st.online_orders === false ? 'Turn on' : 'Pause') + '</button></div></div>' +
+      '<p id="siteMsg" class="msg"></p>';
+    return h;
+  }
+  function saveSite(body) {
+    body.updated_at = new Date().toISOString();
+    var msg = $('siteMsg'); if (msg) { msg.innerHTML = 'Saving…'; }
+    api('PATCH', 'settings?id=eq.1', body, function (err) {
+      if (err) { if ($('siteMsg')) { $('siteMsg').innerHTML = 'Couldn’t save (needs internet).'; } return; }
+      loadData(function () { render(); });
+    }, { Prefer: 'return=minimal' });
   }
 
   function mMenu() {
@@ -843,7 +950,7 @@
       case 'dec': if (S.cart.lines[+arg].qty > 1) { S.cart.lines[+arg].qty -= 1; } else { S.cart.lines.splice(+arg, 1); } save('cart'); render(); break;
       case 'note': var n = w.prompt('Note for the kitchen/bar (e.g. no onion, oat milk)', S.cart.lines[+arg].note || '');
         if (n !== null) { S.cart.lines[+arg].note = n; save('cart'); render(); } break;
-      case 'clear': if (!S.cart.lines.length || w.confirm('Clear this order?')) { S.cart = { name: '', lines: [] }; save('cart'); render(); } break;
+      case 'clear': if (!S.cart.lines.length || w.confirm(S.cart.online ? 'Put online order ' + S.cart.online.number + ' back in the online list?' : 'Clear this order?')) { S.cart = { name: '', lines: [] }; save('cart'); render(); } break;
       case 'ticket': S.showTicket = !S.showTicket; render(); break;
       case 'pay': startPay(); break;
       case 'ptype': S.pay.type = arg; S.pay.step = 'method'; render(); break;
@@ -857,11 +964,19 @@
       case 'back':
         if (S.view === 'pay' && S.pay && S.pay.step === 'method') { S.pay.step = 'type'; render(); }
         else if (S.view === 'manage' && S.manage.edit) { S.manage.edit = null; render(); }
+        else if (S.view === 'pay' && S.cart.online) { S.pay = null; go('register'); }
         else { go(S.device.mode === 'register' ? 'register' : 'station'); }
         break;
       case 'neworder': go('register'); break;
       case 'print': printReceipt(arg); break;
       case 'orders': go('orders'); break;
+      case 'web': go('web'); webPoll(); break;
+      case 'webpay': webPay(arg); break;
+      case 'webvoid': webVoid(arg); break;
+      case 'closetoday': saveSite({ closed_until: JC.today(), closed_note: ($('s_note') && $('s_note').value) || '' }); break;
+      case 'closeuntil': if ($('s_until') && $('s_until').value) { saveSite({ closed_until: $('s_until').value, closed_note: ($('s_note') && $('s_note').value) || '' }); } break;
+      case 'reopen': saveSite({ closed_until: null, closed_note: '' }); break;
+      case 'weborders': saveSite({ online_orders: settings().online_orders === false }); break;
       case 'void': voidOrder(arg); break;
       case 'bump': bump(arg); break;
       case 'menu': go('menu'); break;
@@ -930,6 +1045,8 @@
     }
     ping();
     w.setInterval(ping, 8000);
+    webPoll();
+    w.setInterval(function () { if (S.online && S.view !== 'pay') { webPoll(); } }, 20000);
     w.setInterval(function () { if (S.online && S.session && S.view !== 'pay' && !(S.view === 'manage' && S.manage.edit)) { loadData(); } }, 90000);
     // Keep station ticket ages fresh and show the new day's state.
     if ('serviceWorker' in w.navigator) {
