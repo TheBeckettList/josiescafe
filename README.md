@@ -1,7 +1,7 @@
 # Josie's Cafe — website + POS (MVP)
 
 - The whole website is static files, no build step. Publish the repo root as josiescafe.com.
-  - `/` home: open/closed right now, hours, where to find us (10 languages)
+  - `/` home: open/closed right now, hours, where to find us (11 languages)
   - `/menu/` the menu, read live from the same tables the POS edits (sold out shows straight away)
   - `/order/` order ahead: pick-up time, here or to go, pay at the counter
   - `/pos/` the POS: register, payment, kitchen/bar screens, manager screens

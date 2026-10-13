@@ -65,6 +65,7 @@
     { code: 'it', label: 'Italiano' },
     { code: 'pt', label: 'Português (BR)' },
     { code: 'nb', label: 'Norsk' },
+    { code: 'ga', label: 'Gaeilge' },
     { code: 'he', label: 'עברית' }
   ];
   JC.fallbacks = function (lang) {
