@@ -1,7 +1,7 @@
 /* Lets the POS open with no internet (iOS 11.3+, Android, desktop).
    App files: served from the device at once, refreshed in the background.
    Supabase calls are never cached here; the app keeps its own offline copy. */
-var CACHE = 'josies-pos-v2';
+var CACHE = 'josies-pos-v3';
 var SHELL = ['./', './index.html', './pos.css', './pos.js', './manifest.json', '../js/api.js', '../img/logo.png', '../img/icon-180.png'];
 
 self.addEventListener('install', function (e) {

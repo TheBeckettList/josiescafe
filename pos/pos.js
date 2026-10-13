@@ -4,7 +4,7 @@
 (function (w, d, JC) {
   'use strict';
 
-  var APP_VERSION = '1.1.0';
+  var APP_VERSION = '1.1.1';
   var app = d.getElementById('app');
 
   /* ───────────────────────── state ───────────────────────── */
@@ -308,7 +308,30 @@
     else if (v === 'manage') { h = vManage(); }
     else if (v === 'menu') { h = vMenuSheet(); }
     app.innerHTML = h;
+    if (S.view === 'register') { fitTiles(); }
   }
+
+  /* Shrink long item names until they fit above the price (any length, any screen, old iPads too). */
+  function fitTiles() {
+    var names = app.querySelectorAll('.tile .tn'), i, el, tile, room, size;
+    for (i = 0; i < names.length; i++) {
+      el = names[i];
+      tile = el.parentNode;
+      el.style.fontSize = '';
+      var price = tile.querySelector('.tp');
+      room = price ? price.offsetTop - el.offsetTop - 4 : tile.clientHeight - 48;   // the real gap above the price
+      size = 19;
+      while (el.scrollHeight > room && size > 12) {
+        size -= 1;
+        el.style.fontSize = size + 'px';
+        el.style.lineHeight = '1.1';
+      }
+      // Last resort for very long names: cut off cleanly above the price instead of overlapping it.
+      el.style.maxHeight = el.scrollHeight > room ? room + 'px' : '';
+    }
+  }
+  w.addEventListener('resize', function () { if (S.view === 'register') { fitTiles(); } }, false);
+  w.addEventListener('orientationchange', function () { w.setTimeout(function () { if (S.view === 'register') { fitTiles(); } }, 300); }, false);
 
   /* ── first-time device setup ── */
   function vSetup() {
