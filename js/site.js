@@ -7,12 +7,16 @@
   /* ───────────── words (10 languages; English is the source) ───────────── */
   var T = {
     en: {
+      mapEast: 'Airport',
+      mapBay: 'UTILA BAY',
+      mapDock: 'Ferry dock',
+      findP: 'Off the ferry and you’re practically at our door.',
       tagline: 'Coffee · Breakfast · Lunch', home: 'Home', menu: 'Menu', order: 'Order', lang: 'Language',
       little: 'A little bit', ofhome: 'of home.',
       lead: 'Coffee’s on before the sun is. Come as you are, sandy feet and all, and stay as long as you like.',
       orderAhead: 'Order ahead', seeMenu: 'See the menu',
       b1h: 'Before the boat', b1p: 'Order the night before. It’ll be warm and waiting on your way to the dock.',
-      b2h: 'Stay a while', b2p: 'Benches, plants and Wi-Fi. Bring a book and take your time.',
+      b2h: 'Stay a while', b2p: 'Cool inside or breezy out, a chair or a picnic bench. Settle in and take your time.',
       b3h: 'Lunch, too', b3p: 'Bagel sandwiches, chicken burgers, a big Caesar, and a Sunset smoothie to finish.',
       hours: 'Hours', hoursH: 'Mornings, mostly', hnTime: 'Honduras time. If anything changes, you’ll see it here first.', find: 'Find us', findH: 'Right by the ferry dock',
       pay: 'Lempiras, dollars or card, whatever’s in your pocket.', map: 'Open in Maps', closedDay: 'Closed',
@@ -36,12 +40,16 @@
       orderNo: 'Order {n}', pickupWhen: 'Pick up {w}.', sent: 'Sent', ready: 'Ready', another: 'Start another order'
     },
     es: {
+      mapEast: 'Aeropuerto',
+      mapBay: 'BAHÍA DE UTILA',
+      mapDock: 'Muelle del ferry',
+      findP: 'Bajas del ferry y ya casi estás en nuestra puerta.',
       tagline: 'Café · Desayuno · Almuerzo', home: 'Inicio', menu: 'Menú', order: 'Pedir', lang: 'Idioma',
       little: 'Un poquito', ofhome: 'de hogar.',
       lead: 'El café está listo antes que el sol. Ven como estés, con arena en los pies, y quédate el tiempo que quieras.',
       orderAhead: 'Pide antes', seeMenu: 'Ver el menú',
       b1h: 'Antes del bote', b1p: 'Pide la noche antes. Te espera calientito camino al muelle.',
-      b2h: 'Quédate un rato', b2p: 'Bancas, plantas y Wi-Fi. Trae un libro y tómate tu tiempo.',
+      b2h: 'Quédate un rato', b2p: 'Fresco adentro o con brisa afuera, en silla o en mesa de picnic. Acomódate y tómate tu tiempo.',
       b3h: 'Almuerzo también', b3p: 'Sándwiches de bagel, hamburguesas de pollo, una buena César y un batido Sunset para cerrar.',
       hours: 'Horario', hoursH: 'Sobre todo mañanas', hnTime: 'Hora de Honduras. Si algo cambia, lo verás aquí primero.', find: 'Dónde estamos', findH: 'Junto al muelle del ferry',
       pay: 'Lempiras, dólares o tarjeta, lo que traigas en el bolsillo.', map: 'Abrir en Mapas', closedDay: 'Cerrado',
@@ -65,12 +73,16 @@
       orderNo: 'Pedido {n}', pickupWhen: 'Recoger {w}.', sent: 'Enviado', ready: 'Listo', another: 'Hacer otro pedido'
     },
     fr: {
+      mapEast: 'Aéroport',
+      mapBay: 'BAIE D’UTILA',
+      mapDock: 'Quai du ferry',
+      findP: 'Vous descendez du ferry et vous êtes presque à notre porte.',
       tagline: 'Café · Petit-déjeuner · Déjeuner', home: 'Accueil', menu: 'Menu', order: 'Commander', lang: 'Langue',
       little: 'Un petit peu', ofhome: 'de chez soi.',
       lead: 'Le café est prêt avant le soleil. Venez comme vous êtes, les pieds pleins de sable, et restez aussi longtemps que vous voulez.',
       orderAhead: 'Commander à l’avance', seeMenu: 'Voir le menu',
       b1h: 'Avant le bateau', b1p: 'Commandez la veille. Ce sera chaud et prêt en allant au quai.',
-      b2h: 'Restez un moment', b2p: 'Des bancs, des plantes et du Wi-Fi. Apportez un livre et prenez votre temps.',
+      b2h: 'Restez un moment', b2p: 'Au frais dedans ou dans la brise dehors, sur une chaise ou un banc de pique-nique. Installez-vous et prenez votre temps.',
       b3h: 'Le déjeuner aussi', b3p: 'Bagels garnis, burgers au poulet, une belle César et un smoothie Sunset pour finir.',
       hours: 'Horaires', hoursH: 'Surtout le matin', hnTime: 'Heure du Honduras. Si quelque chose change, vous le verrez ici en premier.', find: 'Nous trouver', findH: 'Juste à côté du quai du ferry',
       pay: 'Lempiras, dollars ou carte, ce que vous avez en poche.', map: 'Ouvrir dans Plans', closedDay: 'Fermé',
@@ -94,12 +106,16 @@
       orderNo: 'Commande {n}', pickupWhen: 'Retrait {w}.', sent: 'Envoyée', ready: 'Prête', another: 'Nouvelle commande'
     },
     de: {
+      mapEast: 'Flughafen',
+      mapBay: 'BUCHT VON UTILA',
+      mapDock: 'Fähranleger',
+      findP: 'Runter von der Fähre, und du stehst fast schon vor unserer Tür.',
       tagline: 'Kaffee · Frühstück · Mittagessen', home: 'Start', menu: 'Speisekarte', order: 'Bestellen', lang: 'Sprache',
       little: 'Ein kleines Stück', ofhome: 'Zuhause.',
       lead: 'Der Kaffee ist vor der Sonne wach. Komm, wie du bist, mit Sand an den Füßen, und bleib, so lange du magst.',
       orderAhead: 'Vorbestellen', seeMenu: 'Zur Speisekarte',
       b1h: 'Vor dem Boot', b1p: 'Am Abend vorher bestellen. Auf dem Weg zum Steg wartet es warm auf dich.',
-      b2h: 'Bleib ein bisschen', b2p: 'Bänke, Pflanzen und WLAN. Bring ein Buch mit und lass dir Zeit.',
+      b2h: 'Bleib ein bisschen', b2p: 'Kühl drinnen oder mit Brise draußen, auf dem Stuhl oder an der Picknickbank. Mach es dir bequem und lass dir Zeit.',
       b3h: 'Auch Mittagessen', b3p: 'Bagel-Sandwiches, Chicken-Burger, ein großer Caesar und zum Schluss ein Sunset-Smoothie.',
       hours: 'Öffnungszeiten', hoursH: 'Vor allem morgens', hnTime: 'Honduras-Zeit. Wenn sich etwas ändert, siehst du es hier zuerst.', find: 'So findest du uns', findH: 'Direkt am Fähranleger',
       pay: 'Lempira, Dollar oder Karte, was eben in der Tasche ist.', map: 'In Karten öffnen', closedDay: 'Geschlossen',
@@ -123,12 +139,16 @@
       orderNo: 'Bestellung {n}', pickupWhen: 'Abholen {w}.', sent: 'Gesendet', ready: 'Fertig', another: 'Neue Bestellung'
     },
     nl: {
+      mapEast: 'Vliegveld',
+      mapBay: 'BAAI VAN UTILA',
+      mapDock: 'Veersteiger',
+      findP: 'Van de veerboot af en je staat zo goed als voor onze deur.',
       tagline: 'Koffie · Ontbijt · Lunch', home: 'Home', menu: 'Menu', order: 'Bestellen', lang: 'Taal',
       little: 'Een klein beetje', ofhome: 'thuis.',
       lead: 'De koffie staat klaar voor de zon op is. Kom zoals je bent, met zand aan je voeten, en blijf zo lang je wilt.',
       orderAhead: 'Vooruit bestellen', seeMenu: 'Bekijk het menu',
       b1h: 'Voor de boot', b1p: 'Bestel de avond ervoor. Het staat warm klaar op weg naar de steiger.',
-      b2h: 'Blijf even', b2p: 'Bankjes, planten en wifi. Neem een boek mee en neem je tijd.',
+      b2h: 'Blijf even', b2p: 'Koel binnen of in de bries buiten, op een stoel of aan de picknicktafel. Ga lekker zitten en neem je tijd.',
       b3h: 'Ook lunch', b3p: 'Bagelsandwiches, kipburgers, een flinke Caesar en een Sunset-smoothie toe.',
       hours: 'Openingstijden', hoursH: 'Vooral ’s ochtends', hnTime: 'Hondurese tijd. Verandert er iets, dan zie je het hier als eerste.', find: 'Waar we zijn', findH: 'Vlak bij de veersteiger',
       pay: 'Lempira, dollars of kaart, wat je maar bij je hebt.', map: 'Openen in Kaarten', closedDay: 'Gesloten',
@@ -155,16 +175,20 @@
       tagline: 'Koffie · Ontbijt · Lunch', home: 'Home', menu: 'Menu', order: 'Bestellen', lang: 'Taal',
       little: 'Een klein beetje', ofhome: 'thuis.',
       lead: 'De koffie staat klaar voor de zon op is. Kom zoals ge zijt, met zand aan uw voeten, en blijf zo lang ge wilt.',
-      b2p: 'Bankskes, planten en wifi. Breng een boek mee en neem uw tijd.',
+      b2p: 'Koel binnen of in de bries buiten, op een stoel of aan de picknicktafel. Zet u en neem uw tijd.',
       menuH: 'Wat er op het vuur staat', yourOrder: 'Uw bestelling', details: 'Uw gegevens', note: 'Nog iets?'
     },
     it: {
+      mapEast: 'Aeroporto',
+      mapBay: 'BAIA DI UTILA',
+      mapDock: 'Molo del traghetto',
+      findP: 'Scendi dal traghetto e sei praticamente alla nostra porta.',
       tagline: 'Caffè · Colazione · Pranzo', home: 'Home', menu: 'Menù', order: 'Ordina', lang: 'Lingua',
       little: 'Un pezzettino', ofhome: 'di casa.',
       lead: 'Il caffè è pronto prima del sole. Vieni come sei, con la sabbia ai piedi, e resta quanto vuoi.',
       orderAhead: 'Ordina prima', seeMenu: 'Guarda il menù',
       b1h: 'Prima della barca', b1p: 'Ordina la sera prima. Lo trovi caldo andando al molo.',
-      b2h: 'Resta un po’', b2p: 'Panche, piante e Wi-Fi. Porta un libro e prenditi il tuo tempo.',
+      b2h: 'Resta un po’', b2p: 'Al fresco dentro o alla brezza fuori, su una sedia o al tavolo da picnic. Mettiti comodo e prenditi il tuo tempo.',
       b3h: 'Anche pranzo', b3p: 'Bagel farciti, burger di pollo, una bella Caesar e uno smoothie Sunset per finire.',
       hours: 'Orari', hoursH: 'Soprattutto di mattina', hnTime: 'Ora dell’Honduras. Se cambia qualcosa, lo vedi prima qui.', find: 'Dove siamo', findH: 'Proprio accanto al molo del traghetto',
       pay: 'Lempira, dollari o carta, quello che hai in tasca.', map: 'Apri in Mappe', closedDay: 'Chiuso',
@@ -188,12 +212,16 @@
       orderNo: 'Ordine {n}', pickupWhen: 'Ritiro {w}.', sent: 'Inviato', ready: 'Pronto', another: 'Nuovo ordine'
     },
     pt: {
+      mapEast: 'Aeroporto',
+      mapBay: 'BAÍA DE UTILA',
+      mapDock: 'Píer da balsa',
+      findP: 'Desceu da balsa, já está praticamente na nossa porta.',
       tagline: 'Café · Café da manhã · Almoço', home: 'Início', menu: 'Cardápio', order: 'Pedir', lang: 'Idioma',
       little: 'Um pouquinho', ofhome: 'de casa.',
       lead: 'O café fica pronto antes do sol. Vem do jeito que você está, com areia no pé, e fica o quanto quiser.',
       orderAhead: 'Peça antes', seeMenu: 'Ver o cardápio',
       b1h: 'Antes do barco', b1p: 'Peça na noite anterior. Fica quentinho te esperando no caminho pro píer.',
-      b2h: 'Fique um pouco', b2p: 'Bancos, plantas e Wi-Fi. Traga um livro e fique à vontade.',
+      b2h: 'Fique um pouco', b2p: 'Fresquinho lá dentro ou na brisa lá fora, numa cadeira ou na mesa de piquenique. Se acomoda e fica à vontade.',
       b3h: 'Almoço também', b3p: 'Sanduíches de bagel, hambúrguer de frango, uma Caesar caprichada e uma vitamina Sunset pra fechar.',
       hours: 'Horários', hoursH: 'Principalmente de manhã', hnTime: 'Horário de Honduras. Se algo mudar, você vê aqui primeiro.', find: 'Onde estamos', findH: 'Pertinho do píer da balsa',
       pay: 'Lempiras, dólares ou cartão, o que tiver no bolso.', map: 'Abrir no Mapas', closedDay: 'Fechado',
@@ -217,12 +245,16 @@
       orderNo: 'Pedido {n}', pickupWhen: 'Retirada {w}.', sent: 'Enviado', ready: 'Pronto', another: 'Fazer outro pedido'
     },
     nb: {
+      mapEast: 'Flyplass',
+      mapBay: 'UTILA-BUKTA',
+      mapDock: 'Fergekai',
+      findP: 'Gå av ferja, så er du nesten på døra vår.',
       tagline: 'Kaffe · Frokost · Lunsj', home: 'Hjem', menu: 'Meny', order: 'Bestill', lang: 'Språk',
       little: 'Litt', ofhome: 'hjemme.',
       lead: 'Kaffen er klar før sola er oppe. Kom som du er, med sand på føttene, og bli så lenge du vil.',
       orderAhead: 'Forhåndsbestill', seeMenu: 'Se menyen',
       b1h: 'Før båten', b1p: 'Bestill kvelden før. Det står varmt og klart på vei til brygga.',
-      b2h: 'Bli en stund', b2p: 'Benker, planter og wifi. Ta med en bok og ta deg tid.',
+      b2h: 'Bli en stund', b2p: 'Kjølig inne eller i brisen ute, på en stol eller ved piknikbordet. Sett deg godt til rette og ta deg tid.',
       b3h: 'Lunsj også', b3p: 'Bagelsandwicher, kyllingburgere, en stor Caesar og en Sunset-smoothie til slutt.',
       hours: 'Åpningstider', hoursH: 'Mest om morgenen', hnTime: 'Honduras-tid. Hvis noe endrer seg, ser du det her først.', find: 'Finn oss', findH: 'Rett ved fergekaia',
       pay: 'Lempira, dollar eller kort, det du har i lomma.', map: 'Åpne i Kart', closedDay: 'Stengt',
@@ -246,12 +278,16 @@
       orderNo: 'Bestilling {n}', pickupWhen: 'Hent {w}.', sent: 'Sendt', ready: 'Klar', another: 'Ny bestilling'
     },
     ga: {
+      mapEast: 'Aerfort',
+      mapBay: 'CUAN UTILA',
+      mapDock: 'Cé an bháid',
+      findP: 'Amach den bhád farantóireachta agus beagnach ag ár ndoras atá tú.',
       tagline: 'Caife · Bricfeasta · Lón', home: 'Baile', menu: 'Biachlár', order: 'Ordaigh', lang: 'Teanga',
       little: 'Beagán', ofhome: 'den bhaile.',
       lead: 'Bíonn an caife réidh roimh an ngrian. Tar mar atá tú, gaineamh ar do chosa, agus fan chomh fada agus is mian leat.',
       orderAhead: 'Ordaigh roimh ré', seeMenu: 'Féach ar an mbiachlár',
       b1h: 'Roimh an mbád', b1p: 'Ordaigh an oíche roimh ré. Beidh sé te ag fanacht leat ar do bhealach chuig an gcé.',
-      b2h: 'Fan tamall', b2p: 'Binsí, plandaí agus Wi-Fi. Tabhair leabhar leat agus tóg do chuid ama.',
+      b2h: 'Fan tamall', b2p: 'Fionnuar istigh nó le leoithne amuigh, ar chathaoir nó ag bord picnice. Socraigh síos agus tóg do chuid ama.',
       b3h: 'Lón freisin', b3p: 'Ceapairí bagel, burgair sicín, Caesar mór agus smúitín Sunset le críochnú.',
       hours: 'Uaireanta', hoursH: 'Ar maidin den chuid is mó', hnTime: 'Am Hondúras. Má athraíonn aon rud, feicfidh tú anseo ar dtús é.', find: 'Cá bhfuilimid', findH: 'Díreach in aice le cé an bháid farantóireachta',
       pay: 'Lempira, dollair nó cárta, cibé atá i do phóca.', map: 'Oscail i Léarscáileanna', closedDay: 'Dúnta',
@@ -275,12 +311,16 @@
       orderNo: 'Ordú {n}', pickupWhen: 'Bailigh {w}.', sent: 'Seolta', ready: 'Réidh', another: 'Ordú eile'
     },
     he: {
+      mapEast: 'שדה התעופה',
+      mapBay: 'מפרץ אוטילה',
+      mapDock: 'רציף המעבורת',
+      findP: 'יורדים מהמעבורת וכמעט כבר אצלנו בדלת.',
       tagline: 'קפה · ארוחת בוקר · ארוחת צהריים', home: 'בית', menu: 'תפריט', order: 'הזמנה', lang: 'שפה',
       little: 'מרגישים', ofhome: 'בבית.',
       lead: 'הקפה מוכן עוד לפני השמש. בואו כמו שאתם, עם חול על הרגליים, ותישארו כמה שבא לכם.',
       orderAhead: 'להזמין מראש', seeMenu: 'לתפריט',
       b1h: 'לפני הסירה', b1p: 'מזמינים ערב קודם. זה מחכה לכם חם בדרך לרציף.',
-      b2h: 'להישאר קצת', b2p: 'ספסלים, צמחים ו-Wi-Fi. תביאו ספר ואל תמהרו.',
+      b2h: 'להישאר קצת', b2p: 'בפנים בצל או בחוץ ברוח, על כיסא או על ספסל פיקניק. תתמקמו ותיקחו את הזמן.',
       b3h: 'גם צהריים', b3p: 'כריכי בייגל, המבורגר עוף, סלט קיסר גדול ושייק Sunset לסיום.',
       hours: 'שעות פתיחה', hoursH: 'בעיקר בבקרים', hnTime: 'שעון הונדורס. אם משהו משתנה, תראו את זה כאן קודם.', find: 'איפה אנחנו', findH: 'ממש ליד רציף המעבורת',
       pay: 'למפירות, דולרים או אשראי, מה שיש בכיס.', map: 'פתיחה במפות', closedDay: 'סגור',
@@ -627,7 +667,7 @@
     }
     sel.onchange = function () { JC.set('lang', sel.value); w.location.search = '?lang=' + sel.value; };
     keys = d.querySelectorAll('[data-t]');
-    for (i = 0; i < keys.length; i++) { k = keys[i].getAttribute('data-t'); if (typeof t(k) === 'string') { keys[i].innerHTML = JC.esc(t(k)); } }
+    for (i = 0; i < keys.length; i++) { k = keys[i].getAttribute('data-t'); if (typeof t(k) === 'string') { keys[i].textContent = t(k); } }
     bounce();
     $('year').innerHTML = String(new Date().getFullYear());
     d.addEventListener('click', onClick, false);
