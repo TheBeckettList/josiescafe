@@ -387,7 +387,16 @@
       if (!failed) { D = fresh; JC.set('site.data', D); }
       cb(failed);
     }
-    JC.rest('GET', 'settings?select=hours,address,tax_rate,prices_include_tax,usd_fee,usd_rate_manual,closed_until,closed_note,online_orders', null, null, function (e, r) { fresh.settings = r && r[0]; done(e); });
+    JC.rest('GET', 'settings?select=hours,address,tax_rate,prices_include_tax,usd_fee,usd_rate_manual,closed_until,closed_note,online_orders', null, null, function (e, r) {
+      if (e && e.status === 400) {
+        // Database not updated to v1.1 yet (003_online_orders.sql): show hours and menu, keep ordering off.
+        JC.rest('GET', 'settings?select=hours,address,tax_rate,prices_include_tax,usd_fee,usd_rate_manual', null, null, function (e2, r2) {
+          fresh.settings = r2 && r2[0]; if (fresh.settings) { fresh.settings.online_orders = false; } done(e2);
+        });
+        return;
+      }
+      fresh.settings = r && r[0]; done(e);
+    });
     JC.rest('GET', 'categories?select=id,name,togo_charge,sort&order=sort.asc', null, null, function (e, r) { fresh.categories = r || []; done(e); });
     JC.rest('GET', 'items?select=id,category_id,name,description,price,togo_charge,available,sort&order=sort.asc', null, null, function (e, r) { fresh.items = r || []; done(e); });
     JC.rest('GET', 'fx_rates?select=day,bank_buy&order=day.desc&limit=7', null, null, function (e, r) { fresh.fx = r || []; done(e); });
