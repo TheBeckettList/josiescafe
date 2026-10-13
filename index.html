@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Josie's Cafe · Utila, Honduras</title>
+<meta name="description" content="Josie's Cafe in Utila, Honduras: coffee, breakfast and lunch. Menu in many languages.">
+<meta name="theme-color" content="#FCE3E8">
+<link rel="apple-touch-icon" href="/img/icon-180.png">
+<link rel="icon" href="/img/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap">
+<link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/"><img src="/img/logo.png" alt="" width="34" height="40"><span>Josie's</span></a>
+  <label class="langpick"><span class="sr" data-t="lang">Language</span>
+    <select id="lang" aria-label="Language"></select>
+  </label>
+</header>
+
+<main>
+  <section class="hero">
+    <img class="logo" src="/img/logo.png" alt="Josie's Cafe" width="206" height="240">
+    <p class="tagline" data-t="tagline">Coffee · Breakfast · Lunch</p>
+    <p id="status" class="status"><span class="dot"></span>&nbsp;</p>
+    <a class="cta" href="#menu" data-t="menu">Menu</a>
+  </section>
+
+  <section class="info">
+    <div class="card">
+      <h2 data-t="hours">Hours</h2>
+      <table class="hours"><tbody id="hours"></tbody></table>
+    </div>
+    <div class="card">
+      <h2 data-t="find">Find us</h2>
+      <p id="address" class="addr">Utila, Honduras</p>
+      <a class="maplink" href="https://maps.google.com/?q=Josie%27s+Cafe+Utila+Honduras" target="_blank" rel="noopener" data-t="map">Open in Maps</a>
+    </div>
+  </section>
+
+  <section class="menu" id="menu">
+    <h2 class="menu-title" data-t="menu">Menu</h2>
+    <p class="note" data-t="prices">Prices in lempiras (L).</p>
+    <nav id="catnav" class="catnav" aria-label="Menu sections"></nav>
+    <div id="menu-list"></div>
+    <p class="counter" data-t="counter">Order at the counter.</p>
+  </section>
+</main>
+
+<footer class="foot">© <span id="year">2026</span> Josie's Cafe · Utila, Honduras</footer>
+
+<script src="/js/api.js"></script>
+<script src="/js/site.js"></script>
+</body>
+</html>
