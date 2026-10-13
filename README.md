@@ -7,7 +7,7 @@
   - `/pos/` the POS: register, payment, kitchen/bar screens, manager screens
 - `supabase/001_schema.sql` — database (already run on project tuthebxguxvogmiowhcx)
 - `supabase/002_seed_menu.sql` — the SAMPLE menu (already loaded; edit or delete in POS › Manage › Menu)
-- `supabase/003_online_orders.sql` — **run this once** for v1.1: open/closed switch, online ordering, real hours
+- `supabase/003_online_orders.sql` + `004_tighten_online_functions.sql` — v1.1: open/closed switch, online ordering, real hours (both already applied to the live project)
 
 ## Online orders (v1.1)
 1. A customer orders on `/order/`. `place_online_order` re-prices everything from the menu (the browser's prices
