@@ -283,3 +283,16 @@ button[disabled] { opacity: .45; cursor: default; }
 .bigstate { font-family: 'Baloo 2', 'Nunito', sans-serif; font-size: 30px; font-weight: 800; margin: 0 0 12px; }
 .bigstate.closed { color: #B55573; }
 .bigstate.open { color: #3E8E7E; }
+
+/* v1.2 · pastry counts and ticket phones */
+.tile .tp .left { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: #FDEDF1; color: #8E4C66; font-size: 13px; vertical-align: 1px; }
+.tile .tp .left.zero { background: #B55573; color: #FFFFFF; }
+.pastries .mrow .qb { margin-left: 6px; }
+.pastries .mrow .btn.sm { margin-left: 10px; }
+input.stk { width: 64px; height: 44px; margin-left: 6px; border: 2px solid #F2D3DA; border-radius: 12px; text-align: center; font: 800 20px 'Baloo 2', 'Nunito', sans-serif; color: #5B3843; background: #FFFFFF; padding: 0; }
+input.stk.zero { border-color: #B55573; color: #B55573; }
+.pastnew { background: #FFF7F8; border-radius: 14px; padding: 12px; margin: 6px 0 10px; }
+.pastnew .row .btn { margin-left: 8px; -webkit-align-self: flex-end; align-self: flex-end; }
+.bigcode { font-family: 'Baloo 2', 'Nunito', sans-serif; font-size: 52px; font-weight: 800; letter-spacing: 6px; margin: 0 0 6px; color: #8E4C66; }
+.steps { margin: 0; padding-left: 22px; }
+.steps li { margin: 0 0 8px; }

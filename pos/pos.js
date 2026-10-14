@@ -4,7 +4,7 @@
 (function (w, d, JC) {
   'use strict';
 
-  var APP_VERSION = '1.1.1';
+  var APP_VERSION = '1.2.0';
   var app = d.getElementById('app');
 
   /* ───────────────────────── state ───────────────────────── */
@@ -62,6 +62,13 @@
     if (item.togo_charge !== null && item.togo_charge !== undefined && item.togo_charge !== '') { return Number(item.togo_charge); }
     var c = byId(S.data.categories, item.category_id);
     return c ? Number(c.togo_charge || 0) : 0;
+  }
+  function isCounted(item) { var c = byId(S.data.categories, item.category_id); return !!(c && c.counted); }
+  // Pastries and other counted items: how many are left, minus what's already in this order.
+  function leftOf(item) {
+    var n = Number(item.stock || 0), j;
+    for (j = 0; j < S.cart.lines.length; j++) { if (S.cart.lines[j].item_id === item.id) { n -= S.cart.lines[j].qty; } }
+    return n;
   }
   function stationFor(item) { var c = byId(S.data.categories, item.category_id); return c ? c.station : 'kitchen'; }
   function timeStr(iso) {
@@ -423,7 +430,8 @@
       html += '<button class="tile' + (it.available ? '' : ' out') + (cnt ? ' in' : '') + '" data-act="add" data-arg="' + it.id + '"' +
         (it.available ? '' : ' disabled') + ' style="border-top-color:' + esc(c.color) + '">' +
         '<span class="tn">' + esc(nm(it.name)) + '</span>' + (cnt ? '<span class="badge">' + cnt + '</span>' : '') +
-        '<span class="tp">' + (it.available ? money(it.price) : 'Sold out') + '</span></button>';
+        '<span class="tp">' + (it.available ? money(it.price) : 'Sold out') +
+        (it.available && isCounted(it) ? '<span class="left' + (leftOf(it) <= 0 ? ' zero' : '') + '">' + leftOf(it) + ' left</span>' : '') + '</span></button>';
     }
     if (!items.length) { html += '<p class="muted">Nothing here yet. Add items in Manage › Menu.</p>'; }
     html += '</div></main>' + vTicket() + '</div>' +
@@ -566,6 +574,10 @@
         card_ref: p.ref || null, created_at: now }]
     };
     S.queue.push(job); save('queue');
+    if (!web) {
+      S.cart.lines.forEach(function (l) { var it = byId(S.data.items, l.item_id); if (it && isCounted(it)) { it.stock = Number(it.stock || 0) - l.qty; } });
+      save('data');
+    }
     if (web) { S.web.list = S.web.list.filter(function (o) { return o.id !== web.id; }); save('web'); }
     S.orders.unshift({ order: job.order, items: items, payments: job.payments, lines: S.cart.lines.slice(), change: change, synced: false });
     if (S.orders.length > 150) { S.orders.length = 150; }
@@ -699,12 +711,14 @@
   /* ───────────────────────── manage (manager only) ───────────────────────── */
   function vManage() {
     var m = S.manage, h = header('Manage', 'back') + '<div class="manage"><nav class="rail">' +
-      [['site', 'Open / closed'], ['menu', 'Menu'], ['staff', 'Staff'], ['money', 'Money & hours'], ['today', 'Today'], ['device', 'This device']].map(function (t) {
+      [['site', 'Open / closed'], ['menu', 'Menu'], ['pastries', 'Pastries'], ['phones', 'Ticket phones'], ['staff', 'Staff'], ['money', 'Money & hours'], ['today', 'Today'], ['device', 'This device']].map(function (t) {
         return '<button class="cat' + (m.tab === t[0] ? ' on' : '') + '" data-act="mtab" data-arg="' + t[0] + '">' + t[1] + '</button>';
       }).join('') + '</nav><main class="mbody">';
     if (!S.online && m.tab !== 'device') { h += '<p class="msg">You’re offline. Changes here need internet.</p>'; }
     if (m.tab === 'site') { h += mSite(); }
     else if (m.tab === 'menu') { h += mMenu(); }
+    else if (m.tab === 'pastries') { h += mPastries(); }
+    else if (m.tab === 'phones') { h += mPhones(); }
     else if (m.tab === 'staff') { h += mStaff(); }
     else if (m.tab === 'money') { h += mMoney(); }
     else if (m.tab === 'today') { h += mToday(); }
@@ -787,7 +801,8 @@
         '<label>To-go charge per item (L)<input id="f_togo" type="number" inputmode="decimal" step="0.01" min="0" value="' + esc(rec.togo_charge) + '"></label></div>' +
         '<p class="lbl">Colour</p><div class="swatches">' + COLORS.map(function (c) {
           return '<button type="button" class="swatch' + (rec.color === c ? ' on' : '') + '" style="background:' + c + '" data-act="color" data-arg="' + c + '" aria-label="Colour ' + c + '"></button>';
-        }).join('') + '</div><label class="check"><input id="f_active" type="checkbox"' + (rec.active ? ' checked' : '') + '> Show this category</label>';
+        }).join('') + '</div><label class="check"><input id="f_active" type="checkbox"' + (rec.active ? ' checked' : '') + '> Show this category</label>' +
+        '<label class="check"><input id="f_counted" type="checkbox"' + (rec.counted ? ' checked' : '') + '> Count items, like pastries (online stops at 0)</label>';
     } else {
       h += '<div class="row2"><label>Price (L)<input id="f_price" type="number" inputmode="decimal" step="0.01" min="0" value="' + esc(rec.price) + '"></label>' +
         '<label>To-go charge (L, blank = category’s)<input id="f_togo" type="number" inputmode="decimal" step="0.01" min="0" value="' + (rec.togo_charge === null || rec.togo_charge === undefined ? '' : esc(rec.togo_charge)) + '"></label></div>' +
@@ -806,6 +821,7 @@
     if (!names.en) { $('editMsg').innerHTML = 'English name is required.'; return; }
     if (e.kind === 'cat') {
       body = { name: names, station: $('f_station').value, togo_charge: Number($('f_togo').value || 0), color: rec.color || COLORS[0], active: $('f_active').checked };
+      if ($('f_counted')) { body.counted = $('f_counted').checked; }
       if (!rec.id) { body.sort = S.data.categories.length + 1; }
       path = 'categories';
     } else {
@@ -940,6 +956,115 @@
     });
   }
 
+  /* ── Pastries: what came in today ── */
+  function countedCats() {
+    return S.data.categories.filter(function (c) { return c.counted; }).sort(function (a, b) { return a.sort - b.sort; });
+  }
+  function mPastries() {
+    var cats = countedCats(), m = S.manage, h = '<h1>Pastries</h1><p class="muted">Type how many came in. Every sale takes one off. ' +
+      'Online orders stop at 0; the register can still sell past 0.</p>';
+    if (!cats.length) { return h + '<p class="card">No counted section yet. In Menu, edit a category and tick “Count items”.</p>'; }
+    cats.forEach(function (c) {
+      var list = itemsIn(c.id, false);
+      h += '<div class="card form pastries"><div class="mhead"><b>' + esc(JC.tr(c.name, 'en')) + '</b>' +
+        '<button class="btn soft sm" data-act="pastnew" data-arg="' + c.id + '">+ Add pastry</button></div>';
+      if (m.past && m.past.cat === c.id) {
+        h += '<form id="pastForm" class="pastnew"><div class="row2"><label>Name<input id="p_name" maxlength="60" placeholder="e.g. Banana bread"></label>' +
+          '<label>Price (L)<input id="p_price" type="number" inputmode="decimal" step="0.01" min="0"></label></div>' +
+          '<div class="row"><label class="grow">How many came in<input id="p_count" type="number" inputmode="numeric" min="0" step="1" value="0"></label>' +
+          '<button type="button" class="btn soft" data-act="pastcancel">Cancel</button><button class="btn primary" type="submit">Add</button></div><p id="pastMsg" class="msg"></p></form>';
+      }
+      list.forEach(function (it) {
+        var n = Number(it.stock || 0);
+        h += '<div class="mrow' + (it.available ? '' : ' off') + '"><span class="grow">' + esc(JC.tr(it.name, 'en')) + '<small>' + money(it.price) + (it.available ? '' : ' · marked sold out') + '</small></span>' +
+          '<button class="qb" data-act="stk" data-arg="' + it.id + ':-1" aria-label="One less">−</button>' +
+          '<input class="stk' + (n <= 0 ? ' zero' : '') + '" data-stock="' + it.id + '" type="number" inputmode="numeric" step="1" value="' + n + '" aria-label="How many left">' +
+          '<button class="qb" data-act="stk" data-arg="' + it.id + ':1" aria-label="One more">+</button>' +
+          '<button class="btn soft sm" data-act="itemedit" data-arg="' + it.id + '">Edit</button></div>';
+      });
+      if (!list.length) { h += '<p class="muted">No pastries yet. Tap + Add pastry.</p>'; }
+      h += '</div>';
+    });
+    return h + '<p id="stkMsg" class="msg"></p>' + (m.edit ? editor() : '');
+  }
+  function stockStep(arg) {
+    var parts = arg.split(':'), it = byId(S.data.items, parts[0]), delta = Number(parts[1]);
+    if (!it) { return; }
+    it.stock = Number(it.stock || 0) + delta; save('data'); render();
+    api('POST', 'rpc/add_stock', { p_item: it.id, p_delta: delta }, function (err, v) {
+      if (err) { it.stock = Number(it.stock || 0) - delta; save('data'); render(); if ($('stkMsg')) { $('stkMsg').innerHTML = 'Needs internet to change counts.'; } return; }
+      if (typeof v === 'number') { it.stock = v; save('data'); }
+    });
+  }
+  function stockSet(id, val) {
+    var it = byId(S.data.items, id), n = parseInt(val, 10);
+    if (!it || isNaN(n)) { render(); return; }
+    var was = it.stock; it.stock = n; save('data');
+    api('PATCH', 'items?id=eq.' + id, { stock: n, updated_at: new Date().toISOString() }, function (err) {
+      if (err) { it.stock = was; save('data'); render(); if ($('stkMsg')) { $('stkMsg').innerHTML = 'Needs internet to change counts.'; } return; }
+      render();
+    }, { Prefer: 'return=minimal' });
+  }
+  function addPastry() {
+    var name = $('p_name').value.replace(/^\s+|\s+$/g, ''), price = $('p_price').value, cnt = parseInt($('p_count').value || '0', 10), cat = S.manage.past.cat;
+    if (!name) { $('pastMsg').innerHTML = 'Name is required.'; return; }
+    if (price === '' || isNaN(Number(price))) { $('pastMsg').innerHTML = 'Price is required.'; return; }
+    $('pastMsg').innerHTML = 'Saving…';
+    api('POST', 'items', { name: { en: name }, price: Number(price), category_id: cat, stock: isNaN(cnt) ? 0 : cnt, show_online: true, available: true, active: true,
+      sort: itemsIn(cat, true).length + 1 }, function (err) {
+      if (err) { $('pastMsg').innerHTML = S.online ? 'Couldn’t save. Try again.' : 'You’re offline. This needs internet.'; return; }
+      S.manage.past = null;
+      loadData(function () { render(); });
+    }, { Prefer: 'return=minimal' });
+  }
+  // Keep pastry counts fresh on every tablet (online orders and other registers take from them too).
+  function stockPoll() {
+    if (!S.online || !S.session || !countedCats().length || S.view === 'pay') { return; }
+    api('GET', 'items?select=id,stock&stock=not.is.null', null, function (err, rows) {
+      if (err || !rows) { return; }
+      var changed = false;
+      rows.forEach(function (r) { var it = byId(S.data.items, r.id); if (it && it.stock !== r.stock) { it.stock = r.stock; changed = true; } });
+      if (!changed) { return; }
+      save('data');
+      var a = d.activeElement, typing = a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA');
+      if (!typing && (S.view === 'register' || (S.view === 'manage' && S.manage.tab === 'pastries' && !S.manage.edit && !S.manage.past))) { render(); }
+    });
+  }
+
+  /* ── Ticket phones: kitchen and bar tickets on staff phones ── */
+  function loadPhones() {
+    S.phones = { code: '', counts: null, err: '' };
+    api('GET', 'ticket_link?select=code', null, function (err, rows) {
+      if (err || !rows || !rows[0]) { S.phones.err = S.online ? 'Couldn’t load the code. Has the 006 database update been run?' : 'Needs internet.'; }
+      else { S.phones.code = rows[0].code; }
+      if (S.view === 'manage' && S.manage.tab === 'phones') { render(); }
+    });
+    api('POST', 'rpc/tickets_phones', {}, function (err, c) {
+      if (!err && c) { S.phones.counts = c; if (S.view === 'manage' && S.manage.tab === 'phones') { render(); } }
+    });
+  }
+  function mPhones() {
+    var p = S.phones || { code: '' }, code = p.code ? p.code.slice(0, 3) + ' ' + p.code.slice(3) : '…', c = p.counts;
+    return '<h1>Ticket phones</h1><p class="muted">Cooks and baristas see their station’s tickets on their own phones, and each new ticket buzzes the phone. Nothing to tap or mark.</p>' +
+      '<div class="card form"><p class="lbl">Ticket code</p><p class="bigcode">' + esc(code) + '</p>' +
+      (c ? '<p>Phones with alerts on: <b>Kitchen ' + c.kitchen + '</b> · <b>Bar ' + c.bar + '</b></p>' : '') +
+      (p.err ? '<p class="msg">' + esc(p.err) + '</p>' : '') +
+      '<div class="row"><button class="btn soft" data-act="newcode"' + (p.code ? '' : ' disabled') + '>New code</button><span class="muted tiny grow">A new code signs every phone out and stops their alerts. Use it when someone leaves.</span></div></div>' +
+      '<div class="card form"><p class="lbl">Set up a phone</p><ol class="steps">' +
+      '<li>On the phone, open <b>josiescafe.com/pos</b></li>' +
+      '<li>Pick <b>Kitchen</b> or <b>Bar</b> and type the code</li>' +
+      '<li><b>Android:</b> tap <b>Turn on alerts</b> and allow</li>' +
+      '<li><b>iPhone</b> (iOS 16.4 or newer): tap Share › <b>Add to Home Screen</b>, open <b>Josie’s Tickets</b> from the home screen, then tap <b>Turn on alerts</b></li>' +
+      '</ol><p class="muted tiny">Alerts need internet on the phone (Wi-Fi or data). Tablets keep opening the full POS.</p></div>';
+  }
+  function newCode() {
+    if (!w.confirm('Make a new ticket code? Every phone will need the new code, and their alerts stop until they sign in again.')) { return; }
+    api('POST', 'rpc/tickets_new_code', {}, function (err, code) {
+      if (err) { w.alert('Needs internet.'); return; }
+      S.phones.code = code; S.phones.counts = { kitchen: 0, bar: 0 }; render();
+    });
+  }
+
   function mDevice() {
     var dv = S.device;
     return '<h1>This device</h1><div class="card form"><p>Signed in as <b>' + esc(S.session ? S.session.email : '—') + '</b> · device ' + esc(dv.code) + ' · v' + APP_VERSION + '</p>' +
@@ -1007,7 +1132,11 @@
       case 'refresh': loadData(function (f) { w.alert(f ? 'Couldn’t refresh (offline?). Using the saved menu.' : 'Menu updated.'); render(); }); break;
       case 'logout': S.staff = null; save('staff'); go('login'); break;
       case 'syncinfo': w.alert(S.syncErr); break;
-      case 'mtab': S.manage.tab = arg; S.manage.edit = null; if (arg === 'today') { S.report = null; } render(); break;
+      case 'mtab': S.manage.tab = arg; S.manage.edit = null; S.manage.past = null; if (arg === 'today') { S.report = null; } if (arg === 'phones') { loadPhones(); } render(); break;
+      case 'stk': stockStep(arg); break;
+      case 'pastnew': S.manage.past = { cat: arg }; render(); if ($('p_name')) { $('p_name').focus(); } break;
+      case 'pastcancel': S.manage.past = null; render(); break;
+      case 'newcode': newCode(); break;
       case 'mcat': S.manage.cat = arg; render(); break;
       case 'catnew': S.manage.edit = { kind: 'cat', rec: { name: {}, station: 'kitchen', togo_charge: 0, color: COLORS[0], active: true } }; render(); break;
       case 'catedit': S.manage.edit = { kind: 'cat', rec: JSON.parse(JSON.stringify(byId(S.data.categories, arg))) }; render(); break;
@@ -1041,6 +1170,7 @@
     if (id === 'setupForm') { doSetup(); }
     else if (id === 'editForm') { saveEditor(); }
     else if (id === 'moneyForm') { saveMoney(); }
+    else if (id === 'pastForm') { addPastry(); }
   }
   function onInput(ev) {
     var el = ev.target;
@@ -1060,6 +1190,14 @@
     app.addEventListener('click', onClick, false);
     app.addEventListener('submit', onSubmit, true);
     app.addEventListener('input', onInput, false);
+    app.addEventListener('change', function (ev) {
+      var el = ev.target, id = el.getAttribute && el.getAttribute('data-stock');
+      if (id) { stockSet(id, el.value); }
+    }, false);
+    // Phones open the read-only ticket view (kitchen/bar). Tablets and computers get the POS.
+    // A phone that has been set up as a register, or chose to be one, stays on the POS.
+    var small = Math.min(w.screen.width || 9999, w.screen.height || 9999) < 600;
+    if (small && !S.device && !JC.get('pos.phoneRegister', false)) { w.location.replace('tickets/'); return; }
     if (!S.session || !S.device) { go('setup'); }
     else if (S.device.mode !== 'register') { go('station'); }
     else { go(S.staff ? 'register' : 'login'); }
@@ -1070,6 +1208,7 @@
     w.setInterval(ping, 8000);
     webPoll();
     w.setInterval(function () { if (S.online && S.view !== 'pay') { webPoll(); } }, 20000);
+    w.setInterval(stockPoll, 20000);
     w.setInterval(function () { if (S.online && S.session && S.view !== 'pay' && !(S.view === 'manage' && S.manage.edit)) { loadData(); } }, 90000);
     // Keep station ticket ages fresh and show the new day's state.
     if ('serviceWorker' in w.navigator) {

@@ -186,3 +186,5 @@ textarea { min-height: 76px; resize: vertical; }
   .langpick select { max-width: 92px; padding: 6px 8px; margin-left: 6px; }
   .pagehead .hand { font-size: 26px; }
 }
+.pr .left { display: block; font-size: 12px; font-weight: 800; color: #B55573; margin-top: 2px; }
+.qty button[disabled] { opacity: .35; cursor: default; }

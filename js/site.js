@@ -24,7 +24,7 @@
       openUntil: 'Come on in · open until {t}', opensToday: 'Opens at {t} today', backAt: 'Closed for now · back {d} at {t}', closedNow: 'Closed for a little while',
       today: 'today', tomorrow: 'tomorrow',
       menuH: 'What’s cooking', menuHand: 'made this morning.', prices: 'Prices in lempiras (L). We take US dollars and cards too.',
-      soldout: 'Out today', add: '+ Add', viewOrder: 'View order', loading: 'Loading the menu…', error: 'The menu couldn’t load. Please try again in a moment.',
+      soldout: 'Out today', left: '{n} left', add: '+ Add', viewOrder: 'View order', loading: 'Loading the menu…', error: 'The menu couldn’t load. Please try again in a moment.',
       orderH: 'Pick it up hot', yourOrder: 'Your order', empty: 'Nothing yet. Pick a few things from the menu.', addMore: 'Add from the menu',
       subtotal: 'Food & drinks', togoCharges: 'To-go cups & boxes', isv: 'ISV', total: 'Total',
       details: 'Your details', name: 'Name', phone: 'WhatsApp number', phoneHelp: 'Only if something’s wrong with your order.',
@@ -57,7 +57,7 @@
       openUntil: 'Pasa adelante · abierto hasta las {t}', opensToday: 'Abre hoy a las {t}', backAt: 'Cerrado por ahora · volvemos {d} a las {t}', closedNow: 'Cerrado un ratito',
       today: 'hoy', tomorrow: 'mañana',
       menuH: 'Qué hay de comer', menuHand: 'hecho esta mañana.', prices: 'Precios en lempiras (L). También aceptamos dólares y tarjetas.',
-      soldout: 'Se acabó', add: '+ Añadir', viewOrder: 'Ver pedido', loading: 'Cargando el menú…', error: 'No se pudo cargar el menú. Intenta de nuevo en un momento.',
+      soldout: 'Se acabó', left: 'Quedan {n}', add: '+ Añadir', viewOrder: 'Ver pedido', loading: 'Cargando el menú…', error: 'No se pudo cargar el menú. Intenta de nuevo en un momento.',
       orderH: 'Recógelo calientito', yourOrder: 'Tu pedido', empty: 'Nada todavía. Escoge algo del menú.', addMore: 'Añadir del menú',
       subtotal: 'Comida y bebida', togoCharges: 'Vasos y cajas para llevar', isv: 'ISV', total: 'Total',
       details: 'Tus datos', name: 'Nombre', phone: 'Número de WhatsApp', phoneHelp: 'Solo por si hay un problema con tu pedido.',
@@ -90,7 +90,7 @@
       openUntil: 'Entrez · ouvert jusqu’à {t}', opensToday: 'Ouvre aujourd’hui à {t}', backAt: 'Fermé pour l’instant · retour {d} à {t}', closedNow: 'Fermé pour un petit moment',
       today: 'aujourd’hui', tomorrow: 'demain',
       menuH: 'Au menu', menuHand: 'fait ce matin.', prices: 'Prix en lempiras (L). Dollars US et cartes acceptés.',
-      soldout: 'Épuisé', add: '+ Ajouter', viewOrder: 'Voir la commande', loading: 'Chargement du menu…', error: 'Le menu n’a pas pu se charger. Réessayez dans un instant.',
+      soldout: 'Épuisé', left: 'Plus que {n}', add: '+ Ajouter', viewOrder: 'Voir la commande', loading: 'Chargement du menu…', error: 'Le menu n’a pas pu se charger. Réessayez dans un instant.',
       orderH: 'À emporter tout chaud', yourOrder: 'Votre commande', empty: 'Rien pour l’instant. Choisissez dans le menu.', addMore: 'Ajouter depuis le menu',
       subtotal: 'Plats et boissons', togoCharges: 'Gobelets et boîtes à emporter', isv: 'ISV', total: 'Total',
       details: 'Vos coordonnées', name: 'Prénom', phone: 'Numéro WhatsApp', phoneHelp: 'Seulement en cas de souci avec la commande.',
@@ -123,7 +123,7 @@
       openUntil: 'Komm rein · geöffnet bis {t}', opensToday: 'Öffnet heute um {t}', backAt: 'Gerade zu · wieder da {d} um {t}', closedNow: 'Kurz geschlossen',
       today: 'heute', tomorrow: 'morgen',
       menuH: 'Was es gibt', menuHand: 'heute früh gemacht.', prices: 'Preise in Lempira (L). Wir nehmen auch US-Dollar und Karten.',
-      soldout: 'Heute aus', add: '+ Dazu', viewOrder: 'Bestellung ansehen', loading: 'Speisekarte wird geladen…', error: 'Die Speisekarte konnte nicht geladen werden. Bitte gleich noch einmal versuchen.',
+      soldout: 'Heute aus', left: 'Noch {n}', add: '+ Dazu', viewOrder: 'Bestellung ansehen', loading: 'Speisekarte wird geladen…', error: 'Die Speisekarte konnte nicht geladen werden. Bitte gleich noch einmal versuchen.',
       orderH: 'Heiß abholen', yourOrder: 'Deine Bestellung', empty: 'Noch nichts. Such dir etwas auf der Speisekarte aus.', addMore: 'Von der Speisekarte',
       subtotal: 'Essen & Getränke', togoCharges: 'Becher & Boxen zum Mitnehmen', isv: 'ISV', total: 'Gesamt',
       details: 'Deine Angaben', name: 'Name', phone: 'WhatsApp-Nummer', phoneHelp: 'Nur falls mit der Bestellung etwas nicht stimmt.',
@@ -156,7 +156,7 @@
       openUntil: 'Kom binnen · open tot {t}', opensToday: 'Vandaag open om {t}', backAt: 'Even dicht · weer open {d} om {t}', closedNow: 'Even gesloten',
       today: 'vandaag', tomorrow: 'morgen',
       menuH: 'Wat er op het vuur staat', menuHand: 'vanochtend gemaakt.', prices: 'Prijzen in lempira (L). We accepteren ook dollars en kaarten.',
-      soldout: 'Op voor vandaag', add: '+ Toevoegen', viewOrder: 'Bekijk bestelling', loading: 'Menu laden…', error: 'Het menu kon niet laden. Probeer het zo opnieuw.',
+      soldout: 'Op voor vandaag', left: 'Nog {n}', add: '+ Toevoegen', viewOrder: 'Bekijk bestelling', loading: 'Menu laden…', error: 'Het menu kon niet laden. Probeer het zo opnieuw.',
       orderH: 'Haal het warm op', yourOrder: 'Je bestelling', empty: 'Nog niets. Kies iets van het menu.', addMore: 'Toevoegen van het menu',
       subtotal: 'Eten & drinken', togoCharges: 'Bekers & bakjes om mee te nemen', isv: 'ISV', total: 'Totaal',
       details: 'Je gegevens', name: 'Naam', phone: 'WhatsApp-nummer', phoneHelp: 'Alleen als er iets mis is met je bestelling.',
@@ -196,7 +196,7 @@
       openUntil: 'Entra pure · aperto fino alle {t}', opensToday: 'Apre oggi alle {t}', backAt: 'Chiuso per ora · torniamo {d} alle {t}', closedNow: 'Chiuso per un po’',
       today: 'oggi', tomorrow: 'domani',
       menuH: 'Cosa c’è', menuHand: 'fatto stamattina.', prices: 'Prezzi in lempira (L). Accettiamo anche dollari USA e carte.',
-      soldout: 'Finito', add: '+ Aggiungi', viewOrder: 'Vedi ordine', loading: 'Caricamento del menù…', error: 'Impossibile caricare il menù. Riprova tra poco.',
+      soldout: 'Finito', left: 'Ne restano {n}', add: '+ Aggiungi', viewOrder: 'Vedi ordine', loading: 'Caricamento del menù…', error: 'Impossibile caricare il menù. Riprova tra poco.',
       orderH: 'Ritiralo caldo', yourOrder: 'Il tuo ordine', empty: 'Ancora niente. Scegli qualcosa dal menù.', addMore: 'Aggiungi dal menù',
       subtotal: 'Cibo e bevande', togoCharges: 'Bicchieri e vaschette da asporto', isv: 'ISV', total: 'Totale',
       details: 'I tuoi dati', name: 'Nome', phone: 'Numero WhatsApp', phoneHelp: 'Solo se c’è un problema con l’ordine.',
@@ -229,7 +229,7 @@
       openUntil: 'Pode entrar · aberto até {t}', opensToday: 'Abre hoje às {t}', backAt: 'Fechado por enquanto · voltamos {d} às {t}', closedNow: 'Fechado por um tempinho',
       today: 'hoje', tomorrow: 'amanhã',
       menuH: 'O que tem hoje', menuHand: 'feito hoje cedo.', prices: 'Preços em lempiras (L). Também aceitamos dólares e cartões.',
-      soldout: 'Acabou', add: '+ Adicionar', viewOrder: 'Ver pedido', loading: 'Carregando o cardápio…', error: 'Não foi possível carregar o cardápio. Tente de novo em instantes.',
+      soldout: 'Acabou', left: 'Restam {n}', add: '+ Adicionar', viewOrder: 'Ver pedido', loading: 'Carregando o cardápio…', error: 'Não foi possível carregar o cardápio. Tente de novo em instantes.',
       orderH: 'Retire quentinho', yourOrder: 'Seu pedido', empty: 'Nada ainda. Escolha algo do cardápio.', addMore: 'Adicionar do cardápio',
       subtotal: 'Comida e bebida', togoCharges: 'Copos e caixas pra viagem', isv: 'ISV', total: 'Total',
       details: 'Seus dados', name: 'Nome', phone: 'Número de WhatsApp', phoneHelp: 'Só se tiver algum problema com o pedido.',
@@ -262,7 +262,7 @@
       openUntil: 'Kom inn · åpent til {t}', opensToday: 'Åpner i dag kl. {t}', backAt: 'Stengt nå · tilbake {d} kl. {t}', closedNow: 'Stengt en liten stund',
       today: 'i dag', tomorrow: 'i morgen',
       menuH: 'Hva vi lager', menuHand: 'laget i morges.', prices: 'Priser i lempira (L). Vi tar også dollar og kort.',
-      soldout: 'Tomt i dag', add: '+ Legg til', viewOrder: 'Se bestilling', loading: 'Laster menyen…', error: 'Menyen kunne ikke lastes. Prøv igjen om litt.',
+      soldout: 'Tomt i dag', left: '{n} igjen', add: '+ Legg til', viewOrder: 'Se bestilling', loading: 'Laster menyen…', error: 'Menyen kunne ikke lastes. Prøv igjen om litt.',
       orderH: 'Hent den varm', yourOrder: 'Din bestilling', empty: 'Ingenting ennå. Velg noe fra menyen.', addMore: 'Legg til fra menyen',
       subtotal: 'Mat og drikke', togoCharges: 'Kopper og bokser til å ta med', isv: 'ISV', total: 'Totalt',
       details: 'Dine opplysninger', name: 'Navn', phone: 'WhatsApp-nummer', phoneHelp: 'Bare hvis noe er galt med bestillingen.',
@@ -295,7 +295,7 @@
       openUntil: 'Isteach leat · ar oscailt go dtí {t}', opensToday: 'Osclaíonn inniu ag {t}', backAt: 'Dúnta anois · ar ais {d} ag {t}', closedNow: 'Dúnta tamall beag',
       today: 'inniu', tomorrow: 'amárach',
       menuH: 'Cad atá á chócaráil', menuHand: 'déanta ar maidin.', prices: 'Praghsanna i lempira (L). Glacaimid le dollair SAM agus cártaí freisin.',
-      soldout: 'Díolta amach', add: '+ Cuir leis', viewOrder: 'Féach ar an ordú', loading: 'Ag lódáil an bhiachláir…', error: 'Níorbh fhéidir an biachlár a lódáil. Bain triail eile as i gceann nóiméid.',
+      soldout: 'Díolta amach', left: '{n} fágtha', add: '+ Cuir leis', viewOrder: 'Féach ar an ordú', loading: 'Ag lódáil an bhiachláir…', error: 'Níorbh fhéidir an biachlár a lódáil. Bain triail eile as i gceann nóiméid.',
       orderH: 'Bailigh te é', yourOrder: 'D’ordú', empty: 'Faic fós. Roghnaigh rud éigin ón mbiachlár.', addMore: 'Cuir leis ón mbiachlár',
       subtotal: 'Bia agus deochanna', togoCharges: 'Cupáin agus boscaí le tabhairt leat', isv: 'ISV', total: 'Iomlán',
       details: 'Do shonraí', name: 'Ainm', phone: 'Uimhir WhatsApp', phoneHelp: 'Ach amháin má bhíonn fadhb le d’ordú.',
@@ -328,7 +328,7 @@
       openUntil: 'בואו פנימה · פתוח עד {t}', opensToday: 'נפתח היום ב-{t}', backAt: 'סגור כרגע · חוזרים ב{d} ב-{t}', closedNow: 'סגור לזמן קצר',
       today: 'היום', tomorrow: 'מחר',
       menuH: 'מה יש היום', menuHand: 'הוכן הבוקר.', prices: 'המחירים בלמפירות (L). מקבלים גם דולרים וכרטיסי אשראי.',
-      soldout: 'נגמר היום', add: '+ הוספה', viewOrder: 'להזמנה', loading: 'טוען את התפריט…', error: 'לא הצלחנו לטעון את התפריט. נסו שוב בעוד רגע.',
+      soldout: 'נגמר היום', left: 'נשארו {n}', add: '+ הוספה', viewOrder: 'להזמנה', loading: 'טוען את התפריט…', error: 'לא הצלחנו לטעון את התפריט. נסו שוב בעוד רגע.',
       orderH: 'לאסוף חם', yourOrder: 'ההזמנה שלך', empty: 'עדיין כלום. בחרו משהו מהתפריט.', addMore: 'הוספה מהתפריט',
       subtotal: 'אוכל ושתייה', togoCharges: 'כוסות וקופסאות לקחת', isv: 'מע״מ', total: 'סה״כ',
       details: 'הפרטים שלך', name: 'שם', phone: 'מספר וואטסאפ', phoneHelp: 'רק אם יש בעיה עם ההזמנה.',
@@ -430,10 +430,13 @@
     if (it.togo_charge !== null && it.togo_charge !== undefined) { return Number(it.togo_charge); }
     var c = catOf(it); return c ? Number(c.togo_charge || 0) : 0;
   }
+  // Pastries (counted items): online orders stop at 0.
+  function maxOf(it) { var c = catOf(it); return c && c.counted ? Math.max(0, Number(it.stock || 0)) : 20; }
+  function inStock(it) { return !!(it && it.available && maxOf(it) > 0); }
   function lines() {
     var out = [], id, it;
     for (id in cart) {
-      if (cart.hasOwnProperty(id)) { it = itemById(id); if (it && it.available && cart[id] > 0) { out.push({ item: it, qty: cart[id] }); } }
+      if (cart.hasOwnProperty(id)) { it = itemById(id); if (inStock(it) && cart[id] > 0) { out.push({ item: it, qty: Math.min(cart[id], maxOf(it)) }); } }
     }
     return out;
   }
@@ -466,8 +469,8 @@
       }
       fresh.settings = r && r[0]; done(e);
     });
-    JC.rest('GET', 'categories?select=id,name,togo_charge,sort&order=sort.asc', null, null, function (e, r) { fresh.categories = r || []; done(e); });
-    JC.rest('GET', 'items?select=id,category_id,name,description,price,togo_charge,available,sort&order=sort.asc', null, null, function (e, r) { fresh.items = r || []; done(e); });
+    JC.rest('GET', 'categories?select=id,name,togo_charge,sort,counted&order=sort.asc', null, null, function (e, r) { fresh.categories = r || []; done(e); });
+    JC.rest('GET', 'items?select=id,category_id,name,description,price,togo_charge,available,stock,sort&order=sort.asc', null, null, function (e, r) { fresh.items = r || []; done(e); });
     JC.rest('GET', 'fx_rates?select=day,bank_buy&order=day.desc&limit=7', null, null, function (e, r) { fresh.fx = r || []; done(e); });
   }
 
@@ -499,8 +502,9 @@
   function qtyHtml(id) {
     var q = cart[id] || 0;
     if (!q) { return '<button class="btn small soft" data-act="add" data-id="' + id + '">' + JC.esc(t('add')) + '</button>'; }
+    var it = itemById(id), full = it && q >= maxOf(it);
     return '<span class="qty"><button data-act="dec" data-id="' + id + '" aria-label="−">−</button><span>' + q + '</span>' +
-      '<button data-act="inc" data-id="' + id + '" aria-label="+">+</button></span>';
+      '<button data-act="inc" data-id="' + id + '" aria-label="+"' + (full ? ' disabled' : '') + '>+</button></span>';
   }
   function paintMenu(failed) {
     var html = '', nav = '', i, j, c, list, it, rate = JC.usdRate(D.settings, D.fx), canOrder = !!(D.settings && D.settings.online_orders !== false);
@@ -512,9 +516,11 @@
       html += '<section class="cat" id="c-' + c.id + '"><h2>' + JC.esc(JC.tr(c.name, lang)) + '</h2><div class="items flex wrapflex">';
       for (j = 0; j < list.length; j++) {
         it = list[j];
-        html += '<div class="item' + (it.available ? '' : ' out') + '"><div class="item-in flex"><div class="grow"><h3>' + JC.esc(JC.tr(it.name, lang)) + '</h3>' +
+        var ok = inStock(it), c3 = catOf(it);
+        html += '<div class="item' + (ok ? '' : ' out') + '"><div class="item-in flex"><div class="grow"><h3>' + JC.esc(JC.tr(it.name, lang)) + '</h3>' +
           (JC.tr(it.description, lang) ? '<p class="d">' + JC.esc(JC.tr(it.description, lang)) + '</p>' : '') + '</div><div class="side flex center-y">' +
-          (it.available ? '<div class="pr"><span class="p">' + JC.money(it.price) + '</span>' + (rate ? '<span class="usd">≈ ' + JC.money(it.price / rate, '$') + '</span>' : '') + '</div>' +
+          (ok ? '<div class="pr"><span class="p">' + JC.money(it.price) + '</span>' + (rate ? '<span class="usd">≈ ' + JC.money(it.price / rate, '$') + '</span>' : '') +
+            (c3 && c3.counted ? '<span class="left">' + JC.esc(t('left', { n: maxOf(it) })) + '</span>' : '') + '</div>' +
             (canOrder ? '<div class="q">' + qtyHtml(it.id) + '</div>' : '') : '<span class="out-tag">' + JC.esc(t('soldout')) + '</span>') + '</div></div></div>';
       }
       html += '</div></section>';
@@ -635,11 +641,11 @@
   function onClick(ev) {
     var el = ev.target, act, id;
     while (el && el !== d.body && !(el.getAttribute && el.getAttribute('data-act'))) { el = el.parentNode; }
-    if (!el || el === d.body || !el.getAttribute) { return; }
+    if (!el || el === d.body || !el.getAttribute || el.disabled) { return; }
     act = el.getAttribute('data-act'); id = el.getAttribute('data-id');
     ev.preventDefault();
     if (act === 'add') { cart[id] = 1; }
-    else if (act === 'inc') { cart[id] = Math.min((cart[id] || 0) + 1, 20); }
+    else if (act === 'inc') { cart[id] = Math.min((cart[id] || 0) + 1, itemById(id) ? maxOf(itemById(id)) : 20); }
     else if (act === 'dec') { cart[id] = (cart[id] || 0) - 1; if (cart[id] <= 0) { delete cart[id]; } }
     else if (act === 'another') { JC.del('site.lastOrder'); }
     saveCart(); paintAll();

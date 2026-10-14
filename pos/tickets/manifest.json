@@ -1,0 +1,10 @@
+{
+  "name": "Josie's Tickets",
+  "short_name": "Tickets",
+  "start_url": "/pos/tickets/",
+  "scope": "/pos/tickets/",
+  "display": "standalone",
+  "background_color": "#FFF7F8",
+  "theme_color": "#FCE3E8",
+  "icons": [{ "src": "/img/icon-180.png", "sizes": "180x180", "type": "image/png" }]
+}
