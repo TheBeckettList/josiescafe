@@ -1,8 +1,8 @@
 /* Lets the POS open with no internet (iOS 11.3+, Android, desktop).
    App files: served from the device at once, refreshed in the background.
    Supabase calls are never cached here; the app keeps its own offline copy. */
-var CACHE = 'josies-pos-v4';
-var SHELL = ['./', './index.html', './pos.css', './pos.js', './manifest.json', '../js/api.js', '../img/logo.png', '../img/icon-180.png',
+var CACHE = 'josies-pos-v5';
+var SHELL = ['./', './index.html', './pos.css', './pos.js', './manifest.json', '../js/api.js', '../img/logo.png', '../img/icon-180.png', '../img/app-icon-180.png',
   './tickets/', './tickets/index.html', './tickets/tickets.css', './tickets/tickets.js', './tickets/manifest.json'];
 
 self.addEventListener('install', function (e) {
@@ -37,7 +37,7 @@ self.addEventListener('push', function (e) {
   var m = {};
   try { m = e.data ? e.data.json() : {}; } catch (x) { m = { title: "Josie's", body: e.data ? e.data.text() : '' }; }
   e.waitUntil(self.registration.showNotification(m.title || "Josie's", {
-    body: m.body || '', tag: m.tag || undefined, renotify: !!m.tag, icon: '/img/icon-180.png',
+    body: m.body || '', tag: m.tag || undefined, renotify: !!m.tag, icon: '/img/app-icon-192.png',
     vibrate: [300, 120, 300, 120, 500], data: { url: m.url || '/pos/tickets/' }
   }));
 });
