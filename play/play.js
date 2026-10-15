@@ -132,6 +132,7 @@
     });
   };
   w.J2PLAY.handle = handle; w.J2PLAY.http = JC.http;
+  w.J2PLAY.ready = function () { return ready; };
 
   /* ───────── a moment in the café: two sticks on tables, an add-on, an online order ───────── */
   function rpc(fn, body, authed) { return handle('POST', '/rest/v1/rpc/' + fn, {}, body, authed !== false).then(function (r) { if (r.status >= 300) { throw new Error(fn + ': ' + JSON.stringify(r.json)); } return r.json; }); }
@@ -244,6 +245,16 @@
     }
   }
 
+  /* for the scenarios: call the same functions the POS calls (with the push banners), and ask the café's database things */
+  w.J2PLAY.call = function (fn, body, authed) {
+    return handle('POST', '/rest/v1/rpc/' + fn, {}, body || {}, authed !== false).then(function (r) {
+      if (r.status >= 300) { throw new Error(fn + ': ' + JSON.stringify(r.json)); }
+      afterWrite('/rest/v1/rpc/' + fn, body || {}, r.json); return r.json;
+    });
+  };
+  w.J2PLAY.q = function (sql, params) { return db.query(sql, params || []).then(function (r) { return r.rows; }); };
+  w.J2PLAY.switchTo = function (name) { switchTo(name); };
+  w.J2PLAY.seed = seedFloor;
   /* ───────── boot ───────── */
   function deleteIdb() { return new Promise(function (res) { try { var r = w.indexedDB.deleteDatabase('/pglite/josies-play-' + VER); r.onsuccess = r.onerror = r.onblocked = function () { res(); }; } catch (e) { res(); } }); }
   function boot() {
