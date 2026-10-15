@@ -104,7 +104,7 @@
       h += '<div class="mimg"></div><div class="hours" style="left:46px;top:296px"><span class="tag' + (closedNow ? ' closed' : '') + '">' + esc(closedNow ? s('closed') : 'OPEN') + '</span><b>' + fmt(t.open) + ' – ' + fmt(t.close) + '</b><small>' + s('mon') + ' – ' + s('sat') + '</small></div>' +
         '<button type="button" class="hit glow" data-act="toMenu" style="left:806px;top:160px;width:84px;height:84px" aria-label="Menu"></button>';
     }
-    h += '<button type="button" class="hit" data-act="hours" style="left:114px;top:92px;width:132px;height:162px" aria-label="Hours"></button></div>' +
+    h += '<button type="button" class="hit" data-act="hours" style="left:' + (W.bay ? w.J2BAY.sign[0] : 114) + 'px;top:' + (W.bay ? w.J2BAY.sign[1] : 92) + 'px;width:132px;height:162px" aria-label="Hours"></button></div>' +
       '<button type="button" class="winset" data-act="bayFlip" aria-label="' + esc(s(W.bay ? 'cafeMap' : 'bayMap')) + '">' + (W.bay ? '<span class="winsetimg"></span>' : w.J2BAY.thumb()) + '<span class="cap">' + esc(s(W.bay ? 'cafeMap' : 'bayMap')) + '</span></button>';
     if (W.cart.length) { h += '<div class="cartpill"><span><small>' + esc(s('yourOrder')) + ' · ' + cartCount() + '</small><b>' + money(cartTotal()) + '</b></span><button type="button" class="go" data-act="review">' + esc(s('review')) + '</button></div>'; }
     return h + '</div>';
