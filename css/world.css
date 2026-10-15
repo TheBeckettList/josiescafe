@@ -90,3 +90,16 @@ button { font-family: inherit; border: 0; cursor: pointer; color: inherit; backg
 @media (min-width: 700px) { .wtop .brand img { height: 50px; } }
 
 .hsteps { list-style: none; counter-reset: h; margin: 6px 0 12px; padding: 0; } .hsteps li { counter-increment: h; display: flex; align-items: center; padding: 11px 0; border-bottom: 2px dashed #F5C9D6; font-weight: 700; font-size: 16px; } .hsteps li:before { content: counter(h); flex: 0 0 30px; height: 30px; margin-right: 12px; border-radius: 15px; background: #FDEDF1; color: #B55573; font-family: 'Baloo 2', sans-serif; font-weight: 800; text-align: center; line-height: 30px; }
+
+/* footer */
+.wfoot { background: #FFEDE7; border-top: 4px dashed #F5C9CF; margin-top: 8px; padding: 26px max(16px, env(safe-area-inset-left, 0px)) 30px; color: #5B3843; }
+.fgrid { max-width: 1100px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 22px 34px; }
+.fgrid section { flex: 1 1 240px; min-width: 0; }
+.wfoot h4 { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; margin: 0 0 8px; color: #B55573; }
+.fhours .fr { display: flex; justify-content: space-between; gap: 14px; max-width: 280px; padding: 3px 0; border-bottom: 2px dashed #F5D3DE; font-weight: 700; } .fhours .fr b { font-weight: 800; }
+.fp { margin: 0 0 10px; font-weight: 700; line-height: 1.4; max-width: 34ch; }
+.flinks { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 10px; }
+.fbtn { display: inline-block; padding: 9px 16px; border-radius: 22px; background: #B55573; color: #FFFFFF; text-decoration: none; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 16px; } .fbtn.alt { background: #FFFFFF; color: #B55573; box-shadow: inset 0 0 0 3px #F5B5C8; }
+.fbtn:focus-visible { outline: 3px solid #5B3843; outline-offset: 2px; }
+.fsmall { max-width: 1100px; margin: 22px auto 0; font-size: 13px; font-weight: 700; color: #86606B; }
+[dir="rtl"] .fgrid { direction: rtl; }
