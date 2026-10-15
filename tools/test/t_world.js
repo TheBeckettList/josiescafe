@@ -1,0 +1,33 @@
+var H = require('./harness'), shim = require('./shim');
+function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.exitCode = 1; } }
+(async function () {
+  var h = await H.start({ reset: true });
+  shim.psql("update settings set online_cutoff='23:59', online_orders=true");
+  var p = await h.page('/world/', { viewport: { width: 390, height: 800 }, touch: true, mobile: true, init: function () { try { localStorage.clear(); } catch (e) {} } });
+  await p.waitForTimeout(1800);
+  await p.screenshot({ path: '/tmp/claude-0/shots/w_phone_home.png' });
+  ok((await p.locator('.mrow').count()) >= 1, 'menu rows (' + await p.locator('.mrow').count() + ')');
+  await p.click('.cat >> nth=1'); await p.waitForTimeout(200);
+  await p.click('.mrow >> nth=1'); await p.waitForTimeout(300);
+  await p.screenshot({ path: '/tmp/claude-0/shots/w_phone_dish.png' });
+  console.log('dish:', (await p.locator('#dcard').innerText()).replace(/\n+/g, ' | ').slice(0, 200));
+  await p.click('[data-act="addDish"]'); await p.waitForTimeout(200);
+  ok((await p.locator('.cartpill').count()) === 1, 'cart pill appears');
+  await p.click('[data-act="review"]'); await p.waitForTimeout(200);
+  await p.click('[data-act="send"]'); await p.waitForTimeout(300);
+  ok((await p.locator('.err').count()) === 1, 'name required');
+  await p.fill('#gname', 'Sam'); await p.click('[data-act="type"][data-arg="togo"]'); await p.fill('#gname', 'Sam');
+  await p.click('[data-act="send"]'); await p.waitForTimeout(2500);
+  console.log('db order:', shim.psql("select customer_name||' '||order_type||' '||total from orders where source='online'").out);
+  ok((await p.locator('.state').innerText()) === 'Making it', 'status shows Making it');
+  await p.screenshot({ path: '/tmp/claude-0/shots/w_phone_status.png', fullPage: true });
+  shim.psql("update orders set phase='done' where source='online'"); await p.waitForTimeout(5800);
+  ok((await p.locator('.state').innerText()) === 'Picked up', 'status shows Picked up');
+  var p2 = await h.page('/world/', { viewport: { width: 1280, height: 900 }, init: function () { try { localStorage.clear(); } catch (e) {} } });
+  await p2.waitForTimeout(1800); await p2.click('.mrow >> nth=1'); await p2.waitForTimeout(300);
+  await p2.screenshot({ path: '/tmp/claude-0/shots/w_desk.png', fullPage: true });
+  shim.psql("update settings set online_cutoff='00:01'"); await p2.evaluate(function () { }); await p2.reload(); await p2.waitForTimeout(1800);
+  ok((await p2.locator('.closedbox').count()) === 1, 'after cutoff: closed notice');
+  console.log('errors:', p.errors.concat(p2.errors));
+  await h.stop();
+})().catch(function (e) { console.error('FAILED', String(e).slice(0, 700)); process.exit(1); });
