@@ -223,6 +223,7 @@
     h += '</div><div class="btot"><span>' + esc(J.t('total')) + '</span><b>' + money(t.grand) + '</b></div></section><section class="paymeth"><div class="methods">' +
       meth('cash_hnl', J.t('cashL')) + meth('cash_usd', J.t('cashUsd')) + meth('card', J.t('card')) + '</div>';
     h += p.method === 'card' ? cardPanel(t) : cashPanel(t, p.method === 'cash_usd');
+    if (p.method === 'cash_usd') { h += '<p class="dollarnote">' + esc(J.t('dollarNote')) + '</p>'; }
     h += '<span class="grow"></span><button type="button" class="paybtn wide" data-act="complete"' + (canComplete(t) ? '' : ' disabled') + '><span>' + esc(J.t('completeOrder')) + '</span><b>' + money(t.grand) + '</b></button></section></div></div>';
     return h;
   };

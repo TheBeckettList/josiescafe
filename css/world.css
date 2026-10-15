@@ -116,3 +116,5 @@ button { font-family: inherit; border: 0; cursor: pointer; color: inherit; backg
 
 .sheet { box-sizing: border-box; }
 .hstat span { display: flex; flex-direction: column; line-height: 1.15; } .hstat span small { font-size: 15px; font-weight: 800; opacity: .9; }
+
+.fp.friendly { color: #86606B; font-size: 15px; } .hint.dollars { margin-top: -4px; font-size: 13.5px; opacity: .9; }
