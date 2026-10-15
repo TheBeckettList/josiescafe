@@ -132,11 +132,11 @@
         /* waves */
         '<path d="M700,680 q22,-10 44,0 M470,700 q22,-10 44,0 M760,930 q22,-10 44,0 M1010,990 q22,-10 44,0 M1120,640 q22,-10 44,0 M300,1000 q22,-10 44,0 M640,560 q22,-10 44,0 M1000,780 q22,-10 44,0 M200,1100 q22,-10 44,0 M1500,1220 q22,-10 44,0" stroke="#FFFFFF" stroke-width="7" fill="none" stroke-linecap="round" opacity=".8"/>' +
         /* the ferry pier, oversized: the pink end is the land end */
-        '<g transform="translate(1086,520) rotate(30)"><rect x="-44" y="-4" width="96" height="360" rx="10" fill="#3B2925" opacity=".1" transform="translate(22,22)"/>' +
-          '<rect x="-48" y="-8" width="96" height="360" rx="10" fill="#F6F1EA" stroke="#D2C6BA" stroke-width="6"/>' +
-          '<path d="M-48,32 h96 M-48,66 h96 M-48,100 h96 M-48,134 h96 M-48,168 h96 M-48,202 h96 M-48,236 h96 M-48,270 h96 M-48,304 h96" stroke="#D2C6BA" stroke-width="3.5"/>' +
-          '<rect x="-48" y="-8" width="96" height="30" rx="8" fill="#F5B5C8"/>' +
-          '<g fill="#CDBFB0" stroke="#B9AB9C" stroke-width="3"><circle cx="-48" cy="90" r="9"/><circle cx="48" cy="90" r="9"/><circle cx="-48" cy="200" r="9"/><circle cx="48" cy="200" r="9"/><circle cx="-48" cy="310" r="9"/><circle cx="48" cy="310" r="9"/><circle cx="-48" cy="352" r="9"/><circle cx="48" cy="352" r="9"/></g>' +
+        '<g transform="translate(1086,520) rotate(30)"><rect x="-44" y="-4" width="96" height="360" rx="22" fill="#3B2925" opacity=".09" transform="translate(20,20)"/>' +
+          '<rect x="-48" y="-8" width="96" height="360" rx="22" fill="#F6F1EA" stroke="#D9CEC2" stroke-width="4" stroke-linejoin="round"/>' +
+          '<path d="M-40,52 h80 M-40,96 h80 M-40,140 h80 M-40,184 h80 M-40,228 h80 M-40,272 h80 M-40,316 h80" stroke="#E2D8CC" stroke-width="3" stroke-linecap="round"/>' +
+          '<rect x="-48" y="-8" width="96" height="34" rx="17" fill="#F5B5C8"/><rect x="-38" y="-2" width="76" height="9" rx="4.5" fill="#FAD3DF" opacity=".9"/>' +
+          '<g fill="#D7CABC"><circle cx="-48" cy="110" r="7"/><circle cx="48" cy="110" r="7"/><circle cx="-48" cy="230" r="7"/><circle cx="48" cy="230" r="7"/><circle cx="-34" cy="344" r="7"/><circle cx="34" cy="344" r="7"/></g>' +
           '<g transform="translate(-92,140) scale(2.5)"><path d="M-11,0 Q0,-14 11,0 V66 Q0,74 -11,66 Z" fill="#FFFFFF" stroke="#E6DCD2" stroke-width="1.5"/><rect x="-6" y="14" width="12" height="30" rx="3" fill="#B9E2EA"/><path d="M-11,56 H11" stroke="#EC5C97" stroke-width="3"/></g>' +
         '</g>' +
       '</g>';
@@ -146,16 +146,16 @@
     h += octopus(X(610), Y(610, 765) - 6, 0.5) + buoy(X(528), Y(528, 722), 0.55) + diveBoat(X(425), Y(425, 842), 0.5);
     h += '<g transform="translate(860,50)" fill="#7A625B"><path d="M0,-20 l9,22 h-18 z"/><text y="22" font-size="16" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">N</text></g>';
     /* Josie's hanging sign, oversized, on the land beside the dock end: a tall post with a long arm */
-    h += '<ellipse cx="645" cy="233" rx="28" ry="7" fill="#3B2925" opacity=".14"/>' +
+    h += '<g transform="translate(-60,0)"><ellipse cx="645" cy="233" rx="28" ry="7" fill="#3B2925" opacity=".14"/>' +
       '<rect x="638" y="26" width="14" height="206" rx="4" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3"/><rect x="633" y="16" width="24" height="12" rx="4" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3"/>' +
       '<rect x="478" y="34" width="174" height="11" rx="4" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3"/>' +
       '<path d="M638,76 L612,48" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/><path d="M638,76 L612,48" stroke="#E2D7CC" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>' +
       '<path d="M520,45 V62 M606,45 V54" stroke="#7A625B" stroke-width="2.5" stroke-dasharray="4 3"/>' +
-      '<image href="/img/sign.png" x="496" y="56" width="132" height="162"/>';
+      '<image href="/img/sign.png" x="496" y="56" width="132" height="162"/></g>';
     return h;
   }
   w.J2BAY = {
-    sign: [496, 56, 132, 162],
+    sign: [436, 56, 132, 162],
     layer: function () {
       return '<svg class="baylayer" width="1440" height="1240" viewBox="0 0 1440 1240" role="img" aria-label="Map of Utila Bay: Josie\'s Cafe is at the land end of the ferry dock, on the ferry road just off Main Street">' + content() + '</svg>';
     },
