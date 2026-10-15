@@ -209,6 +209,8 @@
   }
   function sheetLayer() { return ''; }
   O.head = pHead;
+  /* a staff phone set up for inventory: just the lights, big, nothing else */
+  O.inventoryScreen = function () { return '<div class="shell phoneinv">' + U.topbar('overview') + '<div class="pop inline">' + popInventory() + '</div></div>'; };
 
   /* kitchen and bar: read-only tickets */
   function popTickets(st) {

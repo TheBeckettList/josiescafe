@@ -20,6 +20,7 @@
   }
   function shell() {
     var tab = S.tab;
+    if (S.device.mode === 'inventory' || /[?&]inv\b/.test(w.location.search || '')) { return J.ov.inventoryScreen(); }
     if (tab === 'manager' && !J.can('manager')) { tab = S.tab = 'pos'; }
     if (tab === 'pos' && roleHome() === 'overview') { tab = S.tab = 'overview'; }
     if (tab === 'overview') { return J.ov.screen(); }

@@ -297,3 +297,6 @@ svg { display: block; }
 .pkcheck { position: absolute; right: -8px; top: -6px; width: 22px; height: 22px; border-radius: 50%; background: #B55573; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; -webkit-box-pack: center; -webkit-justify-content: center; justify-content: center; box-shadow: 0 0 0 2px #FFF; }
 .pkfoot { padding: 0 14px 16px; }
 .gtile { padding-bottom: 6px; } .gtile .gtap { display: block; width: 100%; } .gtile:not(.on) { opacity: .55; } .kindbtn { margin-top: 2px; padding: 0 10px; height: 20px; border-radius: 10px; font-family: 'Baloo 2', sans-serif; font-size: 11px; } .kindbtn.element { background: #D9F0E8; color: #2F6B58; } .kindbtn.base { background: #6A3A63; color: #FFF; }
+.phoneinv .pop.inline { position: static; width: auto; max-width: none; margin: 8px; -webkit-transform: none; transform: none; box-shadow: none; height: auto; }
+.phoneinv .igrid { padding-bottom: 20px; }
+.phoneinv .tabs, .phoneinv [data-act="ovClose"] { display: none; }
