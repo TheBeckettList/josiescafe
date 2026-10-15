@@ -131,11 +131,38 @@
   add('cheesecake', '#FFE9EC', '<path d="M5 36 L43 36 L42 42 Q24 46 6 42 Z" fill="#B98050"/><path d="M6 21 L42 21 L43 36 L5 36 Z" fill="#FFE9B8"/><path d="M8 24 L40 24 L40 27 L8 27 Z" fill="#FFF3D6" opacity=".9"/><path d="M5 20 Q24 15 43 20 Q41 24 38 24 Q36 30 33 24 Q28 26 24 24 Q22 31 18 24 Q12 26 9 24 Q6 24 5 20 Z" fill="#EE7A8E"/><circle cx="24" cy="15" r="3.600" fill="#EE7A8E"/><path d="M22 11 q2 -3 4 0 q-2 2 -4 0 z" fill="#8FB98B"/>');
   add('oatmeal-raisin-cookie', '#F3E6D2', '<ellipse cx="24" cy="41" rx="17" ry="2.600" fill="#3B2925" opacity=".1"/><circle cx="24" cy="25" r="17" fill="#CFA06C"/><circle cx="24" cy="25" r="14.400" fill="#DDB27C"/><g fill="#EBD3A4"><ellipse cx="15" cy="20" rx="3" ry="1.300" transform="rotate(-25 15 20)"/><ellipse cx="29" cy="17" rx="3" ry="1.300" transform="rotate(20 29 17)"/><ellipse cx="22" cy="31" rx="3" ry="1.300" transform="rotate(10 22 31)"/><ellipse cx="33" cy="29" rx="3" ry="1.300" transform="rotate(-30 33 29)"/></g><g fill="#5C3550"><ellipse cx="20" cy="23" rx="2.400" ry="1.800" transform="rotate(25 20 23)"/><ellipse cx="29" cy="25" rx="2.400" ry="1.800"/><ellipse cx="25" cy="17" rx="2.400" ry="1.800" transform="rotate(-20 25 17)"/><ellipse cx="17" cy="30" rx="2.400" ry="1.800"/></g>');
 
+
+  /* ───── the croissant: a crescent of flaky lobes, glazed and golden ───── */
+  (function () {
+    var lobes = [   // x, y, tangent angle, thickness along the arc, length across the body, tone
+      [9.4, 35.4, -70, 7.4, 8.4, 0], [38.6, 35.4, 70, 7.4, 8.4, 0],
+      [12.2, 29, -50, 9.4, 12.6, 1], [35.8, 29, 50, 9.4, 12.6, 1],
+      [17.2, 23.2, -24, 10.6, 16, 2], [30.8, 23.2, 24, 10.6, 16, 2],
+      [24, 21.4, 0, 12.8, 19.6, 3]
+    ];
+    var base = ['#D58A3A', '#DB9140', '#E19A47', '#E8A64F'], mid = ['#E3A24E', '#E8A955', '#EDB35F', '#F2BD6A'], hi = '#F8D58C', i, l, o = '';
+    o += shadow(24, 43, 17) + '<g transform="translate(23.4,27.4) rotate(-12) scale(1.04) translate(-24,-28)">';
+    for (i = 0; i < lobes.length; i++) {
+      l = lobes[i];
+      o += '<g transform="rotate(' + l[2] + ' ' + l[0] + ' ' + l[1] + ')">' +
+        '<ellipse cx="' + l[0] + '" cy="' + l[1] + '" rx="' + l[3] / 2 + '" ry="' + l[4] / 2 + '" fill="' + base[l[5]] + '" stroke="#B9702C" stroke-width="1"/>' +
+        '<ellipse cx="' + (l[0] - .6) + '" cy="' + (l[1] - l[4] * .06) + '" rx="' + l[3] / 2 * .78 + '" ry="' + l[4] / 2 * .84 + '" fill="' + mid[l[5]] + '"/>' +
+        '<ellipse cx="' + (l[0] - l[3] * .12) + '" cy="' + (l[1] - l[4] * .22) + '" rx="' + l[3] / 2 * .42 + '" ry="' + l[4] / 2 * .46 + '" fill="' + hi + '" opacity=".85"/>' +
+        '<path d="M' + (l[0] - l[3] * .3) + ' ' + (l[1] - l[4] * .36) + ' q' + l[3] * .3 + ' -' + l[4] * .1 + ' ' + l[3] * .62 + ' 0" stroke="#FFF1CF" stroke-width="1" fill="none" stroke-linecap="round" opacity=".8"/>' +
+        '</g>';
+    }
+    o += '<path d="M14 20.600 q4 -6.800 10 -6.800 q6 0 10 6.800" stroke="#FFF1CF" stroke-width="1.500" fill="none" stroke-linecap="round" opacity=".75"/>';
+    o += '<g stroke="#C27A32" stroke-width=".9" stroke-linecap="round" opacity=".7"><path d="M20 18.500 q-1 3 -.4 6 M28 18.500 q1 3 .4 6 M24 15.500 v4 M15.500 25 q-.5 2.500 .5 4.500 M32.500 25 q.5 2.500 -.5 4.500 M11 31 q0 1.600 1 3 M37 31 q0 1.600 -1 3"/></g>';
+    o += '<g fill="#E8A64F"><circle cx="4.500" cy="38.500" r="1.100"/><circle cx="43.500" cy="38" r="1"/><circle cx="9" cy="41" r=".8"/><circle cx="39" cy="41.200" r=".9"/><circle cx="24" cy="44" r=".8"/></g>';
+    o += '<ellipse cx="21" cy="17.600" rx="2.400" ry="1.100" fill="#FFFFFF" opacity=".55" transform="rotate(-18 21 17.600)"/><circle cx="31" cy="19" r=".8" fill="#FFFFFF" opacity=".7"/>';
+    add('croissant', '#FCEBD6', o + '</g>');
+  }());
+
   var k;
   for (k in D) { if (D.hasOwnProperty(k)) { ART.menu[k] = { vb: '0 0 48 48', svg: D[k].svg, bg: D[k].bg, name: k }; } }
 
   /* the kit's own pictures stay for the ones that are already unique */
-  var KIT = { 'full-plate': 'full-plate', 'avocado-toast': 'avocado-toast', 'fruit-bowl': 'fruit-bowl', 'fries': 'fries', 'croissant': 'croissant', 'cinnamon-roll': 'cinnamon-roll', 'banana-bread': 'banana-bread', 'coconut-bread': 'coconut-bread' };
+  var KIT = { 'full-plate': 'full-plate', 'avocado-toast': 'avocado-toast', 'fruit-bowl': 'fruit-bowl', 'fries': 'fries', 'cinnamon-roll': 'cinnamon-roll', 'banana-bread': 'banana-bread', 'coconut-bread': 'coconut-bread' };
   var ALIAS = { 'chocolate-chip-cookie': 'chocolate-chip-cookies', 'cinnamon-streusel-muffins': 'cinnamon-streusel-muffin', 'tres-leches': 'tres-leches-cake', 'oatmeal-raisin-cookies': 'oatmeal-raisin-cookie',
     'soda-glass': 'soda-glass-bottle', 'soda-plastic': 'soda-plastic-bottle', 'pastry': 'croissant', 'iced-americano': 'iced-americano', 'bottled-water': 'small-water', 'soda': 'soda-glass-bottle', 'fresh-juice': 'fresh-pressed-juice' };
   ART.keyFor = function (en) {
