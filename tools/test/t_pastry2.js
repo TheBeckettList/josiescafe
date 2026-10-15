@@ -23,7 +23,7 @@ var INIT = function () { try { if (!localStorage.getItem('jc.pos.session')) {
   await p.click('[data-act="pastryBack"] >> nth=0'); await p.waitForTimeout(300);
   await p.click('[data-act="ovGear"]'); await p.waitForTimeout(300);
   ok((await p.locator('.pop .ptile').count()) >= 1, 'counting side shows squares');
-  await p.click('.hit[data-ov="fridge"]'); await p.waitForTimeout(500);
+  await p.click('[data-act="ovClose"]'); await p.waitForTimeout(300); await p.click('.hit[data-ov="fridge"]'); await p.waitForTimeout(500);
   ok((await p.locator('.pop .ptile:has-text("Brownie")').count()) === 1, 'inventory popup has the Pastries squares');
   console.log('errors:', p.errors.filter(function (e) { return !/ServiceWorker|fetching the script/.test(e); }));
   await h.stop();

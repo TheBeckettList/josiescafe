@@ -13,11 +13,11 @@ var INIT = function () { try { if (!localStorage.getItem('jc.pos.session')) {
   await p.click('.tab:has-text("Overview")'); await p.waitForTimeout(2200);
   var badge = await p.locator('.hit[data-arg="pastries"] .sbadge').getAttribute('title'); ok(/10 left/.test(badge), 'stand status says ' + badge);
   await p.click('.hit[data-arg="pastries"]'); await p.waitForTimeout(500);
-  ok((await p.locator('.prow').count()) === 2, 'popup lists the 2 pastries');
+  ok((await p.locator('.ptile').count()) === 2, 'popup lists the 2 pastries');
   await p.screenshot({ path: '/tmp/claude-0/shots/pastry_pop.png' });
-  await p.click('.prow >> nth=0 >> [aria-label="+1"]'); await p.waitForTimeout(1200);
+  await p.click('.ptile >> nth=0 >> [aria-label="+1"]'); await p.waitForTimeout(1200);
   console.log('stock now:', shim.psql("select string_agg(name->>'en'||'='||stock, ', ') from items where name->>'en' in ('Brownie','Key lime pie')").out);
-  await p.click('.prow >> nth=0 >> [aria-label="-1"]'); await p.click('.prow >> nth=0 >> [aria-label="-1"]'); await p.waitForTimeout(1200);
+  await p.click('.ptile >> nth=0 >> [aria-label="-1"]'); await p.click('.ptile >> nth=0 >> [aria-label="-1"]'); await p.waitForTimeout(1200);
   console.log('after two minus:', shim.psql("select string_agg(name->>'en'||'='||stock, ', ') from items where name->>'en' in ('Brownie','Key lime pie')").out);
   console.log('errors:', p.errors.filter(function (e) { return !/ServiceWorker|fetching the script/.test(e); }));
   await h.stop();
