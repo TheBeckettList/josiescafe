@@ -27,6 +27,7 @@
       s_shelf_4: ['The coffee beans', 'The beans are checked at the grinder when a shift starts. It is the one check that is required.'],
       s_pastries_1: ['The pastry dome', 'It sits on the register counter with the monitor.'],
       s_pastries_2: ['How many are in it', 'Tap plus and minus to match what is in the dome. The bar hands them out.'],
+      s_pastries_3: ['What you sell', 'Tap the pencil. Switch on the pastries you carry today and set each price. Switch it off and it leaves the register.'],
       s_tables_1: ['The pots', 'Home holds the free sticks. Waiting holds the sticks whose food is on its way.'],
       s_tables_2: ['The tables', 'Each dashed box is a table. A light means someone is sitting there.'],
       s_tables_3: ['Right now', 'Every number, and the next job on each one: Place, Take payment, Stick back.'],
@@ -65,6 +66,7 @@
       s_shelf_4: ['Los granos de café', 'Los granos se revisan en el molino al empezar el turno. Es la única revisión obligatoria.'],
       s_pastries_1: ['La cúpula de pasteles', 'Está en el mostrador de la caja, junto al monitor.'],
       s_pastries_2: ['Cuántos hay', 'Toca más y menos para igualar lo que hay en la cúpula. El bar los entrega.'],
+      s_pastries_3: ['Qué vendes', 'Toca el lápiz. Enciende los pasteles que tienes hoy y pon cada precio. Si lo apagas, sale de la caja.'],
       s_tables_1: ['Las ollas', 'Casa guarda los palitos libres. Espera guarda los palitos cuyo pedido va en camino.'],
       s_tables_2: ['Las mesas', 'Cada caja punteada es una mesa. Una luz significa que alguien está sentado.'],
       s_tables_3: ['Ahora mismo', 'Cada número, y la siguiente tarea de cada uno: Poner, Cobrar, Devolver palito.'],
@@ -113,7 +115,8 @@
       ['s_shelf_4', 'look', hit('grinder'), function () { ov(null, false); }]] },
     { id: 'pastries', ic: 'cup', steps: [
       ['s_pastries_1', 'look', hit('pastries'), function () { ov(null, false); }],
-      ['s_pastries_2', 'do', '.pop .pstep', function () { ov('pastries', false); }]] },
+      ['s_pastries_2', 'do', '.pop .pstep', function () { ov('pastries', false); }],
+      ['s_pastries_3', 'do', '.pop .psetup', function () { ov('pastries', true); }]] },
     { id: 'tables', ic: 'sticky', steps: [
       ['s_tables_1', 'look', hit('pot-home'), function () { ov(null, false); }],
       ['s_tables_2', 'look', '.hit.tbl', null, 1], ['s_tables_3', 'look', '.orail']] },

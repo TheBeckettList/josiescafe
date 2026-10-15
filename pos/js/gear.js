@@ -13,7 +13,7 @@
   G.allowed = function (kind) {
     if (kind === 'sign') { return J.can('manager'); }
     if (kind === 'menu') { return J.can('register'); }
-    if (kind === 'inv') { return J.can('josie'); }
+    if (kind === 'inv' || kind === 'pastries') { return J.can('josie'); }
     return false;
   };
 
