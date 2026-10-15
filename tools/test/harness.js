@@ -8,8 +8,15 @@ var ROOT = path.resolve(__dirname, '../..');
 var SUPA = /^https:\/\/tuthebxguxvogmiowhcx\.supabase\.co/;
 var TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json' };
 
+exports.reset = function () {
+  var r = shim.psql("delete from payments; delete from order_items; delete from order_pieces; delete from ticket_alerts; delete from orders; " +
+    "update sticks set state='home', table_id=null; update ingredients set light='green'; update items set available=true; " +
+    "update settings set closed_until=null, online_orders=true;");
+  if (!r.ok) { throw new Error('reset failed: ' + r.err); }
+};
 exports.start = async function (opts) {
   opts = opts || {};
+  if (opts.reset !== false) { exports.reset(); }
   var server = http.createServer(function (req, res) {
     var p = decodeURIComponent(url.parse(req.url).pathname);
     if (p.slice(-1) === '/') { p += 'index.html'; }

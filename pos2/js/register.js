@@ -193,8 +193,13 @@
   };
 
   /* ───────────── pay ───────────── */
+  function payForTotals(tip) {
+    var pf = ui().payFor, total = J.r2(pf.total);
+    return { sub: total, togo: 0, tax: 0, total: total, tip: J.r2(tip || 0), grand: J.r2(total + (tip || 0)) };
+  }
+  function baseTotals() { return ui().payFor ? payForTotals(0) : J.totals(J.cart(), J.cart().type); }
   function tipAmount() {
-    var p = ui().pay, base = J.totals(J.cart(), J.cart().type).total;
+    var p = ui().pay, base = baseTotals().total;
     if (p.tipMode === 4) { return J.r2(p.tip); }
     return J.r2(Math.round(base * [0, 0.10, 0.15, 0.20][p.tipMode || 0]));
   }
@@ -205,11 +210,14 @@
     return val + 0.009 >= t.total;
   }
   R.pay = function () {
-    var p = ui().pay, c = J.cart(), cardTip = p.method === 'card' ? tipAmount() : 0, t = J.totals(c, c.type, cardTip), i, h;
+    var p = ui().pay, c = J.cart(), cardTip = p.method === 'card' ? tipAmount() : 0, t = ui().payFor ? payForTotals(cardTip) : J.totals(c, c.type, cardTip), i, h;
     var payTotal = c.addTo ? t : t;
     h = '<div class="shell">' + U.topbar('pos', { back: '<button type="button" class="btn ghost" data-act="payBack">' + U.ic('back', 20, '#B55573') + '<span>' + esc(J.t('back')) + '</span></button>' }) + U.band() + '<div class="payp">';
     h += '<section class="bill"><div class="bl">';
-    for (i = 0; i < c.lines.length; i++) { var it = J.ix().itemById[c.lines[i].item_id]; if (it) { h += '<div class="r"><span>' + c.lines[i].qty + ' × ' + esc(J.nm(it.name)) + '</span><span>L' + (Number(it.price) * c.lines[i].qty) + '</span></div>'; } }
+    if (ui().payFor) {
+      for (i = 0; i < ui().payFor.lines.length; i++) { h += '<div class="r"><span>' + esc(ui().payFor.lines[i].label) + '</span><span>L' + ui().payFor.lines[i].amount + '</span></div>'; }
+    }
+    for (i = 0; !ui().payFor && i < c.lines.length; i++) { var it = J.ix().itemById[c.lines[i].item_id]; if (it) { h += '<div class="r"><span>' + c.lines[i].qty + ' × ' + esc(J.nm(it.name)) + '</span><span>L' + (Number(it.price) * c.lines[i].qty) + '</span></div>'; } }
     if (t.togo) { h += '<div class="r acc"><span>' + esc(J.t('toGo')) + '</span><span>L' + t.togo + '</span></div>'; }
     if (t.tip) { h += '<div class="r acc"><span>' + esc(J.t('tip')) + '</span><span>L' + t.tip + '</span></div>'; }
     h += '</div><div class="btot"><span>' + esc(J.t('total')) + '</span><b>' + money(t.grand) + '</b></div></section><section class="paymeth"><div class="methods">' +
@@ -237,7 +245,7 @@
       '<div class="change' + (change !== null && change < 0 ? ' short' : '') + '"><span>' + (change !== null && change < 0 ? 'Still owed' : esc(J.t('change'))) + '</span><b id="changeOut">' + (change === null ? '—' : money(Math.abs(change))) + '</b></div></div>';
   }
   function cardPanel(t) {
-    var p = ui().pay, base = J.totals(J.cart(), J.cart().type).total;
+    var p = ui().pay, base = baseTotals().total;
     return '<div class="pcard"><p class="lbl">' + esc(J.t('tip')) + '</p><div class="chips">' + ['none', '10%', '15%', '20%', 'other'].map(function (l, i) {
       var amt = i === 4 ? (p.tipMode === 4 ? money(p.tip) : '…') : money(Math.round(base * [0, 0.10, 0.15, 0.20][i]));
       return '<button type="button" class="chip tip' + (p.tipMode === i ? ' on' : '') + '" data-act="tip" data-arg="' + i + '"><b>' + (i === 0 ? esc(J.t('none')) : l) + '</b><small>' + amt + '</small></button>';
@@ -246,7 +254,7 @@
   }
   R.givenInput = function (v) {
     var p = ui().pay; p.given = v === '' ? null : Number(v);
-    var c = J.cart(), t = J.totals(c, c.type), rt = J.rate(), val = p.given === null ? null : (p.method === 'cash_usd' ? p.given * rt : p.given), out = J.$('changeOut');
+    var c = J.cart(), t = baseTotals(), rt = J.rate(), val = p.given === null ? null : (p.method === 'cash_usd' ? p.given * rt : p.given), out = J.$('changeOut');
     if (out) { out.innerHTML = val === null ? '—' : money(Math.abs(J.r2(val - t.total))); out.parentNode.className = 'change' + (val !== null && val < t.total ? ' short' : ''); }
     var b = d.querySelector('[data-act="complete"]'); if (b) { b.disabled = !canComplete(t); }
   };
@@ -260,8 +268,12 @@
   };
   R.complete = function () {
     var p = ui().pay, ref = J.$('cardRef'); if (ref) { p.ref = ref.value; }
-    var c = J.cart(), tip = p.method === 'card' ? tipAmount() : 0, t = J.totals(c, c.type, tip);
+    var c = J.cart(), tip = p.method === 'card' ? tipAmount() : 0, t = ui().payFor ? payForTotals(tip) : J.totals(c, c.type, tip);
     if (!canComplete(t)) { return; }
+    if (ui().payFor) {
+      var pf = ui().payFor; J.takePayment(pf.ids, { method: p.method, given: p.given, tip: tip, ref: p.ref });
+      ui().payFor = null; ui().view = 'pos'; S.tab = 'overview'; ui().popup = null; J.changed(); return;
+    }
     R.finish({ method: p.method, given: p.given, tip: tip, ref: p.ref });
   };
   R.start = function (later) {

@@ -132,7 +132,8 @@
           // writes are still waiting to upload: keep our own picture of orders and sticks, take the rest
           if (S.floor) { S.floor.lights = f.lights; S.floor.dish_state = f.dish_state; S.floor.tables = f.tables; }
         } else { S.floor = f; }
-        save('floor'); J.changed();
+        var sig = JSON.stringify([S.floor.open, S.floor.done, S.floor.sticks, S.floor.lights, S.floor.dish_state]);
+        if (sig !== J._floorSig) { J._floorSig = sig; save('floor'); J.changed(); } else { save('floor'); }
       }
       if (cb) { cb(err); }
     });

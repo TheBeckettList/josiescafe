@@ -231,7 +231,9 @@ language sql stable security definer set search_path = public as $$
     'open', (select coalesce(jsonb_agg(f order by f.created_at), '[]') from (
         select o.id, o.number, o.customer_name as name, o.order_type as type, o.source, o.stick_number as stick, o.status, o.total, o.diets,
                o.created_at, o.pickup_at,
-               (select string_agg(i.qty || ' ' || i.name, ' · ' order by i.name) from public.order_items i where i.order_id = o.id and i.stopped_at is null) as items
+               (select string_agg(i.qty || ' ' || i.name, ' · ' order by i.name) from public.order_items i where i.order_id = o.id and i.stopped_at is null) as items,
+               (select coalesce(jsonb_agg(jsonb_build_object('id', i.id, 'qty', i.qty, 'name', i.name, 'station', i.station, 'stopped', i.stopped_at is not null) order by i.id), '[]')
+                  from public.order_items i where i.order_id = o.id) as lines
           from public.orders o where o.phase = 'open' and o.status <> 'void') f),
     'done', (select coalesce(jsonb_agg(f order by f.completed_at desc), '[]') from (
         select o.id, o.number, o.customer_name as name, o.order_type as type, o.stick_number as stick, o.total, o.completed_at, o.created_at,
@@ -263,7 +265,7 @@ language sql stable security definer set search_path = public as $$
              (select oo.stick_number from public.order_pieces pp join public.orders oo on oo.id = pp.order_id where pp.id = op.parent_id) as parent_stick,
              (select count(*) from public.order_pieces ad where ad.parent_id = op.id) as addons_waiting,
              (select coalesce(jsonb_agg(jsonb_build_object('id', i.id, 'qty', i.qty,
-                'name', coalesce(it.name ->> p_lang, it.name ->> 'en', i.name), 'note', i.note, 'stopped', i.stopped_at is not null,
+                'name', coalesce(it.name ->> p_lang, it.name ->> 'en', i.name), 'en', i.name, 'note', i.note, 'stopped', i.stopped_at is not null,
                 'chips', (select coalesce(jsonb_agg(jsonb_build_object('type', ch ->> 'type',
                            'ing', jsonb_build_object('name', coalesce(g.name ->> p_lang, g.name ->> 'en'), 'icon', g.icon),
                            'with', case when w.id is null then null else jsonb_build_object('name', coalesce(w.name ->> p_lang, w.name ->> 'en'), 'icon', w.icon) end,

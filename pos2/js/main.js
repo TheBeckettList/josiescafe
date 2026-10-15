@@ -117,7 +117,7 @@
     if (J.ov && J.ov.after) { J.ov.after(app); }
   }
   J.onChange = function () {
-    if (paintTimer) { return; }
+    if (paintTimer || S.ui.dragging) { return; }
     paintTimer = w.setTimeout(function () { paintTimer = null; paint(); }, 24);
   };
   J.repaintNow = paint;
@@ -152,7 +152,9 @@
       case 'addtoCancel': c.addTo = null; J.saveCart(); J.changed(); break;
       case 'stickPick': R.stickPick(arg); break;
       case 'stickBack2': S.ui.view = 'pos'; J.changed(); break;
-      case 'payBack': S.ui.view = c.type === 'here' && !c.addTo ? 'stick' : 'pos'; J.changed(); break;
+      case 'payBack':
+        if (S.ui.payFor) { S.ui.payFor = null; S.ui.view = 'pos'; S.tab = 'overview'; } else { S.ui.view = c.type === 'here' && !c.addTo ? 'stick' : 'pos'; }
+        J.changed(); break;
       case 'method': S.ui.pay.method = arg; S.ui.pay.given = null; J.changed(); break;
       case 'given': S.ui.pay.given = Number(arg); J.changed(); break;
       case 'tip':
