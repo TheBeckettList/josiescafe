@@ -1,0 +1,80 @@
+/* Josie's World · little things that move when you tap them (the cafe map and the bay map). Nothing here is needed to use the app.
+   Every overlay stays hidden until it is playing, then a copy of the picture (or a tiny drawing) does the cute thing and goes away. */
+.cr { position: absolute; pointer-events: none; visibility: hidden; }
+.cr.on { visibility: visible; }
+.crit { background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+/* the tree rustles and drops a few leaves */
+.cr-tree { -webkit-transform-origin: 210px 108px; transform-origin: 210px 108px; }
+.cr-tree.on { -webkit-animation: crTree 1.5s ease-in-out both; animation: crTree 1.5s ease-in-out both; }
+@keyframes crTree { 0% { transform: rotate(0) scale(1.01); } 12% { transform: rotate(2.4deg) scale(1.025); } 28% { transform: rotate(-2.2deg) scale(1.02); } 44% { transform: rotate(1.6deg) scale(1.02); } 60% { transform: rotate(-1.2deg) scale(1.015); } 78% { transform: rotate(.6deg) scale(1.01); } 100% { transform: rotate(0) scale(1.01); } }
+@-webkit-keyframes crTree { 0% { -webkit-transform: rotate(0) scale(1.01); } 12% { -webkit-transform: rotate(2.4deg) scale(1.025); } 28% { -webkit-transform: rotate(-2.2deg) scale(1.02); } 44% { -webkit-transform: rotate(1.6deg) scale(1.02); } 60% { -webkit-transform: rotate(-1.2deg) scale(1.015); } 100% { -webkit-transform: rotate(0) scale(1.01); } }
+.cr-leaf.on { -webkit-animation: crLeaf 1.7s ease-in both; animation: crLeaf 1.7s ease-in both; }
+@keyframes crLeaf { 0% { opacity: 0; transform: translate(0,0) rotate(0); } 12% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--r)); } }
+@-webkit-keyframes crLeaf { 0% { opacity: 0; -webkit-transform: translate(0,0) rotate(0); } 12% { opacity: 1; } 100% { opacity: 0; -webkit-transform: translate(var(--dx), var(--dy)) rotate(var(--r)); } }
+
+/* the iguana winks, cranes its head up the incline, and opens and closes its mouth */
+.cr-ig { -webkit-transform-origin: 37px 29px; transform-origin: 37px 29px; }
+.cr-ig.on { -webkit-animation: crIg 3.4s ease-in-out both; animation: crIg 3.4s ease-in-out both; }
+@keyframes crIg { 0%, 22% { transform: rotate(0) translateY(0); } 34% { transform: rotate(14deg) translateY(-2px); } 78% { transform: rotate(14deg) translateY(-2px); } 92%, 100% { transform: rotate(0) translateY(0); } }
+@-webkit-keyframes crIg { 0%, 22% { -webkit-transform: rotate(0); } 34% { -webkit-transform: rotate(14deg) translateY(-2px); } 78% { -webkit-transform: rotate(14deg) translateY(-2px); } 92%, 100% { -webkit-transform: rotate(0); } }
+.cr-wink { opacity: 0; }
+.cr-wink.on { -webkit-animation: crWink 3.4s both; animation: crWink 3.4s both; }
+@keyframes crWink { 0%, 4% { opacity: 0; } 6%, 16% { opacity: 1; } 18%, 100% { opacity: 0; } }
+.cr-mouth { -webkit-transform-origin: 12px 20.5px; transform-origin: 12px 20.5px; -webkit-transform: scaleY(0); transform: scaleY(0); }
+.cr-mouth.on { -webkit-animation: crMouth 3.4s both; animation: crMouth 3.4s both; }
+@keyframes crMouth { 0%, 38% { transform: scaleY(0); } 44%, 54% { transform: scaleY(1); } 60% { transform: scaleY(0); } 66%, 76% { transform: scaleY(1); } 82%, 100% { transform: scaleY(0); } }
+@-webkit-keyframes crMouth { 0%, 38% { -webkit-transform: scaleY(0); } 44%, 54% { -webkit-transform: scaleY(1); } 60% { -webkit-transform: scaleY(0); } 66%, 76% { -webkit-transform: scaleY(1); } 82%, 100% { -webkit-transform: scaleY(0); } }
+
+/* a crab scurries sideways into its hole, peeks out, and scurries home */
+.cr-crab { -webkit-transform-origin: 50% 85%; transform-origin: 50% 85%; }
+.cr-crab.on { -webkit-animation: crCrab 4s ease-in-out both; animation: crCrab 4s ease-in-out both; }
+@keyframes crCrab { 0% { transform: translate(0,0) scale(1); opacity: 1; } 22% { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 1; } 30%, 56% { transform: translate(var(--dx), var(--dy)) scale(.1); opacity: 0; } 62%, 70% { transform: translate(var(--dx), var(--dy)) scale(.55); opacity: 1; } 76%, 84% { transform: translate(var(--dx), var(--dy)) scale(.1); opacity: 0; } 90% { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 1; } 100% { transform: translate(0,0) scale(1); opacity: 1; } }
+@-webkit-keyframes crCrab { 0% { -webkit-transform: translate(0,0) scale(1); opacity: 1; } 22% { -webkit-transform: translate(var(--dx), var(--dy)) scale(1); opacity: 1; } 30%, 56% { -webkit-transform: translate(var(--dx), var(--dy)) scale(.1); opacity: 0; } 62%, 70% { -webkit-transform: translate(var(--dx), var(--dy)) scale(.55); opacity: 1; } 76%, 84% { -webkit-transform: translate(var(--dx), var(--dy)) scale(.1); opacity: 0; } 90% { -webkit-transform: translate(var(--dx), var(--dy)) scale(1); opacity: 1; } 100% { -webkit-transform: translate(0,0) scale(1); opacity: 1; } }
+.cr-wig { -webkit-animation: crWig .14s linear infinite alternate; animation: crWig .14s linear infinite alternate; -webkit-transform-origin: 30px 30px; transform-origin: 30px 30px; }
+@keyframes crWig { from { transform: rotate(-5deg) translateY(0); } to { transform: rotate(5deg) translateY(-1px); } }
+@-webkit-keyframes crWig { from { -webkit-transform: rotate(-5deg); } to { -webkit-transform: rotate(5deg); } }
+.cr-hole { opacity: 0; }
+.cr-hole.on { -webkit-animation: crHole 4s both; animation: crHole 4s both; }
+@keyframes crHole { 0%, 14% { opacity: 0; } 20%, 92% { opacity: 1; } 100% { opacity: 0; } }
+@-webkit-keyframes crHole { 0%, 14% { opacity: 0; } 20%, 92% { opacity: 1; } 100% { opacity: 0; } }
+
+/* the eagle ray flaps its wings while the water flows past */
+.cr-ray { -webkit-transform-origin: 45% 55%; transform-origin: 45% 55%; }
+.cr-ray.on { -webkit-animation: crRay 2.4s ease-in-out both; animation: crRay 2.4s ease-in-out both; }
+@keyframes crRay { 0% { transform: scale(1,1); } 10% { transform: scale(1.06,1.13) rotate(-1.5deg); } 20% { transform: scale(1.02,1.02); } 32% { transform: scale(1.07,1.14) rotate(1.5deg); } 44% { transform: scale(1.02,1.02); } 58% { transform: scale(1.06,1.12) rotate(-1deg); } 72% { transform: scale(1.01,1.01); } 100% { transform: scale(1,1); } }
+@-webkit-keyframes crRay { 0% { -webkit-transform: scale(1,1); } 10% { -webkit-transform: scale(1.06,1.13) rotate(-1.5deg); } 20% { -webkit-transform: scale(1.02,1.02); } 32% { -webkit-transform: scale(1.07,1.14) rotate(1.5deg); } 44% { -webkit-transform: scale(1.02,1.02); } 58% { -webkit-transform: scale(1.06,1.12) rotate(-1deg); } 72% { -webkit-transform: scale(1.01,1.01); } 100% { -webkit-transform: scale(1,1); } }
+.cr-flow path { fill: none; stroke: #FFFFFF; stroke-width: 3.4; stroke-linecap: round; stroke-opacity: .75; stroke-dasharray: 46 420; stroke-dashoffset: 460; }
+.cr-flow.on path { -webkit-animation: crFlow 2.2s linear both; animation: crFlow 2.2s linear both; }
+.cr-flow.on path:nth-child(2) { -webkit-animation-delay: .25s; animation-delay: .25s; } .cr-flow.on path:nth-child(3) { -webkit-animation-delay: .5s; animation-delay: .5s; } .cr-flow.on path:nth-child(4) { -webkit-animation-delay: .75s; animation-delay: .75s; }
+@keyframes crFlow { from { stroke-dashoffset: 460; } to { stroke-dashoffset: -20; } }
+@-webkit-keyframes crFlow { from { stroke-dashoffset: 460; } to { stroke-dashoffset: -20; } }
+.cr-rip circle { fill: none; stroke: #FFFFFF; stroke-width: 2.2; opacity: 0; -webkit-transform-origin: 50% 50%; transform-origin: 50% 50%; }
+.cr-rip.on circle { -webkit-animation: crRip 1.6s ease-out both; animation: crRip 1.6s ease-out both; }
+.cr-rip.on circle:nth-child(2) { -webkit-animation-delay: .5s; animation-delay: .5s; }
+@keyframes crRip { 0% { opacity: .85; transform: scale(.3); } 100% { opacity: 0; transform: scale(1.6); } }
+@-webkit-keyframes crRip { 0% { opacity: .85; -webkit-transform: scale(.3); } 100% { opacity: 0; -webkit-transform: scale(1.6); } }
+
+/* the tuk-tuk puffs cute white clouds */
+.cr-puff.on { -webkit-animation: crPuff 1.7s ease-out both; animation: crPuff 1.7s ease-out both; }
+@keyframes crPuff { 0% { opacity: 0; transform: translate(0,0) scale(.3); } 14% { opacity: .98; } 100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(var(--ps)); } }
+@-webkit-keyframes crPuff { 0% { opacity: 0; -webkit-transform: translate(0,0) scale(.3); } 14% { opacity: .98; } 100% { opacity: 0; -webkit-transform: translate(var(--px), var(--py)) scale(var(--ps)); } }
+
+/* the bay: boats rock, the octopus wiggles and puffs ink, fish dart, the buoy bobs, the dive boat bobs and blows bubbles */
+.bc { -webkit-transform-box: fill-box; transform-box: fill-box; -webkit-transform-origin: 50% 85%; transform-origin: 50% 85%; cursor: pointer; }
+.bc-sail.on { -webkit-animation: bcRock 1.4s ease-in-out both; animation: bcRock 1.4s ease-in-out both; }
+@keyframes bcRock { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-6deg); } 45% { transform: rotate(5deg); } 70% { transform: rotate(-3deg); } }
+.bc-oct.on { -webkit-animation: bcWig 1.5s ease-in-out both; animation: bcWig 1.5s ease-in-out both; -webkit-transform-origin: 50% 60%; transform-origin: 50% 60%; }
+@keyframes bcWig { 0%, 100% { transform: rotate(0) scale(1,1); } 15% { transform: rotate(-9deg) scale(1.12,.9); } 35% { transform: rotate(8deg) scale(.92,1.12); } 55% { transform: rotate(-6deg) scale(1.08,.94); } 75% { transform: rotate(4deg) scale(1,1.04); } }
+.bc-ink { opacity: 0; -webkit-transform-box: fill-box; transform-box: fill-box; -webkit-transform-origin: 50% 50%; transform-origin: 50% 50%; }
+.bc-ink.on { -webkit-animation: bcInk 1.6s ease-out both; animation: bcInk 1.6s ease-out both; }
+@keyframes bcInk { 0% { opacity: .0; transform: scale(.3); } 20% { opacity: .75; } 100% { opacity: 0; transform: scale(2.4); } }
+.bf { -webkit-transform-box: fill-box; transform-box: fill-box; }
+.bf.on { -webkit-animation: bcFish 1.8s ease-in-out both; animation: bcFish 1.8s ease-in-out both; }
+@keyframes bcFish { 0% { transform: translate(0,0); } 22% { transform: translate(var(--fx), var(--fy)); } 60% { transform: translate(var(--fx), var(--fy)); } 100% { transform: translate(0,0); } }
+.bc-buoy.on { -webkit-animation: bcBob 1.6s ease-in-out both; animation: bcBob 1.6s ease-in-out both; }
+.bc-dive.on { -webkit-animation: bcBob 1.8s ease-in-out both; animation: bcBob 1.8s ease-in-out both; }
+@keyframes bcBob { 0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-3px) rotate(-3deg); } 55% { transform: translateY(2px) rotate(2.5deg); } 80% { transform: translateY(-1.5px) rotate(-1.5deg); } }
+.bc-bub { opacity: 0; }
+.bc-bub.on { -webkit-animation: bcBub 1.8s ease-out both; animation: bcBub 1.8s ease-out both; }
+@keyframes bcBub { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: .9; } 100% { opacity: 0; transform: translateY(-24px); } }

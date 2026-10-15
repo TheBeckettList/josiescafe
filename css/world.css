@@ -88,3 +88,5 @@ button { font-family: inherit; border: 0; cursor: pointer; color: inherit; backg
 
 .wtop .brand img { display: block; height: 42px; width: auto; margin-top: 2px; }
 @media (min-width: 700px) { .wtop .brand img { height: 50px; } }
+
+.hsteps { list-style: none; counter-reset: h; margin: 6px 0 12px; padding: 0; } .hsteps li { counter-increment: h; display: flex; align-items: center; padding: 11px 0; border-bottom: 2px dashed #F5C9D6; font-weight: 700; font-size: 16px; } .hsteps li:before { content: counter(h); flex: 0 0 30px; height: 30px; margin-right: 12px; border-radius: 15px; background: #FDEDF1; color: #B55573; font-family: 'Baloo 2', sans-serif; font-weight: 800; text-align: center; line-height: 30px; }

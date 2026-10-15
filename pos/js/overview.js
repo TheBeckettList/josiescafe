@@ -76,7 +76,7 @@
   /* ───────────── the screen ───────────── */
   O.screen = function () {
     var f = S.floor, h = '<div class="shell">' + U.topbar('overview') + U.band() + '<div class="ovbody"><div class="mapcol" id="mapcol"><div class="mapbox" id="mapbox"><div class="mapscale" id="mapscale">';
-    h += '<div class="mapimg"></div>';
+    h += '<div class="mapimg"></div>' + (w.J2CRIT ? w.J2CRIT.cafe() : '');
     if (!f) { return h + '</div></div></div><aside class="orail"><p class="empty">Loading…</p></aside></div></div>'; }
     var ts = inCartTables(), i, k, label, t, st = ui().placing, sticks = J.sticks(), homeN = [], waitN = [];
     for (i = 0; i < sticks.length; i++) { if (sticks[i].state === 'home') { homeN.push(sticks[i].number); } else if (sticks[i].state === 'waiting') { waitN.push(sticks[i].number); } }
@@ -116,7 +116,7 @@
       var on = popKind === 'table' && ui().popup.id === label;
       h += '<button type="button" class="hit tbl' + (st ? ' pick' : '') + (on ? ' on' : '') + '" data-act="tablePick" data-arg="' + label + '" data-ov="table-' + label + '" style="' + px(TABLES[label].box) + '" aria-label="Table ' + label + '"></button>';
     }
-    h += '</div>';                                           // mapscale
+    h += (w.J2CRIT ? w.J2CRIT.hits() : '') + '</div>';       // mapscale
     if (st) { h += '<div class="placehint">' + esc(J.t('placeOnTable')) + ' · ' + st + '<button type="button" data-act="placeCancel">' + esc(J.t('cancel')) + '</button></div>'; }
     h += '<div class="poplayer" id="poplayer">' + popupHTML() + '</div></div></div>' + rail() + '</div>' + sheetLayer() + '</div>';
     return h;
@@ -395,6 +395,7 @@
         if (arg === 'kitchen' || arg === 'bar') { O.pollFeeds(); }
         return true;
       case 'ovClose': closePop(); return true;
+      case 'crit': if (w.J2CRIT) { w.J2CRIT.play(arg, d.getElementById('app')); } return true;
       case 'ovGear': ui().flip = !ui().flip; J.changed(); return true;
       case 'tablePick':
         if (ui().placing) {

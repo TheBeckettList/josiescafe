@@ -9,14 +9,14 @@
       nameNeeded: 'Please add your name so we know whose it is.', closedAfter: 'Online orders are closed for today. Come see us until 2:30, or look at the menu.', closedNow: 'We are closed right now. The menu is here to look at.', paused: 'Online orders are paused. Come by the counter.', 
       gone: 'Something in your order just ran out. Please look it over and try again.', many: 'There are a few orders waiting already. Please come by the counter.', fail: 'That did not go through. Please try again.', 
       yourOrderAt: 'Your order at Josie’s', making: 'Making it', pickedUp: 'Picked up', cancelled: 'Cancelled at the counter', addSomething: '+ Add something', kitchenNow: 'Josie’s kitchen, right now', barNow: 'At the bar', payPickup: 'Pay when you pick up', gate: 'Come in by the small gate, under the pink sign.',
-      newOrder: 'Order something else', no: 'NO', core: 'is the dish', vegan: 'Vegan', helpText: 'Tap the menu board on the map, pick a dish, check what is in it, tap what you do not want, then Add. Pay at the counter when you pick it up.',
+      newOrder: 'Order something else', no: 'NO', core: 'is the dish', vegan: 'Vegan', helpText: '', h1: 'Tap the menu board on the map', h2: 'Tap a dish to see what is in it', h3: 'Tap an ingredient to leave it out, or a diet button to see what changes', h4: 'Tap Add, then Review. Type your name and pick For here or To go', h5: 'Send it, then watch it being made. Pay at the counter when you pick it up',
       addingTo: 'Adding to your order', sendAdd: 'Add to my order', tapIngredient: 'Tap an ingredient to leave it out.', meatDairy: 'This has meat and dairy together, which is not kosher-style.', mon: 'Mon', sat: 'Sat', dishIs: 'is what this dish is built on. You can add it anyway.', bar: 'Bar', kitchen: 'Kitchen', bayMap: 'Utila Bay', cafeMap: 'Josie’s' },
     es: { open: 'Abierto', openTill: 'Abierto · hasta', closed: 'Cerrado', justMenu: 'Solo el menú', lang: 'Idioma', help: 'Cómo funciona', yourOrder: 'Tu pedido', review: 'Revisar', add: 'Agregar', out: 'Agotado hoy', ranOut: 'se acabó hoy',
       here: 'Para aquí', togo: 'Para llevar', yourName: 'Tu nombre', send: 'Enviar a la cocina', paySoon: 'Pagas en el mostrador al recogerlo.', total: 'Total', back: 'Atrás', close: 'Cerrar', remove: 'Quitar', empty: 'Nada todavía. Toca un plato.',
       nameNeeded: 'Pon tu nombre para saber de quién es.', closedAfter: 'Los pedidos en línea están cerrados por hoy. Pasa hasta las 2:30, o mira el menú.', closedNow: 'Estamos cerrados ahora. El menú está aquí para mirar.', paused: 'Los pedidos en línea están en pausa. Pasa por el mostrador.',
       gone: 'Algo de tu pedido se acaba de agotar. Revísalo e inténtalo otra vez.', many: 'Ya hay varios pedidos esperando. Pasa por el mostrador.', fail: 'No se pudo enviar. Inténtalo otra vez.',
       yourOrderAt: 'Tu pedido en Josie’s', making: 'Lo estamos haciendo', pickedUp: 'Recogido', cancelled: 'Cancelado en el mostrador', addSomething: '+ Agregar algo', kitchenNow: 'La cocina de Josie’s, ahora', barNow: 'En el bar', payPickup: 'Pagas al recogerlo', gate: 'Entra por el portón pequeño, bajo el letrero rosado.',
-      newOrder: 'Pedir otra cosa', no: 'SIN', core: 'es el plato', vegan: 'Vegano', helpText: 'Toca el menú en el mapa, elige un plato, mira qué lleva, toca lo que no quieres, y Agregar. Pagas en el mostrador al recogerlo.',
+      newOrder: 'Pedir otra cosa', no: 'SIN', core: 'es el plato', vegan: 'Vegano', helpText: '', h1: 'Toca el menú en el mapa', h2: 'Toca un plato para ver qué lleva', h3: 'Toca un ingrediente para quitarlo, o un botón de dieta para ver qué cambia', h4: 'Toca Agregar y luego Revisar. Escribe tu nombre y elige Aquí o Para llevar', h5: 'Envíalo y mira cómo lo preparan. Pagas en el mostrador al recogerlo',
       addingTo: 'Agregando a tu pedido', sendAdd: 'Agregar a mi pedido', tapIngredient: 'Toca un ingrediente para quitarlo.', meatDairy: 'Lleva carne y lácteos juntos, no es estilo kosher.', mon: 'Lun', sat: 'Sáb', dishIs: 'es la base de este plato. Puedes agregarlo igual.', bar: 'Bar', kitchen: 'Cocina', bayMap: 'Bahía de Utila', cafeMap: 'Josie’s' }
   };
   var DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -101,10 +101,10 @@
     var h = '<div class="wmap" style="height:' + b.h + 'px"><div class="wlayer" style="-webkit-transform:' + tr + ';transform:' + tr + '">';
     if (W.bay) { h += w.J2BAY.layer(); }
     else {
-      h += '<div class="mimg"></div><div class="hours" style="left:46px;top:296px"><span class="tag' + (closedNow ? ' closed' : '') + '">' + esc(closedNow ? s('closed') : 'OPEN') + '</span><b>' + fmt(t.open) + ' – ' + fmt(t.close) + '</b><small>' + s('mon') + ' – ' + s('sat') + '</small></div>' +
+      h += '<div class="mimg"></div>' + (w.J2CRIT ? w.J2CRIT.cafe() : '') + '<div class="hours" style="left:46px;top:296px"><span class="tag' + (closedNow ? ' closed' : '') + '">' + esc(closedNow ? s('closed') : 'OPEN') + '</span><b>' + fmt(t.open) + ' – ' + fmt(t.close) + '</b><small>' + s('mon') + ' – ' + s('sat') + '</small></div>' +
         '<button type="button" class="hit glow" data-act="toMenu" style="left:806px;top:160px;width:84px;height:84px" aria-label="Menu"></button>';
     }
-    h += '<button type="button" class="hit" data-act="hours" style="left:' + (W.bay ? w.J2BAY.sign[0] : 114) + 'px;top:' + (W.bay ? w.J2BAY.sign[1] : 92) + 'px;width:132px;height:162px" aria-label="Hours"></button></div>' +
+    h += (!W.bay && w.J2CRIT ? w.J2CRIT.hits() : '') + '<button type="button" class="hit" data-act="hours" style="left:' + (W.bay ? w.J2BAY.sign[0] : 114) + 'px;top:' + (W.bay ? w.J2BAY.sign[1] : 92) + 'px;width:132px;height:162px" aria-label="Hours"></button></div>' +
       '<button type="button" class="winset" data-act="bayFlip" aria-label="' + esc(s(W.bay ? 'cafeMap' : 'bayMap')) + '">' + (W.bay ? '<span class="winsetimg"></span>' : w.J2BAY.thumb()) + '<span class="cap">' + esc(s(W.bay ? 'cafeMap' : 'bayMap')) + '</span></button>';
     if (W.cart.length) { h += '<div class="cartpill"><span><small>' + esc(s('yourOrder')) + ' · ' + cartCount() + '</small><b>' + money(cartTotal()) + '</b></span><button type="button" class="go" data-act="review">' + esc(s('review')) + '</button></div>'; }
     return h + '</div>';
@@ -196,7 +196,7 @@
     if (!W.sheet) { return ''; }
     if (W.sheet === 'langs') {
       h = '<h3>' + esc(s('lang')) + '</h3>'; for (i = 0; i < JC.langs.length; i++) { h += '<button type="button" class="lopt' + (JC.langs[i].code === W.lang ? ' on' : '') + '" data-act="setLang" data-arg="' + JC.langs[i].code + '">' + esc(JC.langs[i].label) + '</button>'; }
-    } else if (W.sheet === 'help') { h = '<h3>' + esc(s('help')) + '</h3><p>' + esc(s('helpText')) + '</p><button type="button" class="big" data-act="sheetX">' + esc(s('close')) + '</button>'; }
+    } else if (W.sheet === 'help') { h = '<h3>' + esc(s('help')) + '</h3><ol class="hsteps"><li>' + esc(s('h1')) + '</li><li>' + esc(s('h2')) + '</li><li>' + esc(s('h3')) + '</li><li>' + esc(s('h4')) + '</li><li>' + esc(s('h5')) + '</li></ol><button type="button" class="big" data-act="sheetX">' + esc(s('close')) + '</button>'; }
     else if (W.sheet === 'hours') {
       var t = today(); h = '<h3>Josie’s Cafe</h3><p><b>' + fmt(t.open) + ' – ' + fmt(t.close) + '</b> · ' + esc(s('mon')) + ' – ' + esc(s('sat')) + '<br>Utila, Honduras</p><button type="button" class="big" data-act="sheetX">' + esc(s('close')) + '</button>';
     } else if (W.sheet === 'review') {
@@ -260,13 +260,15 @@
 
   /* ── events ── */
   app.addEventListener('click', function (ev) {
-    var el = ev.target, act, arg, p;
+    var el = ev.target, act, arg, p, ct = ev.target;
+    while (ct && ct !== app) { if (ct.getAttribute && ct.getAttribute('data-crit') && w.J2CRIT) { w.J2CRIT.play(ct.getAttribute('data-crit'), app); return; } ct = ct.parentNode; }
     while (el && el !== app && !(el.getAttribute && el.getAttribute('data-act'))) { el = el.parentNode; }
     if (!el || el === app || el.disabled) { return; }
     act = el.getAttribute('data-act'); arg = el.getAttribute('data-arg');
     if (act === 'scrim' && ev.target !== el) { return; }
     switch (act) {
       case 'toMenu': W.view = 'menu'; paint(); var m = d.getElementById('menu'); if (m && m.scrollIntoView) { m.scrollIntoView({ behavior: 'smooth' }); } break;
+      case 'crit': if (w.J2CRIT) { w.J2CRIT.play(arg, app); } break;
       case 'bayFlip': W.bay = !W.bay; paint(); break;
       case 'cat': W.cat = arg; paint(); break;
       case 'pick': W.sel = W.sel === arg ? null : arg; W.diets = {}; W.off = {}; paint(); break;

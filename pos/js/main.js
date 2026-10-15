@@ -15,8 +15,7 @@
   function html() {
     if (!S.session) { return setupView(); }
     if (!S.person) { return signinView(); }
-    if (S.ui.tutorial) { return shell() + tutorialHTML(); }
-    return shell();
+    return shell() + (S.ui.tutorial ? tutorialHTML() : '') + J.tour.html();
   }
   function shell() {
     var tab = S.tab;
@@ -99,8 +98,9 @@
 
   /* ───────────── tutorial: shown once at first sign-in, replayed by the ? ───────────── */
   function tutorialHTML() {
-    return '<div class="scrim"></div><div class="tour"><b>' + esc(J.t('tutorialWelcome')) + ', ' + esc(S.person.name) + '</b><p>' + esc(J.t('tutorialLook')) + '</p>' +
-      '<div class="tourbtns"><button type="button" class="btn soft" data-act="tourClose">' + esc(J.t('later')) + '</button><button type="button" class="btn primary" data-act="tourClose">' + esc(J.t('showMe')) + '</button></div></div>';
+    var nm = S.person ? S.person.name : '';
+    return '<div class="scrim"></div><div class="tour"><span class="tavatar">' + esc(nm.charAt(0).toUpperCase()) + '</span><b>' + esc(J.t('tutorialWelcome')) + ', ' + esc(nm) + '</b><p>' + esc(J.tour.welcomeLook()) + '</p>' +
+      '<span class="qbtn tq">?</span><div class="tourbtns tcol"><button type="button" class="btn primary wide" data-act="tourStart">' + esc(J.t('showMe')) + '</button><button type="button" class="btn soft wide" data-act="tourClose">' + esc(J.t('later')) + '</button></div></div>';
   }
 
   /* ───────────── repaint (keeps typing and scroll where they were) ───────────── */
@@ -116,6 +116,7 @@
     for (i = 0; i < els.length; i++) { var k = els[i].getAttribute('data-scroll'); if (scrolls[k] !== undefined) { els[i].scrollTop = scrolls[k]; } }
     if (keep) { var n = J.$(keep.id); if (n) { try { n.focus(); n.setSelectionRange(keep.s, keep.e); } catch (e) {} } }
     if (J.ov && J.ov.after) { J.ov.after(app); }
+    if (J.tour && J.tour.after) { J.tour.after(); }
   }
   J.onChange = function () {
     if (paintTimer || S.ui.dragging) { return; }
@@ -136,8 +137,6 @@
       case 'pin': pinKey(arg); break;
       case 'tab': S.tab = arg; S.ui.popup = null; S.ui.flip = false; S.ui.placing = null; J.changed(); if (arg === 'overview') { J.pollFloor(); } break;
       case 'me': if (w.confirm(S.person.name + ': ' + J.t('signOut') + '?')) { J.signOut(); } break;
-      case 'help': S.ui.tutorial = true; J.changed(); break;
-      case 'tourClose': S.ui.tutorial = false; J.changed(); break;
       case 'cat': S.ui.cat = arg; J.changed(); break;
       case 'diet': J.toggleDiet(arg); break;
       case 'add': var r = J.addItem(arg); if (r === 'cant') { J.addItem(arg, { anyway: true }); } break;
@@ -166,6 +165,7 @@
       case 'placeNow': S.tab = 'overview'; S.ui.view = 'pos'; S.ui.placing = Number(arg); J.changed(); J.pollFloor(); break;
       case 'print': R.printReceipt(arg); break;
       default:
+        if (J.tour && J.tour.handle(act, arg)) { break; }
         if (J.ov && J.ov.handle && J.ov.handle(act, arg, el)) { break; }
         if (J.gear && J.gear.handle && J.gear.handle(act, arg, el)) { break; }
         if (J.mgr && J.mgr.handle && J.mgr.handle(act, arg, el)) { break; }

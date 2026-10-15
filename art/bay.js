@@ -71,7 +71,8 @@
   }
 
   function fish(x, y, sc, rot, col) {
-    return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + sc + ')"><path d="M-9,0 L-18,-7 L-18,7 Z" fill="' + col + '"/><ellipse cx="0" cy="0" rx="11" ry="6.5" fill="' + col + '"/><path d="M-2,-6 Q3,-2 -2,6" stroke="#FFFFFF" stroke-width="1.6" fill="none" opacity=".7"/><circle cx="6" cy="-1.5" r="1.5" fill="#3B2925"/></g>';
+    var fx = ((Math.round(x) * 7) % 40) - 20, fy = ((Math.round(y) * 13) % 30) - 15;
+    return '<g class="bf" style="--fx:' + fx + 'px;--fy:' + fy + 'px"><g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + sc + ')"><path d="M-9,0 L-18,-7 L-18,7 Z" fill="' + col + '"/><ellipse cx="0" cy="0" rx="11" ry="6.5" fill="' + col + '"/><path d="M-2,-6 Q3,-2 -2,6" stroke="#FFFFFF" stroke-width="1.6" fill="none" opacity=".7"/><circle cx="6" cy="-1.5" r="1.5" fill="#3B2925"/></g></g>';
   }
   function school(cx, cy, col, n, spread, rot) {
     var out = '', i, k = cx * 3 + cy;
@@ -145,9 +146,12 @@
         '</g>' +
       '</g>';
     /* the little things, drawn upright in map coordinates */
-    h += '<g>' + sail(X(1125), Y(1125, 745), 0.46, '#EC5C97') + sail(X(1178), Y(1178, 786), 0.44, '#F2A66B') + sail(X(1120), Y(1120, 822), 0.42, '#7FC6D6') + '</g>';
-    h += school(X(822), Y(822, 506), '#F5B5C8', 4, 22, 10) + school(X(930), Y(930, 860), '#F2A66B', 5, 26, -8) + school(X(940), Y(940, 880), '#7FC6D6', 3, 16, 170) + school(X(905), Y(905, 1045), '#EC5C97', 4, 22, 6) + school(X(962), Y(962, 636), '#F2A66B', 3, 16, -4) + school(X(1260), Y(1260, 1152), '#7FC6D6', 4, 22, -6);
-    h += octopus(X(610), Y(610, 765) - 6, 0.5) + buoy(X(528), Y(528, 722), 0.55) + diveBoat(X(425), Y(425, 842), 0.5);
+    h += '<g class="bc bc-sail" data-crit="sail">' + sail(X(1125), Y(1125, 745), 0.46, '#EC5C97') + '</g><g class="bc bc-sail" data-crit="sail">' + sail(X(1178), Y(1178, 786), 0.44, '#F2A66B') + '</g><g class="bc bc-sail" data-crit="sail">' + sail(X(1120), Y(1120, 822), 0.42, '#7FC6D6') + '</g>';
+    h += '<g data-crit="fish">' + school(X(822), Y(822, 506), '#F5B5C8', 4, 22, 10) + school(X(930), Y(930, 860), '#F2A66B', 5, 26, -8) + school(X(940), Y(940, 880), '#7FC6D6', 3, 16, 170) + school(X(905), Y(905, 1045), '#EC5C97', 4, 22, 6) + school(X(962), Y(962, 636), '#F2A66B', 3, 16, -4) + school(X(1260), Y(1260, 1152), '#7FC6D6', 4, 22, -6) + '</g>';
+    var ox = X(610), oy = Y(610, 765) - 6, bx = X(425), by = Y(425, 842);
+    h += '<g class="bc bc-oct" data-crit="octopus">' + octopus(ox, oy, 0.5) + '<g class="bc-ink" data-crit="octopus"><circle cx="' + (ox - 12) + '" cy="' + (oy + 6) + '" r="7" fill="#7A5A8D"/><circle cx="' + (ox + 11) + '" cy="' + (oy + 8) + '" r="8" fill="#7A5A8D"/><circle cx="' + ox + '" cy="' + (oy + 16) + '" r="6" fill="#8B6A9C"/></g></g>' +
+      '<g class="bc bc-buoy" data-crit="buoy">' + buoy(X(528), Y(528, 722), 0.55) + '</g>' +
+      '<g class="bc bc-dive" data-crit="diveboat">' + diveBoat(bx, by, 0.5) + '<g class="bc-bub" data-crit="diveboat"><circle cx="' + (bx - 38) + '" cy="' + (by + 14) + '" r="2.4" fill="#FFFFFF"/><circle cx="' + (bx - 44) + '" cy="' + (by + 8) + '" r="1.8" fill="#FFFFFF"/><circle cx="' + (bx - 36) + '" cy="' + (by + 4) + '" r="1.4" fill="#FFFFFF"/></g></g>';
     /* chairs on Bando Beach */
     h += umbrella(X(1140) + 2, Y(1140, 1082) - 5, '#EC5C97') + chair(X(1105), Y(1105, 1092), '#7FC6D6', -8) + chair(X(1125), Y(1125, 1104), '#F2A66B', 6) + chair(X(1166), Y(1166, 1098), '#EC5C97', -4) + chair(X(1100), Y(1100, 1068), '#F5B5C8', -14);
     h += '<g transform="translate(860,50)" fill="#7A625B"><path d="M0,-20 l9,22 h-18 z"/><text y="22" font-size="16" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">N</text></g>';
