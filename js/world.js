@@ -152,7 +152,7 @@
   /* ── pages ── */
   function top() {
     var t = today(), gt = gate();
-    return '<header class="wtop"><span class="brand">Josie’s</span><span class="pill' + (gt === 'closed_now' ? ' closed' : '') + '">' + esc(gt === 'closed_now' ? s('closed') : s('openTill') + ' ' + fmt(t.close) + ' pm') + '</span>' +
+    return '<header class="wtop"><span class="brand"><img src="/img/josies-wordmark.png" alt="Josie’s" width="63" height="39"></span><span class="pill' + (gt === 'closed_now' ? ' closed' : '') + '">' + esc(gt === 'closed_now' ? s('closed') : s('openTill') + ' ' + fmt(t.close) + ' pm') + '</span>' +
       (phone() ? '' : '<button type="button" class="tlink" data-act="toMenu">' + esc(s('justMenu')) + '</button>') +
       '<button type="button" class="lbtn" data-act="langs">🌐 ' + esc(W.lang.toUpperCase()) + '</button><button type="button" class="qbtn" data-act="helpOpen" aria-label="' + esc(s('help')) + '">?</button></header>';
   }
