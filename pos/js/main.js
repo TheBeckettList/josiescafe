@@ -62,7 +62,7 @@
   function signinView() {
     var names = S.data.names || [], h = '<div class="signin"><img class="si-brand" src="../img/josies-wordmark.png" alt="Josie’s" height="58">', i, p, pin = S.ui.pin, dots = '';
     if (!S.ui.pinFor) {
-      h += '<div class="si-col"><h1 class="si-h">' + esc(J.t('whoIsThis')) + '</h1><div class="plist">';
+      h += '<div class="si-col"><h1 class="si-h">' + esc(J.t('whoIsThis')) + '</h1>' + (w.J2PLAY ? '<p class="muted" style="text-align:center;margin:-6px 0 10px">' + (S.lang === 'es' ? 'Modo de juego: nada es real. Elige quién eres.' : 'Play mode: nothing here is real. Pick who you are.') + '</p>' : '') + '<div class="plist">';
       for (i = 0; i < names.length; i++) {
         p = names[i];
         h += '<button type="button" class="person" data-act="pickPerson" data-arg="' + p.id + '">' + U.avatar(p.name, 54) + '<span class="pn"><b>' + esc(p.name) + '</b><small>' + esc(roleText(p)) + '</small></span></button>';
@@ -133,7 +133,7 @@
     ev.preventDefault();
     switch (act) {
       case 'lang': J.setLang(arg); break;
-      case 'pickPerson': S.ui.pinFor = arg; S.ui.pin = ''; S.ui.pinMsg = ''; J.changed(); break;
+      case 'pickPerson': S.ui.pinFor = arg; S.ui.pin = ''; S.ui.pinMsg = ''; J.changed(); if (w.J2PLAY && w.J2PLAY.autopin) { w.setTimeout(w.J2PLAY.autopin, 80); } break;
       case 'pinBack': S.ui.pinFor = null; S.ui.pin = ''; S.ui.pinMsg = ''; J.changed(); break;
       case 'pin': pinKey(arg); break;
       case 'tab': S.tab = arg; S.ui.popup = null; S.ui.flip = false; S.ui.placing = null; J.changed(); if (arg === 'overview') { J.pollFloor(); } break;
@@ -204,7 +204,7 @@
     w.setInterval(function () { if (S.online && S.session && S.ui.view !== 'pay') { J.loadData(function () { J.changed(); }); } }, 90000);
     w.setInterval(function () { if (S.backBand && S.online && !S.queue.length) { S.backBand = 0; J.changed(); } }, 6000);
     w.setInterval(function () { J.changed(); }, 30000);                 // keep the clock and "6 min" fresh
-    if ('serviceWorker' in w.navigator) { try { w.navigator.serviceWorker.register('sw.js'); } catch (e) {} }
+    if ('serviceWorker' in w.navigator && !w.J2PLAY) { try { w.navigator.serviceWorker.register('sw.js'); } catch (e) {} }
   }
   boot();
 }(window, document, window.JC));

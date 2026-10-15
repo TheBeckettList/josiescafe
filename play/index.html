@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Play Josie's World</title>
+<link rel="icon" href="/img/icon-180.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap">
+<style>
+  :root { --pink: #B55573; --soft: #FDEDF1; --ink: #5B3843; --mute: #86606B; --line: #F5B5C8; --card: #FFFFFF; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --soft: #2B1F24; --ink: #F7E3E9; --mute: #C9A8B2; --card: #3A2A31; --line: #7A4A5C; --pink: #E58AA9; } }
+  :root[data-theme="dark"] { --soft: #2B1F24; --ink: #F7E3E9; --mute: #C9A8B2; --card: #3A2A31; --line: #7A4A5C; --pink: #E58AA9; }
+  * { box-sizing: border-box; } html, body { margin: 0; background: var(--soft); color: var(--ink); font-family: Nunito, system-ui, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 28px 16px 56px; text-align: center; }
+  img.wm { height: 92px; margin: 8px 0 4px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 40px; line-height: 1.05; margin: 8px 0 6px; }
+  p { font-weight: 700; color: var(--mute); font-size: 18px; margin: 6px 0 18px; }
+  .go { display: inline-block; background: var(--pink); color: #fff; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px; padding: 14px 34px; border-radius: 40px; text-decoration: none; box-shadow: 0 6px 0 rgba(142,63,89,.35); }
+  .roles { display: flex; flex-wrap: wrap; justify-content: center; margin: 26px -5px 8px; }
+  .role { width: calc(50% - 10px); margin: 5px; background: var(--card); border-radius: 22px; padding: 14px 12px; box-shadow: 0 0 0 3px var(--line); text-align: left; }
+  .role b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 20px; } .role span { font-size: 14px; font-weight: 700; color: var(--mute); }
+  small { display: block; margin-top: 22px; color: var(--mute); font-weight: 700; }
+</style>
+</head>
+<body>
+<main>
+  <img class="wm" src="/img/josies-wordmark.png" alt="Josie’s">
+  <h1>Play Josie’s World</h1>
+  <p>A pretend café you can run from your phone or laptop. Ring things up, make them at the bar, watch the kitchen, order as a guest. Nothing is real, and nothing leaves your device.</p>
+  <a class="go" href="/pos/?play">Open the play café</a>
+  <div class="roles">
+    <div class="role"><b>Josie</b><span>Owner. Menu, prices, team, wages, pastries.</span></div>
+    <div class="role"><b>Maya</b><span>Manager. The day, the phones.</span></div>
+    <div class="role"><b>Rosa</b><span>Register. Ring up, take payment, place sticks.</span></div>
+    <div class="role"><b>Beto &amp; Lupe</b><span>Bar and kitchen. Read tickets, set the lights.</span></div>
+  </div>
+  <p>Tap <b>Play mode</b> at the bottom left any time to switch who you are, open the guest website, or start over.</p>
+  <small>The first time takes a few seconds to set up. After that it opens fast and remembers where you left it.</small>
+</main>
+</body>
+</html>
