@@ -8,7 +8,7 @@
 
   /* ───────────── which screen is showing ───────────── */
   function roleHome() {
-    var p = S.person;
+    var p = J.eff();
     if (p && (p.station === 'bar' || p.station === 'kitchen') && p.role === 'staff') { return 'overview'; }
     return 'pos';
   }
@@ -33,7 +33,7 @@
 
   /* ───────────── device setup (once per tablet; shared with the live /pos/) ───────────── */
   function setupView() {
-    return '<div class="center setup"><img src="../img/logo.png" alt="" width="110" height="128"><h1>Set up this device</h1>' +
+    return '<div class="center setup"><img src="../img/josies-wordmark.png" alt="Josie’s" height="86" style="display:block;margin:0 auto 10px"><h1>Set up this device</h1>' +
       '<p class="muted">A manager does this once per tablet. It stays signed in, even offline.</p>' +
       '<form id="setupForm" class="pcard form" autocomplete="on"><label>Device email<input id="su_email" type="email" autocapitalize="off" autocorrect="off" value="pos@josiescafe.com"></label>' +
       '<label>Password<input id="su_pass" type="password"></label><label>Device letter<select id="su_code">' + ['A', 'B', 'C', 'D', 'E', 'F'].map(function (c) { return '<option' + (S.device.code === c ? ' selected' : '') + '>' + c + '</option>'; }).join('') + '</select></label>' +
@@ -59,7 +59,7 @@
     return J.t('register');
   }
   function signinView() {
-    var names = S.data.names || [], h = '<div class="signin">', i, p, pin = S.ui.pin, dots = '';
+    var names = S.data.names || [], h = '<div class="signin"><img class="si-brand" src="../img/josies-wordmark.png" alt="Josie’s" height="58">', i, p, pin = S.ui.pin, dots = '';
     if (!S.ui.pinFor) {
       h += '<div class="si-col"><h1 class="si-h">' + esc(J.t('whoIsThis')) + '</h1><div class="plist">';
       for (i = 0; i < names.length; i++) {

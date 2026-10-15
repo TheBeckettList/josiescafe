@@ -2,7 +2,7 @@
    Chai is not a latte and a cappuccino is not a latte: every drink, plate and pastry has its own picture. The ingredient bubbles in the POS
    are separate (stock based) and untouched. Registers each icon in J2ART.menu; J2ART.keyFor("Chai latte") gives the key (or null).
    Needs art/art.js. Plain ES5. */
-(function (w) {
+(function (w, d) {
   'use strict';
   var ART = w.J2ART; if (!ART) { return; }
   function slug(en) { return String(en || '').toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
@@ -158,6 +158,24 @@
     add('croissant', '#FCEBD6', o + '</g>');
   }());
 
+
+  /* ingredient pictures sit in round bubbles: crop each one to its own artwork so it fills the bubble instead of floating in white space */
+  (function fitIngredients() {
+    try {
+      var host = d.body || d.documentElement, div = d.createElement('div'), k, e, bb, size, cx, cy;
+      div.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;width:48px;height:48px';
+      host.appendChild(div);
+      for (k in ART.ing) {
+        if (!ART.ing.hasOwnProperty(k)) { continue; }
+        e = ART.ing[k]; div.innerHTML = '<svg width="48" height="48" viewBox="0 0 48 48">' + e.svg + '</svg>';
+        bb = div.firstChild.getBBox(); if (!bb || bb.width < 4) { continue; }
+        size = Math.min(48, Math.max(bb.width, bb.height) + 1.6); cx = bb.x + bb.width / 2; cy = bb.y + bb.height / 2;
+        e.vb = (cx - size / 2).toFixed(2) + ' ' + (cy - size / 2).toFixed(2) + ' ' + size.toFixed(2) + ' ' + size.toFixed(2);
+      }
+      host.removeChild(div);
+    } catch (err) { /* keep the original frames */ }
+  }());
+
   var k;
   for (k in D) { if (D.hasOwnProperty(k)) { ART.menu[k] = { vb: '0 0 48 48', svg: D[k].svg, bg: D[k].bg, name: k }; } }
 
@@ -178,4 +196,4 @@
     ['Banana bread', 'Pan de banano'], ['Coconut bread', 'Pan de coco'], ['Brownie', 'Brownie'], ['Lemon bar', 'Barra de limón'], ['Blueberry muffin', 'Muffin de arándanos'], ['Tres leches cake', 'Pastel de tres leches'],
     ['Cheesecake', 'Cheesecake'], ['Oatmeal raisin cookie', 'Galleta de avena y pasas']
   ];
-}(window));
+}(window, document));

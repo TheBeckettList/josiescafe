@@ -14,13 +14,14 @@
     '5': { pot: [450, 530], box: [430, 506, 180, 108] }, '6': { pot: [634, 530], box: [614, 506, 180, 108] },
     '7': { pot: [472, 744], box: [438, 678, 110, 134] }, '8': { pot: [318, 880], box: [298, 856, 180, 104] },
     '9': { pot: [1106, 540], box: [1098, 520, 104, 126] }, '10': { pot: [1106, 818], box: [1098, 798, 104, 126] },
-    '11': { pot: [1112, 651], box: [1098, 660, 72, 72] }, '12': { pot: [1184, 709], box: [1168, 718, 72, 72] }
+    '11': { pot: [1112, 651], box: [1098, 660, 72, 72] }, '12': { pot: [1184, 709], box: [1168, 718, 72, 72] },
+    '13': { pot: [353, 348], box: [326, 326, 86, 184] }
   };
   var HIT = {
     kitchen: [[1266, 70, 118, 92], [1146, 212, 184, 216]], bar: [[610, 50, 130, 94]], grinder: [[556, 40, 54, 100]], fridge: [[892, 14, 158, 148]],
-    menu: [[810, 166, 74, 72]], register: [[546, 212, 348, 58]], sign: [[114, 92, 132, 162]], 'pot-home': [[548, 166, 78, 76]], 'pot-wait': [[624, 180, 50, 62]]
+    menu: [[810, 166, 74, 72]], pastries: [[750, 64, 80, 80]], register: [[546, 212, 348, 58]], sign: [[114, 92, 132, 162]], 'pot-home': [[548, 166, 78, 76]], 'pot-wait': [[624, 180, 50, 62]]
   };
-  var LABEL = { kitchen: 'Kitchen', bar: 'Bar', grinder: 'Coffee beans', fridge: 'Fridge', menu: 'Menu board', register: 'Register', sign: 'Sign', 'pot-home': 'Home pot', 'pot-wait': 'Waiting pot' };
+  var LABEL = { kitchen: 'Kitchen', bar: 'Bar', grinder: 'Coffee beans', fridge: 'Fridge', menu: 'Menu board', pastries: 'Pastries', register: 'Register', sign: 'Sign', 'pot-home': 'Home pot', 'pot-wait': 'Waiting pot' };
 
   function px(a) { return 'left:' + a[0] + 'px;top:' + a[1] + 'px;width:' + a[2] + 'px;height:' + a[3] + 'px;'; }
   function potSvg(l, t, n, extra) {
@@ -73,10 +74,38 @@
   function inCartTables() { var o = {}, l = J.sticks(), i; for (i = 0; i < l.length; i++) { if (l[i].state === 'table') { o[l[i].table_id] = l[i].number; } } return o; }
   function tableByLabel(label) { var t = (S.floor && S.floor.tables) || [], i; for (i = 0; i < t.length; i++) { if (t[i].label === String(label)) { return t[i]; } } return null; }
 
+
+  function pastryItems() { var l = (S.data && S.data.items) || [], o = [], i; for (i = 0; i < l.length; i++) { if (l[i].active !== false && J.isCounted(l[i])) { o.push(l[i]); } } return o; }
+  function popPastries() {
+    var l = pastryItems(), h = pHead(J.t('pastriesWord'), J.t('pastriesSub'), 'pastries') + '<div class="pb" data-scroll="pastries">', i, it, n;
+    if (!l.length) { return h + '<p class="psub">' + esc(J.t('pastriesNone')) + '</p></div>'; }
+    for (i = 0; i < l.length; i++) {
+      it = l[i]; n = Number(it.stock || 0);
+      h += '<div class="prow' + (n < 1 ? ' zero' : '') + '"><span class="lico" style="background:' + U.menuBg(U.dishKey(it)) + '">' + ART.svg('menu', U.dishKey(it), 40) + '</span><b>' + esc(J.nm(it.name)) + '</b>' +
+        '<span class="pstep"><button type="button" data-act="pastryStock" data-arg="' + it.id + '|-1" aria-label="-1">−</button><em>' + n + '</em><button type="button" data-act="pastryStock" data-arg="' + it.id + '|1" aria-label="+1">+</button></span></div>';
+    }
+    return h + '</div>';
+  }
+  /* a small status for each thing on the map (shown on its dashed box) */
+  function statusFor(key, homeN, waitN) {
+    var n, i, it, items, out = 0, un = 0, ords, lt, st;
+    if (key === 'kitchen' || key === 'bar') { n = makingCount(key); return n ? { t: n + ' ' + J.t('making'), tone: 'ok' } : { t: J.t('stQuiet'), tone: 'idle' }; }
+    if (key === 'grinder') { lt = worst(function (g) { return g.location === 'grinder'; }); return { t: J.t('stBeans') + ' · ' + J.t(lt === 'green' ? 'plenty' : lt === 'amber' ? 'low' : 'out').toLowerCase(), tone: lt === 'green' ? 'ok' : lt === 'amber' ? 'warn' : 'bad' }; }
+    if (key === 'fridge') { n = 0; for (i = 0; i < S.data.ingredients.length; i++) { it = S.data.ingredients[i]; if (it.inventoried && it.location === 'fridge' && J.light(it.id) !== 'green') { n += 1; } } return n ? { t: n + ' ' + J.t('low').toLowerCase(), tone: 'warn' } : { t: J.t('allGood'), tone: 'ok' }; }
+    if (key === 'menu') { items = S.data.items || []; for (i = 0; i < items.length; i++) { it = items[i]; if (it.active !== false && (!it.available || J.adapt(it, []).out)) { out += 1; } } return out ? { t: out + ' ' + J.t('out').toLowerCase(), tone: 'warn' } : { t: J.t('stAllOn'), tone: 'ok' }; }
+    if (key === 'pastries') { items = pastryItems(); if (!items.length) { return { t: '—', tone: 'idle' }; } for (i = 0; i < items.length; i++) { out += Number(items[i].stock || 0); } return out < 1 ? { t: J.t('stNoneLeft'), tone: 'bad' } : { t: out + ' ' + J.t('stLeft'), tone: out <= 4 ? 'warn' : 'ok' }; }
+    if (key === 'register') { ords = (S.floor && S.floor.open) || []; for (i = 0; i < ords.length; i++) { if (ords[i].status !== 'paid') { un += 1; } } return un ? { t: un + ' ' + J.t('stToPay'), tone: 'warn' } : { t: J.t('stAllPaid'), tone: 'ok' }; }
+    if (key === 'sign') { st = J.settings(); return (st.closed_until && JC.today() <= st.closed_until) ? { t: J.t('closedToday'), tone: 'bad' } : { t: J.t('stOpen'), tone: 'ok' }; }
+    if (key === 'pot-home') { return { t: homeN + ' ' + J.t('stHome'), tone: 'idle' }; }
+    if (key === 'pot-wait') { return waitN ? { t: waitN + ' ' + J.t('stWaiting'), tone: 'warn' } : { t: J.t('stNoneWaiting'), tone: 'idle' }; }
+    return null;
+  }
+  var BPOS = { 'pot-home': ' tl', 'pot-wait': ' tr', bar: ' top', grinder: ' top' };
+  function sbadge(stt, key) { return stt ? '<span class="sbadge ' + stt.tone + (BPOS[key] || '') + '"><i></i>' + esc(stt.t) + '</span>' : ''; }
   /* ───────────── the screen ───────────── */
   O.screen = function () {
     var f = S.floor, h = '<div class="shell">' + U.topbar('overview') + U.band() + '<div class="ovbody"><div class="mapcol" id="mapcol"><div class="mapbox" id="mapbox"><div class="mapscale" id="mapscale">';
-    h += '<div class="mapimg"></div>' + (w.J2CRIT ? w.J2CRIT.cafe() : '');
+    h += '<div class="mapimg"></div>' + (w.J2CRIT ? w.J2CRIT.cafe() + w.J2CRIT.stand() : '');
     if (!f) { return h + '</div></div></div><aside class="orail"><p class="empty">Loading…</p></aside></div></div>'; }
     var ts = inCartTables(), i, k, label, t, st = ui().placing, sticks = J.sticks(), homeN = [], waitN = [];
     for (i = 0; i < sticks.length; i++) { if (sticks[i].state === 'home') { homeN.push(sticks[i].number); } else if (sticks[i].state === 'waiting') { waitN.push(sticks[i].number); } }
@@ -98,23 +127,20 @@
     var wb = worst(function (g) { return g.location === 'grinder'; }), wf = worst(function (g) { return g.location === 'fridge' && g.inventoried; });
     if (wb !== 'green') { h += lowBubble(546, 30, 'coffee-beans', wb); }
     if (wf !== 'green') { h += lowBubble(1056, 12, 'milk', wf); }
-    if (J.can('manager')) {
-      if (makingCount('bar')) { h += '<span class="maplabel" style="left:620px;top:150px">' + esc(J.t('barWord')) + ' · ' + makingCount('bar') + ' ' + esc(J.t('making')) + '</span>'; }
-      if (makingCount('kitchen')) { h += '<span class="maplabel" style="left:1140px;top:170px">' + esc(J.t('kitchenWord')) + ' · ' + makingCount('kitchen') + ' ' + esc(J.t('making')) + '</span>'; }
-    }
     // the tappable things
     var key, rects, hi, popKind = ui().popup && ui().popup.kind;
     for (key in HIT) {
       if (!HIT.hasOwnProperty(key)) { continue; }
       rects = HIT[key];
       for (hi = 0; hi < rects.length; hi++) {
-        h += '<button type="button" class="hit' + (popKind === key ? ' on' : '') + '" data-act="ovOpen" data-arg="' + key + '"' + (hi === 0 ? ' data-ov="' + key + '"' : '') + ' style="' + px(rects[hi]) + '" aria-label="' + esc(LABEL[key]) + '"></button>';
+        h += '<button type="button" class="hit sbox' + (popKind === key ? ' on' : '') + '" data-act="ovOpen" data-arg="' + key + '"' + (hi === 0 ? ' data-ov="' + key + '"' : '') + ' style="' + px(rects[hi]) + '" aria-label="' + esc(LABEL[key]) + '">' + (hi === 0 ? sbadge(key === 'pot-wait' && !waitN.length ? null : statusFor(key, homeN.length, waitN.length), key) : '') + '</button>';
       }
     }
     for (label in TABLES) {
       if (!TABLES.hasOwnProperty(label)) { continue; }
       var on = popKind === 'table' && ui().popup.id === label;
-      h += '<button type="button" class="hit tbl' + (st ? ' pick' : '') + (on ? ' on' : '') + '" data-act="tablePick" data-arg="' + label + '" data-ov="table-' + label + '" style="' + px(TABLES[label].box) + '" aria-label="Table ' + label + '"></button>';
+      var tt = tableByLabel(label), occ = tt && ts[tt.id];
+      h += '<button type="button" class="hit tbl sbox' + (occ ? ' occ' : '') + (st ? ' pick' : '') + (on ? ' on' : '') + '" data-act="tablePick" data-arg="' + label + '" data-ov="table-' + label + '" style="' + px(TABLES[label].box) + '" aria-label="Table ' + label + '">' + (occ ? sbadge({ t: J.t('stStick') + ' ' + occ, tone: 'ok' }) : '') + '</button>';
     }
     h += (w.J2CRIT ? w.J2CRIT.hits() : '') + '</div>';       // mapscale
     if (st) { h += '<div class="placehint">' + esc(J.t('placeOnTable')) + ' · ' + st + '<button type="button" data-act="placeCancel">' + esc(J.t('cancel')) + '</button></div>'; }
@@ -135,13 +161,21 @@
     return '<div class="nrow"><button type="button" class="nrow-l" data-act="numOpen" data-arg="' + esc(g.key) + '">' + (g.stick ? circle(g.stick) : '<span class="rcode">' + esc(g.orders[0].number) + '</span>') +
       '<span class="nt"><b>' + esc(title) + '</b><small>' + esc(sub) + '</small></span></button><button type="button" class="ncta' + (g.paid ? '' : ' alt') + '" data-act="numDo" data-arg="' + esc(g.key) + '">' + esc(cta) + '</button></div>';
   }
+  function jar(level) { var f = level === 'red' ? 0 : 9; return '<svg class="jar" viewBox="0 0 24 28" width="24" height="28" aria-hidden="true"><rect x="5" y="1" width="14" height="5" rx="2" fill="#C9A06A"/><rect x="3" y="5" width="18" height="21" rx="5" fill="#FFFFFF" stroke="#E2D0D6" stroke-width="1.6"/>' + (f ? '<rect x="5" y="' + (24 - f) + '" width="14" height="' + f + '" rx="3" fill="#F2B84B"/>' : '') + '</svg>'; }
   function rail() {
-    var nums = J.numbers(), here = [], go = [], i, g, h = '<aside class="orail" data-scroll="orail">', done = J.justDone(), waitN = [], sticks = J.sticks();
+    var nums = J.numbers(), here = [], go = [], i, g, h = '<aside class="orail" data-scroll="orail">' + (J.quiet ? J.quiet.card() : '') + '', done = J.justDone(), waitN = [], sticks = J.sticks();
     for (i = 0; i < nums.length; i++) { if (nums[i].stick) { here.push(nums[i]); } else { go.push(nums[i]); } }
     for (i = 0; i < sticks.length; i++) { if (sticks[i].state === 'waiting') { waitN.push(sticks[i].number); } }
     if (J.can('manager')) {
       var making = makingCount('bar') + makingCount('kitchen');
       h += '<section class="rcard"><h2>' + esc(J.t('rightNow')) + '</h2><div class="stat3"><span><b>' + nums.length + '</b>' + esc(J.t('open')) + '</span><span><b>' + making + '</b>' + esc(J.t('making')) + '</span><span><b>' + waitN.length + '</b>' + esc(J.t('waiting')) + '</span></div></section>';
+    }
+    if (J.can('manager')) {
+      var low = lowList();
+      h += '<section class="rcard"><h2>' + esc(J.t('runningLow')) + '</h2>';
+      for (i = 0; i < low.length && i < 5; i++) { h += '<button type="button" class="lowrow ' + low[i].light + '" data-act="ovOpen" data-arg="inv">' + U.dot(low[i].ing.id, 'in', 38) + '<b>' + esc(J.nm(low[i].ing.name)) + '</b>' + jar(low[i].light) + '</button>'; }
+      if (!low.length) { h += '<p class="rmuted">' + esc(J.t('allGood')) + '</p>'; }
+      h += '</section>';
     }
     if (waitN.length) {
       h += '<section class="rcard bin">';
@@ -166,12 +200,11 @@
     }
     if (!done.length) { h += '<p class="rmuted">' + esc(J.t('undo')) + '…</p>'; }
     h += '</section>';
-    if (J.can('manager')) {
-      var low = lowList();
-      h += '<section class="rcard"><h2>' + esc(J.t('runningLow')) + '</h2>';
-      for (i = 0; i < low.length && i < 5; i++) { h += '<button type="button" class="lowrow ' + low[i].light + '" data-act="ovOpen" data-arg="inv">' + U.dot(low[i].ing.id, 'in', 34) + '<b>' + esc(J.nm(low[i].ing.name)) + '</b></button>'; }
-      if (!low.length) { h += '<p class="rmuted">' + esc(J.t('allGood')) + '</p>'; }
-      h += '</section>';
+    if (S.person && S.person.role === 'josie') {
+      var va = ui().viewAs || '', chips = [['', J.t('viewJosie')], ['register', J.t('viewRegister')], ['bar', J.t('barWord')], ['kitchen', J.t('kitchenWord')], ['guest', J.t('viewGuest')]];
+      h += '<section class="rcard"><h2>' + esc(J.t('viewAs')) + '</h2><div class="vchips">';
+      for (i = 0; i < chips.length; i++) { h += '<button type="button" class="vchip' + (va === chips[i][0] ? ' on' : '') + '" data-act="viewAs" data-arg="' + chips[i][0] + '">' + esc(chips[i][1]) + '</button>'; }
+      h += '</div></section>';
     }
     return h + '</aside>';
   }
@@ -196,6 +229,7 @@
     else if (k === 'pot-home') { inner = pHead('Home pot', 'Sticks ready to hand out', null) + '<div class="pb"><div class="pcard"><span class="psub">Ring up an order and a stick leaves this pot for the waiting pot.</span></div></div>'; }
     else if (k === 'pot-wait') { inner = popWaiting(); }
     else if (k === 'register') { inner = popRegister(); }
+    else if (k === 'pastries') { inner = popPastries(); }
     else if (k === 'table') { inner = popNumber(J.numberOf(p.key) || numberForTable(p.id), p.id); }
     else if (k === 'number') { inner = popNumber(J.numberOf(p.key), null); }
     if (k === 'ingpick' || k === 'dish' || k === 'menu') { return '<div class="pop' + (ui().sheetMode ? ' sheetmode' : '') + (ui().flip ? ' flip' : '') + '" role="dialog">' + inner + '</div>'; }
@@ -210,7 +244,7 @@
   function sheetLayer() { return ''; }
   O.head = pHead;
   /* a staff phone set up for inventory: just the lights, big, nothing else */
-  O.inventoryScreen = function () { return '<div class="shell phoneinv">' + U.topbar('overview') + '<div class="pop inline">' + popInventory() + '</div></div>'; };
+  O.inventoryScreen = function () { return '<div class="shell phoneinv">' + U.topbar('overview') + (J.quiet ? '<div class="quietwrap">' + J.quiet.card() + '</div>' : '') + '<div class="pop inline">' + popInventory() + '</div></div>'; };
 
   /* kitchen and bar: read-only tickets */
   function popTickets(st) {
@@ -394,7 +428,10 @@
         } else { open(arg, null, arg); }
         if (arg === 'kitchen' || arg === 'bar') { O.pollFeeds(); }
         return true;
+      case 'quietSet': case 'quietLater': case 'quietBreak': return J.quiet ? J.quiet.handle(act, arg) : false;
       case 'ovClose': closePop(); return true;
+      case 'viewAs': if (arg === 'guest') { w.open('/', '_blank'); } else { ui().viewAs = arg || null; ui().popup = null; if (ui().viewAs && J.eff().station !== 'register') { S.tab = 'overview'; } J.changed(); } return true;
+      case 'pastryStock': var ps = String(arg).split('|'), pit = J.ix().itemById[ps[0]]; if (pit) { var old = Number(pit.stock || 0), nu = Math.max(0, old + Number(ps[1])); if (nu !== old) { pit.stock = nu; J.save('data'); J.changed(); J.api('PATCH', 'items?id=eq.' + pit.id, { stock: nu }, function (err) { if (err) { pit.stock = old; J.save('data'); J.changed(); w.alert(S.online ? 'Couldn’t save. Try again.' : 'Counting needs internet.'); } }, { Prefer: 'return=minimal' }); } } return true;
       case 'crit': if (w.J2CRIT) { w.J2CRIT.play(arg, d.getElementById('app')); } return true;
       case 'ovGear': ui().flip = !ui().flip; J.changed(); return true;
       case 'tablePick':

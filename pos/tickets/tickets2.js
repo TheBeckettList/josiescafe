@@ -90,7 +90,7 @@
     d.documentElement.lang = S.lang;
     var keep = app.querySelector('.tv-scroll'), top = keep ? keep.scrollTop : 0, h;
     if (!S.code) {
-      h = '<div class="setup"><img src="../../img/logo.png" alt="Josie\'s Cafe"><h1>Josie’s</h1><p>' + esc(s('pick')) + '</p><div class="seg">' +
+      h = '<div class="setup"><img class="wm" src="../../img/josies-wordmark.png" alt="Josie’s"><p>' + esc(s('pick')) + '</p><div class="seg">' +
         ['kitchen', 'bar'].map(function (k) { return '<button type="button" class="' + (S.station === k ? 'on' : '') + '" data-act="station" data-arg="' + k + '">' + esc(s(k)) + '</button>'; }).join('') + '</div>' +
         '<form id="codeForm"><input id="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" aria-label="' + esc(s('code')) + '"><p class="help">' + esc(s('help')) + '</p><p class="msg">' + esc(S.msg) + '</p>' +
         '<button class="btn" type="submit">' + esc(s('open')) + '</button></form></div>';
