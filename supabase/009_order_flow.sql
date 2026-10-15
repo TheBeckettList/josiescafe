@@ -82,6 +82,7 @@ begin
          coalesce(i ->> 'station', 'kitchen'), coalesce(i -> 'chips', '[]'), nullif(i ->> 'piece_id', '')::uuid
   from jsonb_array_elements(coalesce(p -> 'items', '[]')) i
   on conflict (id) do nothing;
+  perform public.apply_stock(oid, -1);   -- counted items (pastries) come off once, the first time the order arrives
 
   insert into public.payments (id, order_id, method, amount, tip, usd_amount, usd_rate, card_ref, created_at)
   select (x ->> 'id')::uuid, oid, x ->> 'method', (x ->> 'amount')::numeric, coalesce((x ->> 'tip')::numeric, 0),
