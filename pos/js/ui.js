@@ -60,7 +60,7 @@
     opts = opts || {};
     var tabs = [['pos', J.t('pos')], ['overview', J.t('overview')]];
     if (J.can('manager')) { tabs.push(['manager', J.t('manager')]); }
-    var h = '<header class="top"><span class="brand">' + J.t('app') + '</span><span class="grow"></span>';
+    var h = '<header class="top"><span class="brand"><img src="../img/josies-wordmark.png" alt="' + J.t('app') + '" height="36"></span><span class="grow"></span>';
     if (!opts.back) {
       h += '<div class="tabs">';
       for (var i = 0; i < tabs.length; i++) { h += '<button type="button" class="tab' + (tab === tabs[i][0] ? ' on' : '') + '" data-act="tab" data-arg="' + tabs[i][0] + '">' + tabs[i][1] + '</button>'; }

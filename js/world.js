@@ -101,7 +101,7 @@
     var h = '<div class="wmap" style="height:' + b.h + 'px"><div class="wlayer" style="-webkit-transform:' + tr + ';transform:' + tr + '">';
     if (W.bay) { h += w.J2BAY.layer(); }
     else {
-      h += '<div class="mimg"></div>' + (w.J2CRIT ? w.J2CRIT.cafe() : '') + '<div class="hours" style="left:46px;top:296px"><span class="tag' + (closedNow ? ' closed' : '') + '">' + esc(closedNow ? s('closed') : 'OPEN') + '</span><b>' + fmt(t.open) + ' – ' + fmt(t.close) + '</b><small>' + s('mon') + ' – ' + s('sat') + '</small></div>' +
+      h += '<div class="mimg"></div>' + (w.J2CRIT ? w.J2CRIT.cafe() + w.J2CRIT.stand() : '') + '<div class="hours" style="left:46px;top:296px"><span class="tag' + (closedNow ? ' closed' : '') + '">' + esc(closedNow ? s('closed') : 'OPEN') + '</span><b>' + fmt(t.open) + ' – ' + fmt(t.close) + '</b><small>' + s('mon') + ' – ' + s('sat') + '</small></div>' +
         '<button type="button" class="hit glow" data-act="toMenu" style="left:806px;top:160px;width:84px;height:84px" aria-label="Menu"></button>';
     }
     h += (!W.bay && w.J2CRIT ? w.J2CRIT.hits() : '') + '<button type="button" class="hit" data-act="hours" style="left:' + (W.bay ? w.J2BAY.sign[0] : 114) + 'px;top:' + (W.bay ? w.J2BAY.sign[1] : 92) + 'px;width:132px;height:162px" aria-label="Hours"></button></div>' +

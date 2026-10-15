@@ -75,6 +75,16 @@
     return h;
   }
 
+
+  /* a map object (not a critter): the pastry stand with its glass dome, on the bar counter beside the coffee machine */
+  C.stand = function () {
+    return '<svg class="mapobj" viewBox="0 0 76 76" style="position:absolute;left:752px;top:66px;width:76px;height:76px;pointer-events:none;z-index:4" aria-hidden="true">' +
+      '<ellipse cx="38" cy="70" rx="24" ry="3" fill="#3B2925" opacity=".1"/><ellipse cx="38" cy="67" rx="21" ry="5" fill="#F5B5C8"/><rect x="35" y="57" width="6" height="10" fill="#EE95B3"/><ellipse cx="38" cy="57" rx="28" ry="5" fill="#FFFFFF" stroke="#F1D3DD" stroke-width="1.500"/>' +
+      '<path d="M15 54 L29 54 L27.500 46 Q22 43 16.500 46 Z" fill="#F5B5C8"/><path d="M13.500 47 Q14 36 22 35 Q30 36 30.500 47 Z" fill="#E2A66A"/><circle cx="19" cy="41" r="1.200" fill="#B98050"/><circle cx="25" cy="40" r="1.200" fill="#B98050"/>' +
+      '<circle cx="39" cy="48" r="8.500" fill="#D9A15F"/><circle cx="39" cy="48" r="7" fill="#E5B677"/><g fill="#5A3626"><circle cx="36" cy="46" r="1.300"/><circle cx="42" cy="48" r="1.300"/><circle cx="38" cy="51" r="1.300"/></g>' +
+      '<circle cx="56" cy="50" r="7.500" fill="#E8B777"/><circle cx="56" cy="50" r="5.200" fill="#F6D9AE"/><path d="M56 50 m-2 0 a2 2 0 1 1 2 2" stroke="#B98050" stroke-width="1.300" fill="none"/>' +
+      '<path d="M9 55 Q9 11 38 11 Q67 11 67 55 Z" fill="#DDF1F8" fill-opacity=".38" stroke="#BFE3F0" stroke-width="2"/><path d="M15 48 Q15 22 29 17" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round" opacity=".75"/><circle cx="38" cy="9" r="3.800" fill="#EE95B3"/></svg>';
+  };
   C.cafe = function () { return treeHtml() + iguanaHtml() + crabsHtml() + rayHtml() + tukHtml(); };
   C.hits = function () {
     var H = [['tree', 560, 640, 265, 230], ['iguana', 478, 888, 190, 66], ['crab1', 858, 966, 66, 56], ['crab2', 950, 992, 62, 56], ['crab3', 1041, 960, 52, 46], ['ray', 392, 1144, 200, 98], ['tuk', 96, 340, 170, 240]], i, h = '';

@@ -49,21 +49,24 @@
 
   function card(big, small) { return '<div class="mcard"><b>' + big + '</b><small>' + esc(small) + '</small></div>'; }
   function dayView() {
-    var r = M.rev, h = '', i, b, max = 1, k, bars = '', l;
+    var r = M.rev, i, b, max = 1, k, bars = '', l, nowQ, left, right, mapCard, chartCard;
     if (!r) { return '<p class="empty">' + esc(M.err || t('loading')) + '</p>'; }
-    var wait = (r.bar_wait || r.kitchen_wait) ? [r.bar_wait ? t('bar') + ' · ' + r.bar_wait + ' ' + t('min') : '', r.kitchen_wait ? t('kitchen') + ' · ' + r.kitchen_wait + ' ' + t('min') : ''].filter(Boolean).join('  ') : '';
-    h += '<div class="mstats">' + card(money(r.sales), t('sales')) + card(r.orders, t('orders') + ' · ' + r.online + ' ' + t('online')) + card(r.avg_wait ? r.avg_wait + ' ' + t('min') : '—', t('wait') + (wait ? ' · ' + wait : '')) + card(r.busiest || '—', t('busiest')) + '</div>';
-    h += '<div class="pcard mloved"><h3>' + esc(t('loved')) + '</h3>';
-    if (!r.loved.length) { h += '<p class="empty">' + esc(t('none')) + '</p>'; }
-    for (i = 0; i < r.loved.length; i++) { h += '<div class="lrow"><i>' + (i + 1) + '</i><span class="lico">' + ART.svg('menu', T.dishKey(r.loved[i].name, ''), 34) + '</span><b>' + esc(r.loved[i].name) + '</b><em>' + r.loved[i].qty + '</em></div>'; }
-    h += '</div><div class="pcard mlow"><h3>' + esc(t('low')) + '</h3>';
-    for (i = 0; i < r.low.length; i++) { l = r.low[i]; h += '<div class="lrow"><span class="lico">' + icoOf(l.icon, 34) + '</span><b>' + esc(l.name) + '</b><em>' + esc(l.light === 'red' ? t('out') : t('lowWord')) + ' ' + esc(l.at) + '</em></div>'; }
-    if (!r.low.length) { h += '<p class="empty">' + esc(t('none')) + '</p>'; }
-    h += '</div>';
+    function chip(name, mins, x, y) { return '<span class="mchip" style="left:' + x + '%;top:' + y + '%"><i></i>' + esc(name) + ' · ' + (mins ? mins + ' ' + t('min') : '—') + '</span>'; }
+    mapCard = '<div class="pcard mmapcard"><div class="mmap" style="background-image:url(../img/world/map.png)">' + chip(t('bar'), r.bar_wait, 40, 10) + chip(t('kitchen'), r.kitchen_wait, 66, 14) + '</div></div>';
     for (k in r.buckets) { if (r.buckets.hasOwnProperty(k)) { max = Math.max(max, r.buckets[k]); } }
-    for (i = 24; i <= 58; i++) { b = r.buckets[i] || 0; bars += '<i style="height:' + Math.max(4, Math.round(b / max * 70)) + 'px;opacity:' + (b ? 0.35 + 0.65 * b / max : 0.25) + '"></i>'; }
-    h += '<div class="pcard mbars"><h3>' + esc(t('day')) + '</h3><div class="bars">' + bars + '</div><div class="bax"><span>6 am</span><span>8</span><span>10</span><span>12</span><span>2 pm</span></div><small>' + esc(t('darker')) + '</small></div>';
-    return h + phonesCard();
+    var hn = new Date(Date.now() - 6 * 3600 * 1000); nowQ = hn.getUTCHours() * 4 + Math.floor(hn.getUTCMinutes() / 15);
+    for (i = 24; i <= 58; i++) { b = r.buckets[i] || 0; bars += '<i class="' + (i === nowQ ? 'now' : '') + '" style="height:' + Math.max(5, Math.round(b / max * 78)) + 'px;opacity:' + (i > nowQ && nowQ >= 24 && nowQ <= 58 ? .28 : (b ? 0.4 + 0.6 * b / max : 0.28)) + '"></i>'; }
+    chartCard = '<div class="pcard mbars"><div class="mhead"><h3>' + esc(t('day')) + '</h3><span class="mtime">' + esc(J.clock()) + '</span></div><div class="bars">' + bars + '</div><div class="bax"><span>6 am</span><span>8</span><span>10</span><span>12</span><span>2 pm</span></div><small>' + esc(t('darker')) + '</small></div>';
+    left = mapCard + chartCard;
+    right = '<div class="mstats">' + card(money(r.sales), t('sales')) + card(r.orders, t('orders') + ' · ' + r.online + ' ' + t('online')) + card(r.avg_wait ? r.avg_wait + ' ' + t('min') : '—', t('wait')) + card(r.busiest || '—', t('busiest')) + '</div>' +
+      '<div class="pcard mloved"><h3>' + esc(t('loved')) + '</h3>';
+    if (!r.loved.length) { right += '<p class="empty">' + esc(t('none')) + '</p>'; }
+    for (i = 0; i < r.loved.length; i++) { right += '<div class="lrow"><i>' + (i + 1) + '</i><span class="lico">' + ART.svg('menu', T.dishKey(r.loved[i].name, ''), 38) + '</span><b>' + esc(r.loved[i].name) + '</b><em>' + r.loved[i].qty + '</em></div>'; }
+    right += '</div><div class="pcard mlow"><h3>' + esc(t('low')) + '</h3>';
+    for (i = 0; i < r.low.length; i++) { l = r.low[i]; right += '<div class="lrow"><span class="lico">' + icoOf(l.icon, 38) + '</span><b>' + esc(l.name) + '</b><em>' + esc(l.light === 'red' ? t('out') : t('lowWord')) + ' ' + esc(l.at) + '</em></div>'; }
+    if (!r.low.length) { right += '<p class="empty">' + esc(t('none')) + '</p>'; }
+    right += '</div>';
+    return '<div class="mgrid"><div class="mleft">' + left + '</div><div class="mright">' + right + '</div></div>' + phonesCard();
   }
   function payView() {
     var p = M.pay, h = '<div class="paytop"><div class="perpick"><button type="button" data-act="payPer" data-arg="-1">‹</button><b>' + esc(M.per ? M.per.label : '') + '</b><button type="button" data-act="payPer" data-arg="1">›</button></div><span class="topay">' + esc(t('toPay')) + ' <b>' + (p ? money(p.to_pay) : '') + '</b></span></div>', i, l;

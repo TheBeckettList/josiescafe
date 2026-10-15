@@ -19,7 +19,7 @@
       pay: ['Pay now', 'Take the payment now. For here, you pick a stick next.'],
       later: ['Pay later', 'Send it to the bar and kitchen now and take the payment when they finish.'],
       tabs: ['The map', 'Overview shows every stick, table, the bar and the kitchen, live. Tap things on it.'],
-      help: ['The ? is always here', 'Tap it on any screen to see these steps again.'],
+      help: ['The ? explains anything', 'Tap the ?, then tap the part of the screen you want explained. It shows you step by step.'],
       lang: ['English or Spanish', 'EN | ES changes every word on this screen, for you only.'],
       // which stick
       sticks: ['Pick a stick', 'Tap a free stick. It is the number the guest keeps. Orders for here go to the kitchen the moment you tap.'],
@@ -41,7 +41,7 @@
       mloved: ['Most loved and running low', 'What sold most today, and what ran low or out.'],
       mphones: ['Kitchen and bar phones', 'Send the link, give the code, and a phone gets every ticket. New code stops all phones until they type it again.'],
       mpay: ['Payroll', 'Only Josie sees this: hours times rate, paid by cash or transfer, with Undo.'],
-      welcomeLook: 'A quick look around. You can replay it any time with the ? at the top.'
+      welcomeLook: 'A quick look around. You can replay it any time with the ? at the top, then tap what you want shown.'
     },
     es: {
       onScreen: 'En esta pantalla', showAgain: 'Muéstrame otra vez', skip: 'Saltar', next: 'Siguiente', done: 'Listo', back: 'Atrás', close: 'Cerrar',
@@ -53,7 +53,7 @@
       pay: ['Pagar ahora', 'Cobra ahora. Si es para aquí, sigues con el palito.'],
       later: ['Pagar después', 'Mándalo al bar y a la cocina ahora y cobra cuando terminen.'],
       tabs: ['El mapa', 'Mapa muestra cada palito, mesa, el bar y la cocina, en vivo. Toca las cosas.'],
-      help: ['El ? siempre está aquí', 'Tócalo en cualquier pantalla para ver estos pasos otra vez.'],
+      help: ['El ? explica todo', 'Toca el ?, luego toca la parte de la pantalla que quieras entender. Te lo muestra paso a paso.'],
       lang: ['Inglés o español', 'EN | ES cambia cada palabra de esta pantalla, solo para ti.'],
       sticks: ['Elige un palito', 'Toca un palito libre. Es el número que se queda el cliente. Los pedidos para aquí van a la cocina al tocar.'],
       stickTotal: ['Lo que pidieron', 'Este es el ticket que verán la cocina y el bar.'],
@@ -71,9 +71,10 @@
       mloved: ['Lo más pedido y lo que se acaba', 'Lo que más se vendió hoy y lo que se acabó o quedó poco.'],
       mphones: ['Teléfonos de cocina y bar', 'Manda el enlace, da el código y el teléfono recibe cada ticket. Un código nuevo detiene todos hasta que lo escriban otra vez.'],
       mpay: ['Planilla', 'Solo Josie ve esto: horas por tarifa, pagado en efectivo o transferencia, con Deshacer.'],
-      welcomeLook: 'Un vistazo rápido. Puedes repetirlo cuando quieras con el ? de arriba.'
+      welcomeLook: 'Un vistazo rápido. Puedes repetirlo cuando quieras con el ? de arriba y toca lo que quieras ver.'
     }
   };
+  T.TXT = TXT;
   function tx(id) { var l = (TXT[S.lang] || TXT.en); return l[id] || TXT.en[id]; }
 
   /* which screen are we on */
@@ -86,11 +87,11 @@
     if (S.ui.view === 'pay') { return 'pay'; }
     return 'pos';
   };
-  function isStaffStation() { var p = S.person; return !!(p && p.role === 'staff' && (p.station === 'bar' || p.station === 'kitchen')); }
+  function isStaffStation() { var p = J.eff(); return !!(p && p.role === 'staff' && (p.station === 'bar' || p.station === 'kitchen')); }
 
   /* the steps for a screen: [id, selector, union?] */
   function defs(screen) {
-    var p = S.person || {}, list = [];
+    var p = J.eff() || {}, list = [];
     if (screen === 'pos') {
       list = [['cats', '.cat', 1], ['tiles', '.tile'], ['tk', '.tk'], ['diets', '.dchip', 1], ['seg', '.seg2'], ['pay', '.paybtn'], ['later', '.later'], ['tabs', '.tabs'], ['lang', '.lang'], ['help', '.qbtn']];
     } else if (screen === 'stick') { list = [['sticks', '.stk-right'], ['stickTotal', '.stk-card'], ['help', '.qbtn']]; }
@@ -132,6 +133,7 @@
   T.after = function () {
     var host = d.getElementById('tourlayer'), t = S.ui.tour, h = '', i, st, r, pad = 8, cw = 330, ch, left, top, vw = w.innerWidth, vh = w.innerHeight;
     if (!host) { return; }
+    if (S.ui.helpOpen && !t && T.pick) { T.pick(host); return; }
     if (S.ui.helpOpen && !t) {
       var l = T.list(T.screen());
       h = '<div class="tscrim" data-act="tourClose"></div><div class="thelp"><b>' + esc(tx('onScreen')) + '</b>';

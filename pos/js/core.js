@@ -45,8 +45,14 @@
     return (h % 12 || 12) + ':' + m;
   };
   J.minsSince = function (iso) { return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60000)); };
+  /* who the app is behaving as: Josie can preview Register, Bar or Kitchen from the Overview ("View as"); the server still sees Josie */
+  J.eff = function () {
+    var p = S.person; if (!p) { return null; }
+    if (p.role === 'josie' && S.ui && S.ui.viewAs) { return { id: p.id, name: p.name, role: 'staff', station: S.ui.viewAs }; }
+    return p;
+  };
   J.can = function (what) {
-    var r = S.person && S.person.role;
+    var r = J.eff() && J.eff().role;
     if (what === 'josie') { return r === 'josie'; }
     if (what === 'manager') { return r === 'josie' || r === 'manager'; }
     return !!r;
