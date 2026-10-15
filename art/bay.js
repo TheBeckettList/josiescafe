@@ -10,9 +10,9 @@
   var G = 'translate(' + OX + ',' + OY + ') scale(' + K + ')';
 
   /* the bay's coast: west shore, north shore past Josie's pier, down the east shore to Bando Beach */
-  var COAST = [[-400, 1110], [-100, 1020], [0, 965], [100, 905], [190, 825], [260, 745], [330, 690], [400, 640], [460, 590], [500, 545], [560, 490], [620, 462], [700, 445], [800, 435], [900, 432], [990, 448], [1050, 480], [1085, 518], [1120, 548], [1170, 592], [1215, 642], [1250, 702], [1268, 762], [1272, 822], [1255, 882], [1230, 936], [1195, 976], [1155, 1006], [1125, 1032]];
-  var TOWN = COAST.slice(10, 27);
-  var ROADPTS = COAST.slice(9, 26);
+  var COAST = [[-400, 1110], [-100, 1020], [0, 965], [100, 905], [190, 825], [260, 745], [330, 690], [400, 640], [460, 590], [500, 545], [560, 490], [620, 462], [700, 445], [800, 435], [900, 432], [990, 448], [1050, 480], [1085, 518], [1120, 548], [1170, 592], [1215, 642], [1250, 702], [1268, 762], [1272, 822], [1255, 882], [1230, 936], [1195, 976], [1155, 1006]];
+  var TOWN = COAST.slice(10, 26);
+  var ROADPTS = COAST.slice(9, 23);
   function smooth(p) {
     var d = 'M' + p[0][0] + ',' + p[0][1], i, mx, my;
     for (i = 1; i < p.length - 1; i++) { mx = (p[i][0] + p[i + 1][0]) / 2; my = (p[i][1] + p[i + 1][1]) / 2; d += ' Q' + p[i][0] + ',' + p[i][1] + ' ' + mx.toFixed(1) + ',' + my.toFixed(1); }
@@ -28,9 +28,8 @@
   }
   var coastD = smooth(COAST), roadD = smooth(offset(ROADPTS, 78)), shoreLandD = smooth(offset(COAST, 16));
   /* land: everything north and east of the coast, round the spit to Point Pool and up the ocean side */
-  var LAND = coastD + ' L1180,1062 Q1300,1100 1440,1108 Q1560,1090 1660,1030 Q1780,950 1840,830 Q1900,700 1925,560 Q1945,400 1960,200 L1990,-500 L-400,-500 Z';
-  var WATERCLIP = coastD + ' L1125,1032 L600,1190 L-400,1320 Z';
-  var REEFFLAT = 'M1125,1032 Q1000,1085 880,1128 Q760,1160 640,1196 L600,1226 Q780,1206 930,1218 Q1100,1226 1270,1198 Q1420,1168 1530,1128 Q1620,1090 1670,1040 L1440,1108 Q1300,1100 1180,1062 Z';
+  var SHORE = coastD + ' Q1105,1030 1100,1066 Q1098,1100 1150,1104 Q1300,1120 1440,1114 Q1560,1094 1660,1034 Q1780,952 1840,832 Q1900,702 1925,562 Q1945,402 1960,202';
+  var LAND = SHORE + ' L1990,-500 L-400,-500 Z';
 
   /* little town: a few small houses with pink and cream roofs, set back from the road, in groups with gaps */
   function houses() {
@@ -117,13 +116,10 @@
     var h = '<defs><linearGradient id="seag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93D1E2"/><stop offset=".55" stop-color="#85C8DC"/><stop offset="1" stop-color="#6DB5D0"/></linearGradient></defs>' +
       '<rect x="-700" y="-900" width="3000" height="3200" fill="url(#seag)"/>' +
       '<g transform="' + G + '">' +
-        /* reef flat that closes the bay to the south, and the shallows round the shore */
-        '<path d="' + REEFFLAT + '" fill="#B9E7E1"/><path d="M1090,1070 Q990,1100 880,1140 Q770,1172 680,1202 Q800,1196 940,1206 Q1100,1214 1250,1186 Q1400,1156 1500,1116 Q1590,1080 1640,1044 Q1500,1100 1440,1112 Q1300,1100 1200,1072 Z" fill="#9ADDD3"/>' +
-        '<ellipse cx="900" cy="1160" rx="190" ry="26" fill="#C9EEDF" opacity=".8"/><ellipse cx="1260" cy="1150" rx="150" ry="22" fill="#C9EEDF" opacity=".7"/><ellipse cx="760" cy="1190" rx="110" ry="18" fill="#C9EEDF" opacity=".7"/>' +
-        '<clipPath id="bayclip"><path d="' + WATERCLIP + '"/></clipPath>' +
-        '<g clip-path="url(#bayclip)"><path d="' + coastD + '" stroke="#C6E9F0" stroke-width="170" fill="none"/><path d="' + coastD + '" stroke="#DDF3F7" stroke-width="72" fill="none"/>' +
-          reef(822, 506, 70, 42, 21) + reef(962, 636, 58, 38, 31) + reef(930, 860, 92, 78, 41) + reef(560, 890, 52, 128, 51) + reef(905, 1045, 72, 46, 61) + reef(610, 765, 84, 48, 71) + reef(380, 960, 70, 40, 81) +
-        '</g>' +
+        /* the shallows round the whole shore, the rounded tip at Bando, and the reefs in the water */
+        '<path d="' + SHORE + '" stroke="#C6E9F0" stroke-width="170" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="' + SHORE + '" stroke="#DDF3F7" stroke-width="72" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
+        reef(822, 506, 70, 42, 21) + reef(962, 636, 58, 38, 31) + reef(930, 860, 92, 78, 41) + reef(560, 890, 52, 128, 51) + reef(905, 1045, 72, 46, 61) + reef(610, 765, 84, 48, 71) + reef(380, 960, 70, 40, 81) +
+        reef(760, 1170, 150, 44, 91) + reef(1010, 1175, 130, 38, 92) + reef(1260, 1182, 120, 34, 93) +
         /* land */
         '<path d="' + LAND + '" fill="#F7DCC4"/>' +
         '<path d="' + blob(1620, 560, 300, 470, 4, .14) + '" fill="#9BCDAB"/><path d="' + blob(1610, 560, 235, 400, 5, .16) + '" fill="#86C09B"/><path d="' + blob(1450, 980, 190, 80, 12, .18) + '" fill="#9BCDAB"/>' +
@@ -133,7 +129,7 @@
         '<path d="' + blob(1710, 470, 55, 75, 18, .2) + '" fill="#BEE5EA"/>' +
         '<path d="' + shoreLandD + '" stroke="#FBEFE4" stroke-width="70" fill="none" opacity=".85"/>' +
         '<path d="M1180,1062 Q1300,1100 1440,1108 Q1560,1090 1660,1030 Q1780,950 1840,830 Q1900,700 1925,560 Q1945,400 1960,200" stroke="#FBEFE4" stroke-width="40" fill="none" stroke-linecap="round" opacity=".9"/>' +
-        '<path d="' + blob(1128, 1040, 100, 56, 33, .12) + '" fill="#DDF3F7" opacity=".9"/><path d="' + blob(1126, 1036, 84, 44, 34, .1) + '" fill="#FBEFE4"/><path d="' + blob(1124, 1034, 62, 30, 35, .1) + '" fill="#FFF6EA"/>' +
+        '<path d="' + blob(1128, 1082, 78, 44, 34, .08) + '" fill="#FBEFE4"/><path d="' + blob(1130, 1080, 56, 28, 35, .08) + '" fill="#FFF6EA"/>' +
         houses() + palm(1290, 1070, 1.5) + palm(1350, 1086, 1.3) +
         '<path d="' + coastD + '" stroke="#FFFFFF" stroke-width="10" fill="none" stroke-dasharray="3 26" stroke-linecap="round" opacity=".9"/>' +
         '<path d="' + roadD + '" stroke="#E9E1D8" stroke-width="64" fill="none" stroke-linecap="round"/><path d="' + roadD + '" stroke="#FFFFFF" stroke-width="50" fill="none" stroke-linecap="round"/><path d="' + roadD + '" stroke="#F5C9D6" stroke-width="6" fill="none" stroke-dasharray="38 34"/>' +
@@ -153,7 +149,7 @@
     h += school(X(822), Y(822, 506), '#F5B5C8', 4, 22, 10) + school(X(930), Y(930, 860), '#F2A66B', 5, 26, -8) + school(X(940), Y(940, 880), '#7FC6D6', 3, 16, 170) + school(X(905), Y(905, 1045), '#EC5C97', 4, 22, 6) + school(X(962), Y(962, 636), '#F2A66B', 3, 16, -4) + school(X(1260), Y(1260, 1152), '#7FC6D6', 4, 22, -6);
     h += octopus(X(610), Y(610, 765) - 6, 0.5) + buoy(X(528), Y(528, 722), 0.55) + diveBoat(X(425), Y(425, 842), 0.5);
     /* chairs on Bando Beach */
-    h += umbrella(X(1142) + 2, Y(1142, 1038) - 4, '#EC5C97') + chair(X(1100), Y(1100, 1046), '#7FC6D6', -8) + chair(X(1117), Y(1117, 1056), '#F2A66B', 6) + chair(X(1160), Y(1160, 1052), '#EC5C97', -4) + chair(X(1086), Y(1086, 1030), '#F5B5C8', -14);
+    h += umbrella(X(1140) + 2, Y(1140, 1082) - 5, '#EC5C97') + chair(X(1105), Y(1105, 1092), '#7FC6D6', -8) + chair(X(1125), Y(1125, 1104), '#F2A66B', 6) + chair(X(1166), Y(1166, 1098), '#EC5C97', -4) + chair(X(1100), Y(1100, 1068), '#F5B5C8', -14);
     h += '<g transform="translate(860,50)" fill="#7A625B"><path d="M0,-20 l9,22 h-18 z"/><text y="22" font-size="16" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">N</text></g>';
     /* Josie's hanging sign, oversized, on the land beside the dock end: a tall post with a long arm */
     h += '<g transform="translate(-60,0)"><ellipse cx="645" cy="233" rx="28" ry="7" fill="#3B2925" opacity=".14"/>' +
