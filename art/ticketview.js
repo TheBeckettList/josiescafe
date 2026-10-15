@@ -121,7 +121,8 @@
       for (i = 0; i < cards.length; i++) { if (cards[i].offsetTop <= mid) { cur = i; } }
       for (i = 0; i < dots.length; i++) { dots[i].className = i === cur ? 'on' : ''; }
       c = cards[cur];
-      if (more) { more.hidden = !(c && (c.offsetTop + c.offsetHeight) > (sc.scrollTop + sc.clientHeight + 10)); }
+      var its = c ? c.querySelectorAll('.tv-item') : [], last = its.length ? its[its.length - 1] : c;
+      if (more) { more.hidden = !(last && (last.offsetTop + last.offsetHeight + (last === c ? 0 : c.offsetTop)) > (sc.scrollTop + sc.clientHeight - 6)); }
     }
     sc.onscroll = update; update();
   };

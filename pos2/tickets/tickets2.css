@@ -1,0 +1,22 @@
+/* Josie's Tickets (new look): the kitchen or bar on a cook's own phone. Read only. */
+html, body { margin: 0; height: 100%; background: #FCE3E8; font-family: 'Nunito', sans-serif; color: #5B3843; -webkit-text-size-adjust: 100%; }
+#app { height: 100%; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-orient: vertical; -webkit-flex-direction: column; flex-direction: column; }
+button { font-family: inherit; border: 0; cursor: pointer; }
+.top { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; padding: 12px 16px 8px; padding-top: calc(12px + env(safe-area-inset-top)); }
+.top h1 { margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; -webkit-box-flex: 1; -webkit-flex: 1; flex: 1; }
+.top small { font-size: 12px; font-weight: 800; color: #86606B; margin-right: 10px; }
+.top small i { display: inline-block; width: 8px; height: 8px; border-radius: 4px; background: #5BBF9B; margin-right: 5px; }
+.top small.off i { background: #E0A24A; }
+.dots { width: 40px; height: 40px; border-radius: 20px; background: #FFF; color: #B55573; font-size: 22px; line-height: 1; }
+.feed { -webkit-box-flex: 1; -webkit-flex: 1 1 auto; flex: 1 1 auto; min-height: 0; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-orient: vertical; -webkit-flex-direction: column; flex-direction: column; padding: 0 14px 14px; padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
+.setup { padding: 40px 28px; text-align: center; }
+.setup img { width: 96px; height: auto; }
+.setup h1 { font-family: 'Baloo 2', sans-serif; font-size: 30px; margin: 8px 0; }
+.seg { margin: 14px 0; } .seg button { padding: 10px 22px; background: #FFF; color: #B55573; font-weight: 800; font-size: 16px; } .seg button:first-child { border-radius: 22px 0 0 22px; } .seg button:last-child { border-radius: 0 22px 22px 0; } .seg button.on { background: #B55573; color: #FFF; }
+.setup input { width: 70%; font-size: 30px; letter-spacing: 8px; text-align: center; padding: 10px; border: 3px solid #F5B5C8; border-radius: 18px; font-family: 'Baloo 2', sans-serif; }
+.help, .msg { font-size: 13px; color: #86606B; } .msg { color: #B55573; min-height: 18px; font-weight: 800; }
+.btn { margin-top: 8px; padding: 14px 36px; border-radius: 28px; background: #B55573; color: #FFF; font-family: 'Baloo 2', sans-serif; font-size: 20px; }
+.link { margin-top: 18px; background: none; color: #86606B; font-size: 13px; text-decoration: underline; }
+.sheet { position: fixed; left: 0; right: 0; top: 0; bottom: 0; background: rgba(91,56,67,.4); display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: end; -webkit-align-items: flex-end; align-items: flex-end; }
+.sheet-in { background: #FFF; width: 100%; border-radius: 24px 24px 0 0; padding: 18px; }
+.sheet-in button { display: block; width: 100%; margin: 8px 0; padding: 14px; border-radius: 16px; background: #FDEDF1; color: #B55573; font-weight: 800; font-size: 16px; }
