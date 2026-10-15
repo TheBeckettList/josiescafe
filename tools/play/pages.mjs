@@ -16,5 +16,5 @@ function make(src, out, inject, base, after) {
   fs.writeFileSync(path.join(root, out), s);
   console.log('wrote', out);
 }
-make('pos/index.html', 'play/app/index.html', '/play/play.js?v=7', '/pos/', '/play/scenarios.js?v=1');
-make('index.html', 'play/guest/index.html', '/play/guest.js?v=4', '');
+make('pos/index.html', 'play/app/index.html', '/play/play.js?v=8', '/pos/', '/play/scenarios.js?v=2');
+make('index.html', 'play/guest/index.html', '/play/guest.js?v=5', '');

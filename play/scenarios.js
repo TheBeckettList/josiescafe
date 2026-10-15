@@ -67,13 +67,13 @@
         { t: 8, kind: 'probe', name: 'finish before paying', say: 'The cashier tries to finish it before it is paid',
           run: function (x) { return x.call('complete_number', { p: { order_ids: [x.id('p')], at: new Date().toISOString() } }).then(function (r) { return r && r.ok === false ? 'refused politely: unpaid' : 'went through (unexpected)'; }); } },
         { t: 14, kind: 'probe', name: 'pay twice', say: 'The cashier takes the payment twice',
-          run: function (x) { var amt = x.total('p'); return x.call('pay_orders', { p: { payments: [{ id: x.uuid(), order_id: x.id('p'), method: 'cash_hnl', amount: amt }] } }).then(function () { return x.call('pay_orders', { p: { payments: [{ id: x.uuid(), order_id: x.id('p'), method: 'cash_hnl', amount: amt }] } }); }).then(function () { return x.q("select count(*)::int c, coalesce(sum(amount),0)::numeric s from payments where order_id = $1", [x.id('p')]).then(function (r) { return r[0].c === 1 ? 'counted once' : 'counted ' + r[0].c + ' times, L' + r[0].s; }); }); } },
+          run: function (x) { var amt = x.total('p'); return x.call('pay_orders', { p: { payments: [{ id: x.uuid(), order_id: x.id('p'), method: 'cash_hnl', amount: amt }] } }).then(function () { return x.call('pay_orders', { p: { payments: [{ id: x.uuid(), order_id: x.id('p'), method: 'cash_hnl', amount: amt }] } }); }).then(function () { return x.payments(x.id('p')).then(function (r) { return r.c === 1 ? 'counted once' : 'counted ' + r.c + ' times, L' + r.s; }); }); } },
         { t: 22, kind: 'probe', name: 'a stick that is taken', say: 'Someone places a stick that is already on a table',
-          run: function (x) { return x.q("select state, table_id from sticks where number = $1", [x.stick('p')]).then(function (r) { return x.call('place_stick', { p: { stick: x.stick('p'), table_id: x.freeTable() } }).then(function () { return 'moved it'; }); }).catch(function (e) { return 'refused: ' + String(e.message).slice(0, 60); }); } },
+          run: function (x) { return x.call('place_stick', { p: { stick: x.stick('p'), table_id: x.freeTable() } }).then(function () { return 'moved it'; }).catch(function (e) { return 'refused: ' + String(e.message).slice(0, 60); }); } },
         { t: 30, kind: 'probe', name: 'a huge pastry order', say: 'A guest asks for 40 croissants',
           run: function (x) { return x.online('Giant', [['Croissant', 40]]).then(function (o) { return 'accepted'; }).catch(function (e) { return /unavailable|stock|limit|bad_qty/i.test(e.message) ? 'refused politely (too many for one order)' : 'error: ' + String(e.message).slice(0, 70); }); } },
         { t: 40, kind: 'probe', name: 'ordering with the café closed', say: 'Online ordering is paused, a guest tries anyway',
-          run: function (x) { return x.q("update settings set online_orders = false").then(function () { return x.online('Late', [['Latte', 1]]); }).then(function () { return 'accepted (unexpected)'; }).catch(function (e) { return /paused/.test(e.message) ? 'refused: orders paused' : 'error: ' + String(e.message).slice(0, 70); }).then(function (m) { return x.q("update settings set online_orders = true").then(function () { return m; }); }); } },
+          run: function (x) { return x.setOnline(false).then(function () { return x.online('Late', [['Latte', 1]]); }).then(function () { return 'accepted (unexpected)'; }).catch(function (e) { return /paused/.test(e.message) ? 'refused: orders paused' : 'error: ' + String(e.message).slice(0, 70); }).then(function (m) { return x.setOnline(true).then(function () { return m; }); }); } },
         { t: 60, kind: 'say', say: 'Finishing up: the first order is paid, brought out and its stick returns to the pot.' }
       ]; } }
   ];
@@ -91,12 +91,13 @@
     function say(m, tone) { R.log.push({ t: R.sim, m: m, tone: tone || '' }); if (R.onTick) { R.onTick(R); } }
     function fail(m) { R.errors.push({ t: R.sim, m: m }); say('✗ ' + m, 'bad'); }
     function lookup() {
-      return P.q("select i.id, i.name->>'en' as n, i.price, c.station, coalesce(c.counted, false) as counted from items i join categories c on c.id = i.category_id where i.active").then(function (rows) {
+      var E = P.eng;
+      return E.menu().then(function (rows) {
         rows.forEach(function (x) { cat[x.n] = x; });
-        return P.q('select id, label from tables order by label');
-      }).then(function (t) { tables = t.map(function (x) { return { id: x.id, label: x.label, used: false }; }); return P.q("select id, name->>'en' as n from ingredients"); })
-        .then(function (g) { g.forEach(function (x) { ingredients[x.n] = x.id; }); return P.q("select id from people where name = 'Rosa'"); })
-        .then(function (p) { return P.call('sign_in', { p_person: p[0].id, p_pin: '1234', p_device: 'S' }); })
+        return E.tables();
+      }).then(function (t) { tables = t.map(function (x) { return { id: x.id, label: x.label, used: false }; }); return E.ingredientIds(); })
+        .then(function (g) { ingredients = g; return E.personId('Rosa'); })
+        .then(function (id) { return P.call('sign_in', { p_person: id, p_pin: '1234', p_device: 'S' }); })
         .then(function (r) { token = r.token; });
     }
     function freeStick() { var n; for (n = 1; n <= 24; n++) { if (!sticks[n]) { sticks[n] = true; return n; } } return null; }
@@ -140,7 +141,7 @@
     }
     function insert(e) { var j = 0; while (j < R.queue.length && R.queue[j].t <= e.t) { j++; } R.queue.splice(j, 0, e); }
 
-    var X = { call: P.call, q: P.q, uuid: uuid, id: function (k) { return R.byKey[k].id; }, total: function (k) { return R.byKey[k].total; }, stick: function (k) { return R.byKey[k].stick; }, freeTable: freeTable,
+    var X = { call: P.call, payments: function (id) { return P.eng.payments(id); }, setOnline: function (on) { return P.eng.setOnline(on); }, uuid: uuid, id: function (k) { return R.byKey[k].id; }, total: function (k) { return R.byKey[k].total; }, stick: function (k) { return R.byKey[k].stick; }, freeTable: freeTable,
       online: function (name, items) {
         var ls = [], j; for (j = 0; j < items.length; j++) { ls.push({ item_id: cat[items[j][0]].id, qty: items[j][1] }); }
         return P.call('place_online_order2', { p: { id: uuid(), name: name, order_type: 'togo', lines: ls } }, false);
@@ -194,7 +195,7 @@
     /* what the room looks like right now: the numbers behind the report */
     function sample() {
       var s = { t: R.sim, bar: queueDepth('bar'), kitchen: queueDepth('kitchen'), open: openCount() };
-      return P.q("select count(*) filter (where state = 'waiting')::int w from sticks").then(function (r) { s.waiting = r[0].w; }).catch(function () { s.waiting = 0; }).then(function () {
+      return P.eng.waiting().then(function (n) { s.waiting = n; }).catch(function () { s.waiting = 0; }).then(function () {
         s.unpaid = Object.keys(R.orders).filter(function (k) { var o = R.orders[k]; return !o.paid && !o.cancelled && !o.finished; }).length;
         samples.push(s); ['bar', 'kitchen', 'open', 'waiting', 'unpaid'].forEach(function (k) { if (s[k] > peak[k]) { peak[k] = s[k]; } }); return s;
       });

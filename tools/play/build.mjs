@@ -23,6 +23,19 @@ for (const f of files) {
 }
 const extra = fs.readFileSync(path.join(here, 'preset.sql'), 'utf8');
 await db.exec(extra);
+// the pretend pastry case, so the light engine's snapshot has it too
+await db.exec(`update items set active = true, price = 60, stock = 6 where name->>'en' in ('Brownie','Key lime pie','Croissant'); update items set active = true, price = 55, stock = 4 where name->>'en' = 'Cinnamon roll'`);
+// the light engine (play/engine-sim.js) starts from this snapshot of the same café: no database in the browser
+const snap = {};
+for (const [k, sql] of Object.entries({
+  categories: 'select * from categories order by sort', items: 'select * from items order by sort', settings: 'select * from settings',
+  fx: 'select day, bank_buy, bank_sell from fx_rates order by day desc limit 10', ingredients: 'select * from ingredients order by id',
+  dish_ingredients: 'select * from dish_ingredients', swaps: 'select * from swaps order by sort', diets: 'select * from diets order by sort',
+  diet_marks: 'select * from diet_marks', tables: 'select * from tables order by label', sticks: 'select * from sticks order by number',
+  people: 'select id, name, role, station, language, active, hidden from people order by name', ticket_link: 'select code from ticket_link'
+})) { snap[k] = (await db.query(`select coalesce(jsonb_agg(t), '[]'::jsonb) as j from (${sql}) t`)).rows[0].j; }
+fs.writeFileSync(path.join(root, 'play', 'data.json'), JSON.stringify(snap));
+console.log('wrote play/data.json', fs.statSync(path.join(root, 'play', 'data.json')).size, 'bytes');
 await db.exec('vacuum; checkpoint;').catch(() => {});
 const blob = await db.dumpDataDir('gzip');
 const out = path.join(root, 'play', 'db.tar.gz'); fs.mkdirSync(path.dirname(out), { recursive: true });
