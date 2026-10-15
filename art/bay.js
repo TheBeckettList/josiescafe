@@ -108,11 +108,9 @@
     /* waves, boats and words are drawn upright in the map's own coordinates */
     h += '<path d="M640,420 q18,-8 36,0 M700,610 q18,-8 36,0 M520,690 q18,-8 36,0 M860,520 q18,-8 36,0 M960,690 q18,-8 36,0 M1180,470 q18,-8 36,0 M1260,640 q18,-8 36,0 M820,330 q18,-8 36,0 M1100,380 q18,-8 36,0" stroke="#FFFFFF" stroke-width="4.5" fill="none" stroke-linecap="round" opacity=".85"/>';
     h += sail(X(1090), Y(1090, 560), 0.42, '#EC5C97') + sail(X(1140), Y(1140, 760), 0.4, '#F2A66B') + sail(X(930), Y(930, 700), 0.38, '#7FC6D6') + sail(X(760), Y(760, 640), 0.38, '#EC5C97');
-    h += '<g font-family="Baloo 2,Nunito,sans-serif" font-weight="800" text-anchor="middle"><text x="' + X(470) + '" y="' + Y(470, 500) + '" font-size="40" fill="#FFFFFF" opacity=".85">Utila Bay</text></g>' +
-      '<g transform="translate(' + X(640) + ',' + Y(640, 300) + ')"><rect x="-62" y="-19" width="124" height="38" rx="19" fill="#FFFFFF" stroke="#F5B5C8" stroke-width="3"/><text y="7" font-family="Baloo 2,Nunito,sans-serif" font-weight="800" font-size="21" fill="#B55573" text-anchor="middle">Ferry dock</text></g>' +
-      '<g transform="translate(900,52)" fill="#7A625B"><path d="M0,-20 l9,22 h-18 z"/><text y="22" font-size="16" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">N</text></g>' +
+    h += '<g transform="translate(900,52)" fill="#7A625B"><path d="M0,-20 l9,22 h-18 z"/><text y="22" font-size="16" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">N</text></g>' +
       /* Josie's hanging sign, oversized, at the land end of the pier */
-      '<g transform="translate(0,50)"><ellipse cx="731" cy="104" rx="26" ry="6" fill="#3B2925" opacity=".14"/>' +
+      '<g transform="translate(80,50)"><ellipse cx="731" cy="104" rx="26" ry="6" fill="#3B2925" opacity=".14"/>' +
       '<rect x="724" y="14" width="14" height="90" rx="4" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3"/><rect x="719" y="6" width="24" height="12" rx="4" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3"/>' +
       '<rect x="566" y="18" width="168" height="11" rx="4" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3"/>' +
       '<path d="M724,50 L700,26" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/><path d="M724,50 L700,26" stroke="#E2D7CC" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>' +
@@ -121,7 +119,7 @@
     return h;
   }
   w.J2BAY = {
-    sign: [582, 88, 132, 162],
+    sign: [662, 88, 132, 162],
     layer: function () {
       return '<svg class="baylayer" width="1440" height="1240" viewBox="0 0 1440 1240" role="img" aria-label="Map of Utila Bay: Josie\'s Cafe is at the land end of the ferry dock, on the ferry road just off Main Street">' + content() + '</svg>';
     },
