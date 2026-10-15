@@ -4,6 +4,7 @@
 (function (w, d) {
   'use strict';
   var JC = w.JC, base = (JC.cfg.url || '').replace(/\/$/, ''), db = null, voidFns = null, ready = null, VER = 'v3';
+  var me = d.currentScript, GUEST_ONLY = !!(me && /[?&]guest=1/.test(me.src));   // the stand-alone customer link: just the guest website, its own café in memory
   w.J2PLAY = { on: true };
   /* no service worker in the sandbox: the app asks for one, the answer is nothing */
   try { Object.defineProperty(w.navigator, 'serviceWorker', { value: { register: function () { return Promise.resolve(); } }, configurable: true }); } catch (e) {}
@@ -135,6 +136,7 @@
   /* ───────── a moment in the café: two sticks on tables, an add-on, an online order ───────── */
   function rpc(fn, body, authed) { return handle('POST', '/rest/v1/rpc/' + fn, {}, body, authed !== false).then(function (r) { if (r.status >= 300) { throw new Error(fn + ': ' + JSON.stringify(r.json)); } return r.json; }); }
   function one(sql) { return db.query(sql).then(function (r) { var row = r.rows[0]; return row ? row[Object.keys(row)[0]] : null; }); }
+  var PASTRIES = "update items set active = true, price = 60, stock = 6 where name->>'en' in ('Brownie','Key lime pie','Croissant'); update items set active = true, price = 55, stock = 4 where name->>'en' = 'Cinnamon roll'";
   function seedFloor() {
     var names = {}, ids = {}, ings = {}, tbls = {}, u = function (n) { return '00000000-0000-0000-0000-0000000000' + ('0' + n).slice(-2); }, now = new Date().toISOString();
     function ago(m) { return new Date(Date.now() - m * 60000).toISOString(); }
@@ -202,6 +204,7 @@
   function clock() { var c = d.getElementById('phclock'); if (c) { var n = new Date(); c.textContent = n.getHours() % 12 || 12; c.textContent += ':' + ('0' + n.getMinutes()).slice(-2); } }
   function esc2(x) { return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
   function banner(station, card) {
+    if (GUEST_ONLY) { return; }
     ensurePhone(); phoneEl.style.display = ''; placePhone();
     var n = d.createElement('div'); n.className = 'nt';
     n.setAttribute('style', 'background:rgba(255,255,255,.93);color:#3A2A30;border-radius:18px;padding:9px 11px;margin-bottom:8px;box-shadow:0 4px 12px rgba(0,0,0,.18)');
@@ -221,11 +224,20 @@
       }).catch(function () {});
     });
   }
+  /* a guest's order walks itself through the café: the cashier takes payment, then it is picked up, five seconds apart */
+  function walkOrder(id) {
+    w.setTimeout(function () {
+      one("select total from orders where id = '" + id + "'").then(function (tot) {
+        return rpc('pay_orders', { p: { payments: [{ id: JC.uuid(), order_id: id, method: 'cash_hnl', amount: Number(tot || 0) }] } });
+      }).catch(function () {});
+    }, 5000);
+    w.setTimeout(function () { rpc('complete_number', { p: { order_ids: [id], at: new Date().toISOString() } }).catch(function () {}); }, 10000);
+  }
   function afterWrite(path, body, out) {
     var m = /^\/rest\/v1\/rpc\/([a-z0-9_]+)$/.exec(path); if (!m) { return; }
     var fn = m[1], p = (body && body.p) || {};
     if (fn === 'sync_order2' && p.order && p.order.id) { pushFor(p.order.id); }
-    else if (fn === 'place_online_order2' && p.id) { pushFor(p.id); }
+    else if (fn === 'place_online_order2' && p.id) { pushFor(p.id); walkOrder(p.id); }
     else if (fn === 'add_to_online_order' && (p.id || p.order_id)) { pushFor(p.id || p.order_id); }
     else if (fn === 'stop_item' && p.alert_id) {
       db.query('select a.station, public.push_alert_card(a.id, $2) as c from public.ticket_alerts a where a.id = $1::uuid', [p.alert_id, 'en']).then(function (r) { var x = r.rows[0]; if (x && x.c) { banner(x.station, x.c); } }).catch(function () {});
@@ -236,19 +248,20 @@
   function deleteIdb() { return new Promise(function (res) { try { var r = w.indexedDB.deleteDatabase('/pglite/josies-play-' + VER); r.onsuccess = r.onerror = r.onblocked = function () { res(); }; } catch (e) { res(); } }); }
   function boot() {
     var fresh = false;
-    try { fresh = !w.localStorage.getItem('jc.play.seeded.' + VER); } catch (e) {}
+    try { fresh = GUEST_ONLY || !w.localStorage.getItem('jc.play.seeded.' + VER); } catch (e) {}
     say('Loading the little database…');
     return (fresh ? deleteIdb() : Promise.resolve()).then(function () {
       return Promise.all([import('./vendor/index.js'), fresh ? w.fetch('/play/db.tar.gz').then(function (r) { return r.blob(); }) : Promise.resolve(null)]);
     }).then(function (x) {
       var opts = { relaxedDurability: true }; if (x[1]) { opts.loadDataDir = x[1]; }
-      return x[0].PGlite.create('idb://josies-play-' + VER, opts);
+      return x[0].PGlite.create(GUEST_ONLY ? 'memory://' : 'idb://josies-play-' + VER, opts);
     }).then(function (inst) {
       db = inst;
+      if (GUEST_ONLY) { return db.exec(PASTRIES); }
       return fresh ? (say('Putting a few guests in the café…'), seedFloor().then(function () { try { w.localStorage.setItem('jc.play.seeded.' + VER, '1'); } catch (e) {} })) : null;
     });
   }
-  ready = boot().then(function () { cover_off(); bar(); }).catch(function (e) { say('Play mode could not start here (' + String(e && e.message || e).slice(0, 90) + '). Try a newer browser.'); throw e; });
+  ready = boot().then(function () { cover_off(); if (!GUEST_ONLY) { bar(); } }).catch(function (e) { say('Play mode could not start here (' + String(e && e.message || e).slice(0, 90) + '). Try a newer browser.'); throw e; });
 
   /* ───────── the little bar: who you are, switch, start over ───────── */
   var WHO = [['Rosa', 'Rosa · register'], ['Beto', 'Beto · bar'], ['Lupe', 'Lupe · kitchen'], ['Josie', 'Josie · owner (look only)']];

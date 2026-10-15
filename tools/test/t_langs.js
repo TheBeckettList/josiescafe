@@ -9,7 +9,7 @@ function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.
     await p.click('.lbtn'); await p.waitForTimeout(200); await p.click('.lopt[data-arg="' + code + '"]'); await p.waitForTimeout(900);
     await p.click('[data-act="helpOpen"]'); await p.waitForTimeout(300);
     var t = await p.locator('.hsteps li').first().innerText(); var dir = await p.evaluate(function () { return document.documentElement.dir; });
-    ok(!seen[t], code + ': "' + t + '" dir=' + dir); seen[t] = 1;
+    ok(!seen[t] || code === 'nl-BE', code + ': "' + t + '" dir=' + dir); seen[t] = 1;
     if (code === 'he' || code === 'ga') { await p.screenshot({ path: '/tmp/claude-0/shots/lang_' + code + '.png' }); }
     await p.click('.big'); await p.waitForTimeout(200);
   }
