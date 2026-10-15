@@ -6,7 +6,7 @@ var pw = require('/opt/node22/lib/node_modules/playwright');
 var shim = require('./shim');
 var ROOT = path.resolve(__dirname, '../..');
 var SUPA = /^https:\/\/tuthebxguxvogmiowhcx\.supabase\.co/;
-var TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json' };
+var TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json', '.wasm': 'application/wasm', '.gz': 'application/gzip', '.data': 'application/octet-stream' };
 
 exports.reset = function () {
   var r = shim.psql("delete from payments; delete from order_items; delete from order_pieces; delete from ticket_alerts; delete from orders; " +
