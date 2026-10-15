@@ -3,7 +3,7 @@ function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.
 (async function () {
   var h = await H.start({ reset: true });
   var REAL = { access_token: 'REAL-TOKEN', refresh_token: 'real', expires_at: Date.now() + 1e9, email: 'pos@josiescafe.com' };
-  var p = await h.page('/pos/?play', { viewport: { width: 1180, height: 820 }, init: function () { try { if (!localStorage.getItem('jc.pos.session')) { localStorage.setItem('jc.pos.session', JSON.stringify({ access_token: 'REAL-TOKEN', refresh_token: 'real', expires_at: Date.now() + 1e9, email: 'pos@josiescafe.com' })); localStorage.setItem('jc.p2.person', JSON.stringify({ name: 'RealPerson', token: 'real' })); } } catch (e) {} } });
+  var p = await h.page('/play/app/', { viewport: { width: 1180, height: 820 }, init: function () { try { if (!localStorage.getItem('jc.pos.session')) { localStorage.setItem('jc.pos.session', JSON.stringify({ access_token: 'REAL-TOKEN', refresh_token: 'real', expires_at: Date.now() + 1e9, email: 'pos@josiescafe.com' })); localStorage.setItem('jc.p2.person', JSON.stringify({ name: 'RealPerson', token: 'real' })); } } catch (e) {} } });
   p.on('console', function (m) { if (m.type() === 'error' || m.type() === 'warning') { console.log('console:', m.text().slice(0, 200)); } });
   await p.waitForSelector('.person', { timeout: 90000 });
   ok((await p.locator('#playcover').count()) === 0, 'the play café is up');

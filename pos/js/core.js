@@ -11,8 +11,8 @@
   var EMPTY = { categories: [], items: [], settings: null, fx: [], ingredients: [], dish_ingredients: [], swaps: [], diets: [], diet_marks: [], names: [] };
   var KEYS = { session: 'pos.session', device: 'pos.device', data: 'p2.data', person: 'p2.person', queue: 'p2.queue', floor: 'p2.floor',
     cart: 'p2.cart', log: 'p2.log', lang: 'p2.lang', known: 'p2.known', tour: 'p2.tour', tickets: 'p2.tickets' };
-  /* an earlier build of Play mode wrote its pretend sign-in over this tablet's real one: clear what it left so the device asks to be set up again */
-  (function () { var bad = JC.get(KEYS.session, null), k; if (bad && bad.access_token === 'play-token' && !w.J2PLAY) { for (k in KEYS) { if (KEYS.hasOwnProperty(k) && k !== 'device' && k !== 'lang') { JC.del(KEYS[k]); } } } }());
+  /* a leftover test sign-in on this browser (access token 'play-token') is not a real one: clear what it left so the device asks to be set up again */
+  (function () { var bad = JC.get(KEYS.session, null), k; if (bad && bad.access_token === 'play-token') { for (k in KEYS) { if (KEYS.hasOwnProperty(k) && k !== 'device' && k !== 'lang') { JC.del(KEYS[k]); } } } }());
   var S = J.S = {
     session: JC.get(KEYS.session, null),
     device: JC.get(KEYS.device, null) || { code: 'A', mode: 'register', lang: 'en' },
