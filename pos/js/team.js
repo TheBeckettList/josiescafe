@@ -15,7 +15,11 @@
   function load() {
     if (Tm.busy || !S.person || !S.person.token) { return; }
     Tm.busy = true;
-    J.call('people_list', { p_token: S.person.token }, function (e, r) { Tm.busy = false; Tm.err = e ? t('needNet') : ''; if (r) { Tm.list = r; } J.changed(); });
+    J.call('people_list', { p_token: S.person.token }, function (e, r) {
+      Tm.busy = false; Tm.err = e ? t('needNet') : ''; if (r) { Tm.list = r; }
+      if (r && Tm.wantSelf) { Tm.wantSelf = false; Tm.handle('teamEdit', S.person.id); }
+      J.changed();
+    });
   }
   function who(p) { return p.role === 'josie' ? t('owner') : p.role === 'manager' ? t('manager') : (p.station ? t(p.station) : t('staff')); }
   function chips(field, opts, cur) {
@@ -52,6 +56,8 @@
     return '<div class="shell mgr">' + U.topbar('manager', { back: '<button type="button" class="backbtn" data-act="teamBack" aria-label="' + esc(t('back')) + '">‹</button><b class="mtitle">' + esc(t('title')) + ' <span class="lockpill">🔒 ' + esc(t('onlyJosie')) + '</span></b>' }) +
       '<div class="mbody"><div class="teamwrap">' + (Tm.edit ? form() : listView()) + '</div></div></div>';
   };
+  /* the guide asks for your own row, to change your PIN */
+  Tm.openSelf = function () { J.mgr.view = 'team'; Tm.edit = null; Tm.list = null; Tm.wantSelf = true; J.changed(); };
   Tm.button = function () { return J.can('josie') ? '<button type="button" class="paybtn mteam" data-act="teamOpen">' + esc(t('title')) + '</button>' : ''; };
   function find(id) { var l = Tm.list || [], i; for (i = 0; i < l.length; i++) { if (l[i].id === id) { return l[i]; } } return null; }
   Tm.handle = function (act, arg) {

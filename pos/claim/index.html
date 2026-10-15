@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Owner access</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../../img/favicon-32.png?v=3">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap">
+<style>
+  :root { --pink: #B55573; --soft: #FDEDF1; --ink: #5B3843; --mute: #86606B; --line: #F5B5C8; --card: #FFFFFF; --bad: #B0364B; --ok: #2F6B58; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --soft: #2B1F24; --ink: #F7E3E9; --mute: #C9A8B2; --card: #3A2A31; --line: #7A4A5C; --pink: #E58AA9; --bad: #FF8FA3; --ok: #7FD1B3; } }
+  :root[data-theme="dark"] { --soft: #2B1F24; --ink: #F7E3E9; --mute: #C9A8B2; --card: #3A2A31; --line: #7A4A5C; --pink: #E58AA9; --bad: #FF8FA3; --ok: #7FD1B3; }
+  * { box-sizing: border-box; } html, body { margin: 0; background: var(--soft); color: var(--ink); font-family: Nunito, system-ui, sans-serif; }
+  main { max-width: 440px; margin: 0 auto; padding: 28px 16px 56px; text-align: center; }
+  img { height: 72px; } h1 { font-family: 'Baloo 2', sans-serif; font-size: 32px; margin: 8px 0 4px; } p { font-weight: 700; color: var(--mute); margin: 6px 0 16px; }
+  form { background: var(--card); border-radius: 26px; padding: 20px; box-shadow: 0 0 0 3px var(--line); text-align: left; }
+  label { display: block; font-family: 'Baloo 2', sans-serif; font-weight: 800; margin: 0 0 4px; }
+  input { width: 100%; height: 56px; border-radius: 16px; border: 3px solid var(--line); padding: 0 16px; font-size: 26px; letter-spacing: 6px; font-weight: 800; color: var(--ink); background: var(--card); margin-bottom: 14px; text-align: center; }
+  input#nm { letter-spacing: 0; font-size: 20px; }
+  button { width: 100%; height: 56px; border-radius: 28px; background: var(--pink); color: #fff; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; border: 0; }
+  .msg { min-height: 24px; font-weight: 800; color: var(--bad); text-align: center; margin: 4px 0 10px; } .msg.ok { color: var(--ok); }
+</style>
+</head>
+<body>
+<main>
+  <img src="../../img/josies-wordmark.png" alt="Josie’s">
+  <h1>Owner access</h1>
+  <p>Choose a 6-digit PIN. This link works once.</p>
+  <form id="f" autocomplete="off">
+    <label for="nm">Name on screen</label><input id="nm" type="text" value="Owner" maxlength="30">
+    <label for="p1">New 6-digit PIN</label><input id="p1" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="new-password">
+    <label for="p2">Type it again</label><input id="p2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="new-password">
+    <div class="msg" id="msg"></div>
+    <button type="submit">Save my PIN</button>
+  </form>
+</main>
+<script src="../../js/api.js"></script>
+<script>
+(function () {
+  var tok = (location.hash || '').replace(/^#/, ''), f = document.getElementById('f'), msg = document.getElementById('msg'), busy = false;
+  try { history.replaceState(null, '', location.pathname); } catch (e) {}
+  function say(t, ok) { msg.textContent = t; msg.className = 'msg' + (ok ? ' ok' : ''); }
+  if (!/^[0-9a-f]{20,}$/i.test(tok)) { say('This link is not complete. Ask for a new one.'); }
+  f.addEventListener('submit', function (e) {
+    e.preventDefault(); if (busy) { return; }
+    var a = document.getElementById('p1').value, b = document.getElementById('p2').value;
+    if (!/^[0-9]{6}$/.test(a)) { say('The PIN is exactly 6 digits.'); return; }
+    if (a !== b) { say('The two PINs are different.'); return; }
+    busy = true; say('Saving…', true);
+    JC.rest('POST', 'rpc/claim_owner', { p_token: tok, p_pin: a, p_name: document.getElementById('nm').value }, null, function (err, ok) {
+      busy = false;
+      if (err || ok !== true) { say(err ? 'That did not work. Try again.' : 'This link was already used or has expired. Ask for a new one.'); return; }
+      f.style.display = 'none';
+      document.querySelector('p').innerHTML = '<b style="font-size:22px;color:var(--ok)">You are set.</b><br>On the sign-in screen, tap the Josie’s logo 7 times, then type your 6 digits.';
+    });
+  });
+}());
+</script>
+</body>
+</html>
