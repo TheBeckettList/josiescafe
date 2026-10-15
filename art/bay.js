@@ -66,6 +66,32 @@
     for (i = 0; i < 6; i++) { h += '<path d="M2,-56 Q' + (30 * Math.cos(i * 1.05 - .5)) + ',' + (-56 + 22 * Math.sin(i * 1.05 - .5) - 18) + ' ' + (46 * Math.cos(i * 1.05 - .5)) + ',' + (-56 + 30 * Math.sin(i * 1.05 - .5)) + '" stroke="#6DB28F" stroke-width="9" fill="none" stroke-linecap="round"/>'; }
     return h + '</g>';
   }
+
+  function fish(x, y, sc, rot, col) {
+    return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + sc + ')"><path d="M-9,0 L-18,-7 L-18,7 Z" fill="' + col + '"/><ellipse cx="0" cy="0" rx="11" ry="6.5" fill="' + col + '"/><path d="M-2,-6 Q3,-2 -2,6" stroke="#FFFFFF" stroke-width="1.6" fill="none" opacity=".7"/><circle cx="6" cy="-1.5" r="1.5" fill="#3B2925"/></g>';
+  }
+  function school(cx, cy, col, n, spread, rot) {
+    var out = '', i, k = cx * 3 + cy;
+    for (i = 0; i < n; i++) { k = (k * 9301 + 49297) % 233280; out += fish((cx + (k % 100 / 100 - .5) * spread * 2).toFixed(0), (cy + ((k >> 3) % 100 / 100 - .5) * spread).toFixed(0), (.55 + (k % 7) / 25).toFixed(2), rot + (k % 21) - 10, col); }
+    return out;
+  }
+  function octopus(x, y, sc) {
+    var t = '', i, a;
+    for (i = 0; i < 7; i++) { a = -70 + i * 23; t += '<path d="M' + (i * 7 - 21) + ',8 q' + (Math.sin(a / 57) * 10) + ',16 ' + (Math.sin(a / 40) * 18) + ',26 q' + (Math.cos(a / 30) * 8) + ',8 ' + (Math.sin(a / 20) * 10) + ',10" stroke="#D98BB8" stroke-width="6" fill="none" stroke-linecap="round"/>'; }
+    return '<g transform="translate(' + x + ',' + y + ') scale(' + sc + ')"><ellipse cx="0" cy="34" rx="30" ry="7" fill="#3B2925" opacity=".12"/>' + t +
+      '<ellipse cx="0" cy="-6" rx="20" ry="17" fill="#E3A0C6"/><ellipse cx="-6" cy="-12" rx="7" ry="5" fill="#F3C3DB" opacity=".8"/><circle cx="-7" cy="1" r="5" fill="#FFFFFF"/><circle cx="7" cy="1" r="5" fill="#FFFFFF"/><circle cx="-6" cy="2" r="2.4" fill="#3B2925"/><circle cx="8" cy="2" r="2.4" fill="#3B2925"/></g>';
+  }
+  function buoy(x, y, sc) {
+    return '<g transform="translate(' + x + ',' + y + ') scale(' + sc + ')"><ellipse cx="0" cy="10" rx="20" ry="5" fill="#FFFFFF" opacity=".5"/><path d="M0,0 V-34" stroke="#7A625B" stroke-width="2.4"/>' +
+      '<path d="M0,-34 h20 v13 h-20 z" fill="#E24D5C"/><path d="M0,-34 L20,-21" stroke="#FFFFFF" stroke-width="3"/><circle cx="0" cy="4" r="9" fill="#F2A66B"/><path d="M-9,2 h18" stroke="#FFFFFF" stroke-width="3"/></g>';
+  }
+  function diveBoat(x, y, sc) {
+    return '<g transform="translate(' + x + ',' + y + ') scale(' + sc + ')"><ellipse cx="0" cy="24" rx="70" ry="11" fill="#FFFFFF" opacity=".4"/>' +
+      '<path d="M-58,4 L52,4 Q66,4 72,-8 L72,12 Q60,26 40,26 L-44,26 Q-58,26 -58,12 Z" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3" stroke-linejoin="round"/><path d="M-56,14 H68" stroke="#EC5C97" stroke-width="5"/>' +
+      '<rect x="-36" y="-14" width="46" height="18" rx="5" fill="#B9E2EA" stroke="#FFFFFF" stroke-width="3"/><path d="M-40,-16 h54" stroke="#F5B5C8" stroke-width="5" stroke-linecap="round"/>' +
+      '<path d="M38,4 V-30" stroke="#7A625B" stroke-width="2.4"/><path d="M38,-30 h22 v14 h-22 z" fill="#E24D5C"/><path d="M38,-30 L60,-16" stroke="#FFFFFF" stroke-width="3.4"/>' +
+      '<circle cx="-70" cy="30" r="3" fill="#FFFFFF" opacity=".8"/><circle cx="-78" cy="38" r="2.2" fill="#FFFFFF" opacity=".7"/></g>';
+  }
   function bush(x, y, r) { return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#7DBE9C"/><circle cx="' + (x - r * .35) + '" cy="' + (y - r * .3) + '" r="' + r * .55 + '" fill="#97D0B1"/>'; }
   function sail(x, y, s, col) {
     return '<g transform="translate(' + x + ',' + y + ') scale(' + s + ')">' +
@@ -107,7 +133,12 @@
       '</g>';
     /* waves, boats and words are drawn upright in the map's own coordinates */
     h += '<path d="M640,420 q18,-8 36,0 M700,610 q18,-8 36,0 M520,690 q18,-8 36,0 M860,520 q18,-8 36,0 M960,690 q18,-8 36,0 M1180,470 q18,-8 36,0 M1260,640 q18,-8 36,0 M820,330 q18,-8 36,0 M1100,380 q18,-8 36,0" stroke="#FFFFFF" stroke-width="4.5" fill="none" stroke-linecap="round" opacity=".85"/>';
-    h += sail(X(1090), Y(1090, 560), 0.42, '#EC5C97') + sail(X(1140), Y(1140, 760), 0.4, '#F2A66B') + sail(X(930), Y(930, 700), 0.38, '#7FC6D6') + sail(X(760), Y(760, 640), 0.38, '#EC5C97');
+    /* three sailboats anchored together */
+    h += sail(778, 352, 0.46, '#EC5C97') + sail(832, 384, 0.44, '#F2A66B') + sail(784, 418, 0.42, '#7FC6D6');
+    /* fish over the reefs */
+    h += school(X(850), Y(850, 770), '#F2A66B', 5, 26, -8) + school(X(880), Y(880, 800), '#7FC6D6', 3, 18, 170) + school(X(470), Y(470, 320), '#F5B5C8', 4, 24, 12) + school(X(235), Y(235, 930), '#F2A66B', 4, 22, -4) + school(X(770), Y(770, 1150), '#EC5C97', 4, 26, 6) + school(X(1020), Y(1020, 1010), '#7FC6D6', 3, 14, -170);
+    /* Sturch Bank dive site, left side of the cove: dive boat, buoy, octopus on the reef */
+    h += octopus(X(255), Y(255, 600) - 6, 0.55) + buoy(214, 352, 0.6) + diveBoat(132, 448, 0.55);
     h += '<g transform="translate(900,52)" fill="#7A625B"><path d="M0,-20 l9,22 h-18 z"/><text y="22" font-size="16" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">N</text></g>' +
       /* Josie's hanging sign, oversized, at the land end of the pier */
       '<g transform="translate(80,50)"><ellipse cx="731" cy="104" rx="26" ry="6" fill="#3B2925" opacity=".14"/>' +
