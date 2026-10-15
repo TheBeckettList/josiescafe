@@ -55,3 +55,12 @@ Do not build the placeholders.
 ## Guest-facing times
 - Guests never see "ready in" times. Online orders do not ask for a pickup time in the new checkout.
   `orders.pickup_at` stays in the database for the live v1.2 flow only, and the new ticket does not show it.
+
+## Live database status (Oct 15, 2026)
+- `007_josies_world_schema.sql` is applied to the live project (applied in pieces; the Supabase tool times out at 60s
+  and every schema change takes a few seconds there, so big batches hang. Apply in groups of 3-4 statements).
+- `008_draft_ingredients.sql` is applied: 46 draft ingredients, 151 dish links, 17 diet "no" marks. It is a DRAFT built from
+  the menu descriptions. Josie corrects element/base, core flags, swaps and diet marks in the admin gear.
+- People: Manager (josie role), Dorcas, Martha (staff). Rates and real PINs are not set yet.
+- Hours are Mon-Sat 6:15-14:30, closed Sunday; online cutoff 14:00.
+- The live v1.2 POS, ticket phones and website were not changed and keep working.
