@@ -19,7 +19,7 @@
   };
   var HIT = {
     kitchen: [[1266, 70, 118, 92], [1146, 212, 184, 216]], bar: [[610, 50, 130, 94]], grinder: [[556, 40, 54, 100]], fridge: [[892, 14, 158, 148]],
-    menu: [[810, 166, 74, 72]], pastries: [[750, 64, 80, 80]], register: [[546, 212, 348, 58]], sign: [[114, 92, 132, 162]], 'pot-home': [[548, 166, 78, 76]], 'pot-wait': [[624, 180, 50, 62]]
+    menu: [[810, 166, 74, 46]], pastries: [[674, 180, 66, 66]], register: [[742, 214, 150, 34]], sign: [[114, 92, 132, 162]], 'pot-home': [[548, 166, 78, 76]], 'pot-wait': [[624, 180, 50, 62]]
   };
   var LABEL = { kitchen: 'Kitchen', bar: 'Bar', grinder: 'Coffee beans', fridge: 'Fridge', menu: 'Menu board', pastries: 'Pastries', register: 'Register', sign: 'Sign', 'pot-home': 'Home pot', 'pot-wait': 'Waiting pot' };
 
@@ -89,19 +89,20 @@
   /* a small status for each thing on the map (shown on its dashed box) */
   function statusFor(key, homeN, waitN) {
     var n, i, it, items, out = 0, un = 0, ords, lt, st;
-    if (key === 'kitchen' || key === 'bar') { n = makingCount(key); return n ? { t: n + ' ' + J.t('making'), tone: 'ok' } : { t: J.t('stQuiet'), tone: 'idle' }; }
+    if (key === 'kitchen' || key === 'bar') { n = makingCount(key); return n ? { t: n + ' ' + J.t('making'), tone: 'ok', n: n } : { t: J.t('stQuiet'), tone: 'idle' }; }
     if (key === 'grinder') { lt = worst(function (g) { return g.location === 'grinder'; }); return { t: J.t('stBeans') + ' · ' + J.t(lt === 'green' ? 'plenty' : lt === 'amber' ? 'low' : 'out').toLowerCase(), tone: lt === 'green' ? 'ok' : lt === 'amber' ? 'warn' : 'bad' }; }
-    if (key === 'fridge') { n = 0; for (i = 0; i < S.data.ingredients.length; i++) { it = S.data.ingredients[i]; if (it.inventoried && it.location === 'fridge' && J.light(it.id) !== 'green') { n += 1; } } return n ? { t: n + ' ' + J.t('low').toLowerCase(), tone: 'warn' } : { t: J.t('allGood'), tone: 'ok' }; }
-    if (key === 'menu') { items = S.data.items || []; for (i = 0; i < items.length; i++) { it = items[i]; if (it.active !== false && (!it.available || J.adapt(it, []).out)) { out += 1; } } return out ? { t: out + ' ' + J.t('out').toLowerCase(), tone: 'warn' } : { t: J.t('stAllOn'), tone: 'ok' }; }
+    if (key === 'fridge') { n = 0; for (i = 0; i < S.data.ingredients.length; i++) { it = S.data.ingredients[i]; if (it.inventoried && it.location === 'fridge' && J.light(it.id) !== 'green') { n += 1; } } return n ? { t: n + ' ' + J.t('low').toLowerCase(), tone: 'warn', n: n } : { t: J.t('allGood'), tone: 'ok' }; }
+    if (key === 'menu') { items = S.data.items || []; for (i = 0; i < items.length; i++) { it = items[i]; if (it.active !== false && (!it.available || J.adapt(it, []).out)) { out += 1; } } return out ? { t: out + ' ' + J.t('out').toLowerCase(), tone: 'warn', n: out } : { t: J.t('stAllOn'), tone: 'ok' }; }
     if (key === 'pastries') { items = pastryItems(); if (!items.length) { return { t: '—', tone: 'idle' }; } for (i = 0; i < items.length; i++) { out += Number(items[i].stock || 0); } return out < 1 ? { t: J.t('stNoneLeft'), tone: 'bad' } : { t: out + ' ' + J.t('stLeft'), tone: out <= 4 ? 'warn' : 'ok' }; }
-    if (key === 'register') { ords = (S.floor && S.floor.open) || []; for (i = 0; i < ords.length; i++) { if (ords[i].status !== 'paid') { un += 1; } } return un ? { t: un + ' ' + J.t('stToPay'), tone: 'warn' } : { t: J.t('stAllPaid'), tone: 'ok' }; }
+    if (key === 'register') { ords = (S.floor && S.floor.open) || []; for (i = 0; i < ords.length; i++) { if (ords[i].status !== 'paid') { un += 1; } } return un ? { t: un + ' ' + J.t('stToPay'), tone: 'warn', n: un } : { t: J.t('stAllPaid'), tone: 'ok' }; }
     if (key === 'sign') { st = J.settings(); return (st.closed_until && JC.today() <= st.closed_until) ? { t: J.t('closedToday'), tone: 'bad' } : { t: J.t('stOpen'), tone: 'ok' }; }
-    if (key === 'pot-home') { return { t: homeN + ' ' + J.t('stHome'), tone: 'idle' }; }
-    if (key === 'pot-wait') { return waitN ? { t: waitN + ' ' + J.t('stWaiting'), tone: 'warn' } : { t: J.t('stNoneWaiting'), tone: 'idle' }; }
+    if (key === 'pot-home') { return { t: homeN + ' ' + J.t('stHome'), tone: 'idle', n: homeN }; }
+    if (key === 'pot-wait') { return waitN ? { t: waitN + ' ' + J.t('stWaiting'), tone: 'warn', n: waitN } : { t: J.t('stNoneWaiting'), tone: 'idle' }; }
     return null;
   }
-  var BPOS = { 'pot-home': ' tl', 'pot-wait': ' tr', bar: ' top', grinder: ' top' };
-  function sbadge(stt, key) { return stt ? '<span class="sbadge ' + stt.tone + (BPOS[key] || '') + '"><i></i>' + esc(stt.t) + '</span>' : ''; }
+  var BPOS = { 'pot-home': ' tl' };
+  /* a stoplight: green fine, amber look, red act, grey quiet. A number only where a count helps; the words live in the label. */
+  function sbadge(stt, key) { return stt ? '<span class="sbadge ' + stt.tone + (BPOS[key] || '') + '" title="' + esc(stt.t) + '"><i>' + (stt.n ? esc(String(stt.n)) : '') + '</i></span>' : ''; }
   /* ───────────── the screen ───────────── */
   O.screen = function () {
     var f = S.floor, h = '<div class="shell">' + U.topbar('overview') + U.band() + '<div class="ovbody"><div class="mapcol" id="mapcol"><div class="mapbox" id="mapbox"><div class="mapscale" id="mapscale">';
@@ -121,12 +122,8 @@
       else { for (i = 0; i < waitN.length && i < 4; i++) { h += potSvg(620 + i * 22, 184 + (i % 2) * 6, waitN[i], 'draggable'); } }
     } else { h += potSvg(628, 184, 0); }
     // making bubbles
-    if (makingCount('bar')) { h += makingBubble('bar', makingLabel('bar')); }
-    if (makingCount('kitchen')) { h += makingBubble('kitchen', makingLabel('kitchen')); }
     // low-stock bubbles (reminders only)
     var wb = worst(function (g) { return g.location === 'grinder'; }), wf = worst(function (g) { return g.location === 'fridge' && g.inventoried; });
-    if (wb !== 'green') { h += lowBubble(546, 30, 'coffee-beans', wb); }
-    if (wf !== 'green') { h += lowBubble(1056, 12, 'milk', wf); }
     // the tappable things
     var key, rects, hi, popKind = ui().popup && ui().popup.kind;
     for (key in HIT) {
@@ -140,7 +137,7 @@
       if (!TABLES.hasOwnProperty(label)) { continue; }
       var on = popKind === 'table' && ui().popup.id === label;
       var tt = tableByLabel(label), occ = tt && ts[tt.id];
-      h += '<button type="button" class="hit tbl sbox' + (occ ? ' occ' : '') + (st ? ' pick' : '') + (on ? ' on' : '') + '" data-act="tablePick" data-arg="' + label + '" data-ov="table-' + label + '" style="' + px(TABLES[label].box) + '" aria-label="Table ' + label + '">' + (occ ? sbadge({ t: J.t('stStick') + ' ' + occ, tone: 'ok' }) : '') + '</button>';
+      h += '<button type="button" class="hit tbl sbox' + (occ ? ' occ' : '') + (st ? ' pick' : '') + (on ? ' on' : '') + '" data-act="tablePick" data-arg="' + label + '" data-ov="table-' + label + '" style="' + px(TABLES[label].box) + '" aria-label="Table ' + label + '">' + (occ ? sbadge({ t: J.t('stStick') + ' ' + occ, tone: 'ok', n: occ }) : '') + '</button>';
     }
     h += (w.J2CRIT ? w.J2CRIT.hits() : '') + '</div>';       // mapscale
     if (st) { h += '<div class="placehint">' + esc(J.t('placeOnTable')) + ' · ' + st + '<button type="button" data-act="placeCancel">' + esc(J.t('cancel')) + '</button></div>'; }
@@ -317,7 +314,7 @@
     var it = J.ix().itemById[id]; if (!it) { return pHead('', '', null); }
     var rows = J.ix().di[id] || [], key = U.dishKey(it), i, h = pHead(J.nm(it.name), '', 'menu') + '<div class="pb" data-scroll="dish"><div class="dishtop"><span class="mico big" style="background:' + U.menuBg(key) + '">' + ART.svg('menu', key, 56) + '</span><b>L' + Number(it.price) + '</b></div><div class="ingrows">';
     for (i = 0; i < rows.length; i++) { h += '<div class="ingrow">' + J.ingIcon(rows[i].ingredient_id, 40) + '<span>' + esc(J.ingName(rows[i].ingredient_id)) + '</span>' + (J.light(rows[i].ingredient_id) !== 'green' ? '<i class="lt ' + J.light(rows[i].ingredient_id) + '"></i>' : '') + '</div>'; }
-    if (!rows.length) { h += '<p class="psub">No ingredients yet. Tap the gear to add them.</p>'; }
+    if (!rows.length) { h += '<p class="psub">No ingredients yet. Tap the pencil to add them.</p>'; }
     h += '</div>' + (it.description ? '<p class="psub">' + esc(J.nm(it.description)) + '</p>' : '') + '</div>';
     return h;
   }

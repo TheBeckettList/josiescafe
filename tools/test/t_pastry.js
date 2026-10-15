@@ -11,7 +11,7 @@ var INIT = function () { try { if (!localStorage.getItem('jc.pos.session')) {
   await p.click('.person:has-text("Manager")'); for (var k of ['1','2','3','4']) { await p.click('.key[data-arg="' + k + '"]'); }
   await p.waitForTimeout(1500); if (await p.locator('[data-act="tourClose"]').count()) { await p.click('[data-act="tourClose"] >> nth=0'); }
   await p.click('.tab:has-text("Overview")'); await p.waitForTimeout(2200);
-  var badge = await p.locator('.hit[data-arg="pastries"] .sbadge').innerText(); ok(/10 left/.test(badge), 'stand status says ' + badge);
+  var badge = await p.locator('.hit[data-arg="pastries"] .sbadge').getAttribute('title'); ok(/10 left/.test(badge), 'stand status says ' + badge);
   await p.click('.hit[data-arg="pastries"]'); await p.waitForTimeout(500);
   ok((await p.locator('.prow').count()) === 2, 'popup lists the 2 pastries');
   await p.screenshot({ path: '/tmp/claude-0/shots/pastry_pop.png' });

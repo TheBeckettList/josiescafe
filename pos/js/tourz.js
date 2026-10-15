@@ -45,12 +45,12 @@
       z_grinder1: ['The coffee beans', 'The beans are checked at the grinder. Tap it and set Plenty, Low or Out.'],
       z_grinder2: ['The check', 'This one is required at the start of a shift. The fridge is only when you have a minute.'],
       z_menu1: ['The menu board', 'Tap it to look at the whole menu with what is on and off right now.'],
-      z_menu2: ['Change it', 'The gear on the popup lets the right people edit dishes, prices and ingredients.'],
+      z_menu2: ['Change it', 'The pencil on the popup lets the right people edit dishes, prices and ingredients.'],
       z_pastries1: ['The pastry stand', 'Everything in the dome, with how many are left. Tap one to change the count.'],
       z_pastries2: ['The bar hands them out', 'Pastries are made by the bar, so the bar tickets show them.'],
       z_register1: ['The register', 'Tap it to jump back to ringing up an order.'],
       z_sign1: ['The sign', 'Open or closed, and the hours. Online orders stop at 2 pm on their own.'],
-      z_sign2: ['Change it', 'The gear lets a manager close early or change the hours. The website follows.'],
+      z_sign2: ['Change it', 'The pencil lets a manager close early or change the hours. The website follows.'],
       z_pot1: ['The pots', 'The home pot holds sticks that are free. The waiting pot holds sticks whose food is on its way to a table.'],
       z_pot2: ['Placing a stick', 'Tap a stick in the waiting pot, then tap the table. It leaves the pot and the table lights up.'],
       z_table1: ['A table', 'Tap a table to see who is sitting there and what they ordered.'],
@@ -69,7 +69,7 @@
       z_quiet1: ['Quiet-time check', 'When it is quiet, the bar and kitchen get one small question about what is low. Answer, or tap Later. No one is chased.'],
       // popups
       z_pop1: ['This popup', 'Everything here is about the thing you tapped. Tap outside it, or the cross, to close.'],
-      z_pop2: ['The gear', 'The gear flips the popup to its setup. What you see there depends on who you are.'],
+      z_pop2: ['The pencil', 'The pencil flips the popup to its setup. What you see there depends on who you are.'],
       z_pop3: ['Tickets', 'Cards are in the order they came in. Scroll for more, there is nothing to press.'],
       z_pop4: ['Lights', 'Plenty, Low or Out. Set what you see on the shelf. The menu follows at once.'],
       // manager
@@ -81,6 +81,7 @@
       z_mphones2: ['New code', 'Making a new code stops every phone until the new code is typed in. Use it if a phone is lost.'],
       z_mpay1: ['Payroll', 'Only Josie sees this. Hours times rate, per person.'],
       z_mpay2: ['Paid', 'Mark it paid by cash or transfer. Undo is there for a mistake.'],
+      z_team1: ['Your people', 'Everyone who can sign in. Tap one to change their station, wage or PIN.'],
       z_mday1: ['The day', 'Move between days to see any day you want.']
     },
     es: {
@@ -119,12 +120,12 @@
       z_grinder1: ['Los granos de café', 'Los granos se revisan en el molino. Tócalo y ponlos en Bastante, Poco o Agotado.'],
       z_grinder2: ['La revisión', 'Esta es obligatoria al empezar el turno. El refri es solo cuando tengas un minuto.'],
       z_menu1: ['El menú', 'Tócalo para ver todo el menú, con lo que está activo o apagado ahora.'],
-      z_menu2: ['Cambiarlo', 'El engrane de la ventana deja que las personas indicadas editen platos, precios e ingredientes.'],
+      z_menu2: ['Cambiarlo', 'El lápiz de la ventana deja que las personas indicadas editen platos, precios e ingredientes.'],
       z_pastries1: ['El puesto de pasteles', 'Todo lo que hay en la cúpula y cuántos quedan. Toca uno para cambiar la cuenta.'],
       z_pastries2: ['El bar los entrega', 'Los pasteles los atiende el bar, así que aparecen en los tickets del bar.'],
       z_register1: ['La caja', 'Tócala para volver a cobrar un pedido.'],
       z_sign1: ['El letrero', 'Abierto o cerrado, y el horario. Los pedidos en línea paran a las 2 pm solos.'],
-      z_sign2: ['Cambiarlo', 'El engrane deja que gerencia cierre temprano o cambie el horario. El sitio web lo sigue.'],
+      z_sign2: ['Cambiarlo', 'El lápiz deja que gerencia cierre temprano o cambie el horario. El sitio web lo sigue.'],
       z_pot1: ['Las ollas', 'La olla de casa guarda los palitos libres. La olla de espera guarda los palitos cuyo pedido va camino a una mesa.'],
       z_pot2: ['Poner un palito', 'Toca un palito de la olla de espera y luego la mesa. Sale de la olla y la mesa se ilumina.'],
       z_table1: ['Una mesa', 'Toca una mesa para ver quién está sentado y qué pidió.'],
@@ -141,7 +142,7 @@
       z_viewas1: ['Ver como', 'Josie puede ver la pantalla como la ve la caja, el bar o la cocina. Nada cambia, es solo para mirar.'],
       z_quiet1: ['Revisión en la calma', 'Cuando hay calma, el bar y la cocina reciben una pregunta chica sobre lo que se acaba. Contestan, o tocan Después. Nadie es perseguido.'],
       z_pop1: ['Esta ventana', 'Todo aquí es sobre lo que tocaste. Toca afuera, o la cruz, para cerrar.'],
-      z_pop2: ['El engrane', 'El engrane pasa la ventana a su configuración. Lo que ves ahí depende de quién eres.'],
+      z_pop2: ['El lápiz', 'El lápiz pasa la ventana a su configuración. Lo que ves ahí depende de quién eres.'],
       z_pop3: ['Tickets', 'Las tarjetas van en el orden en que llegaron. Desliza para ver más, no hay nada que presionar.'],
       z_pop4: ['Luces', 'Bastante, Poco o Agotado. Pon lo que ves en el estante. El menú lo sigue al instante.'],
       z_mstats1: ['Hoy hasta ahora', 'Ventas, pedidos y la espera promedio de cada estación. Los promedios son por estación, nunca por persona.'],
@@ -152,6 +153,7 @@
       z_mphones2: ['Código nuevo', 'Un código nuevo detiene todos los teléfonos hasta que lo escriban. Úsalo si se pierde un teléfono.'],
       z_mpay1: ['Planilla', 'Solo Josie ve esto. Horas por tarifa, por persona.'],
       z_mpay2: ['Pagado', 'Márcalo pagado en efectivo o transferencia. Deshacer está para un error.'],
+      z_team1: ['Tu gente', 'Todos los que pueden entrar. Toca uno para cambiar su estación, salario o PIN.'],
       z_mday1: ['El día', 'Muévete entre días para ver el que quieras.']
     }
   };
@@ -215,6 +217,7 @@
       { sel: '.lang', steps: [['z_lang1', '.lang']] }
     ],
     manager: [
+      { sel: '.teamlist', steps: [['z_team1', '.teamlist']] },
       { sel: '.mstats', steps: [['z_mstats1', '.mstats'], ['z_mstats2', '.mstats']] },
       { sel: '.mloved', steps: [['z_mloved1', '.mloved'], ['z_mloved2', '.mloved']] },
       { sel: '.mphones', steps: [['z_mphones1', '.mphones'], ['z_mphones2', '.mphones']] },

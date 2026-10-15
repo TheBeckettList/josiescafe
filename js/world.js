@@ -166,7 +166,7 @@
   function stateOf() { return W.status ? W.status.state : 'making'; }
   function sceneHtml(kind, label, name) {
     var ph = w.innerWidth, bw = Math.min(ph - 28, 460), r = kind === 'kitchen' ? { x: 1090, y: 60, w: 350 } : { x: 520, y: 20, w: 390 }, sc = bw / r.w;
-    return '<div class="scene" style="width:' + bw + 'px"><div class="layer" style="-webkit-transform:translate(' + (-r.x * sc) + 'px,' + (-r.y * sc) + 'px) scale(' + sc + ');transform:translate(' + (-r.x * sc) + 'px,' + (-r.y * sc) + 'px) scale(' + sc + ')"><div class="mimg" style="background:url(../img/world/map.png) 0 0 / 1440px 1240px no-repeat;width:1440px;height:1240px"></div></div>' +
+    return '<div class="scene" style="width:' + bw + 'px"><div class="layer" style="-webkit-transform:translate(' + (-r.x * sc) + 'px,' + (-r.y * sc) + 'px) scale(' + sc + ');transform:translate(' + (-r.x * sc) + 'px,' + (-r.y * sc) + 'px) scale(' + sc + ')"><div class="mimg" style="background:url(../img/world/map.png?v=2) 0 0 / 1440px 1240px no-repeat;width:1440px;height:1240px"></div></div>' +
       (stateOf() === 'making' ? '<span class="bub" style="left:' + (kind === 'kitchen' ? 20 : 20) + 'px;top:14px">' + esc(name) + '</span>' : '') + '<span class="lbl"><i></i>' + esc(label) + '</span></div>';
   }
   function statusPage() {

@@ -15,6 +15,7 @@
   function html() {
     if (!S.session) { return setupView(); }
     if (!S.person) { return signinView(); }
+    if (J.setup) { J.setup.check(); if (S.ui.setup === 'home') { return J.setup.home(); } }
     return shell() + (S.ui.tutorial ? tutorialHTML() : '') + J.tour.html();
   }
   function shell() {
@@ -166,6 +167,8 @@
       case 'print': R.printReceipt(arg); break;
       default:
         if (J.tour && J.tour.handle(act, arg)) { break; }
+        if (J.setup && J.setup.handle(act, arg)) { break; }
+        if (J.team && J.team.handle(act, arg)) { break; }
         if (J.ov && J.ov.handle && J.ov.handle(act, arg, el)) { break; }
         if (J.gear && J.gear.handle && J.gear.handle(act, arg, el)) { break; }
         if (J.mgr && J.mgr.handle && J.mgr.handle(act, arg, el)) { break; }
@@ -176,6 +179,7 @@
     if (el.id === 'cust') { J.cart().name = el.value; J.saveCart(); }
     else if (el.id === 'givenIn') { R.givenInput(el.value); }
     else if (el.id === 'cardRef') { S.ui.pay.ref = el.value; }
+    else if (J.team && J.team.input(el)) { return; }
     else if (J.gear && J.gear.input) { J.gear.input(el); }
   }
   function onSubmit(ev) { ev.preventDefault(); if (ev.target.id === 'setupForm') { doSetup(); } else if (J.gear && J.gear.submit) { J.gear.submit(ev.target); } }

@@ -14,7 +14,7 @@ function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.
   await p.screenshot({ path: '/tmp/claude-0/shots/ov_map.png' });
   var rails = await p.locator('.orail .rcard h2').allTextContents(); console.log('rail cards:', rails);
   ok((await p.locator('.nrow').count()) >= 3, 'rail lists the numbers (' + await p.locator('.nrow').count() + ' rows)');
-  ok((await p.locator('.mk').count()) === 2, 'making bubbles on the bar and the kitchen');
+  ok((await p.locator('.hit[data-ov="bar"] .sbadge.ok i').count()) === 1 && (await p.locator('.hit[data-ov="kitchen"] .sbadge.ok i').count()) === 1, 'making lights on the bar and the kitchen');
   await p.click('.hit[data-arg="kitchen"] >> nth=0'); await p.waitForTimeout(1200);
   await p.screenshot({ path: '/tmp/claude-0/shots/ov_kitchen.png' });
   ok((await p.locator('.pop .tv-card').count()) >= 1, 'kitchen popup shows ticket cards (' + await p.locator('.pop .tv-card').count() + ')');
