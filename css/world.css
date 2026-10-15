@@ -14,12 +14,12 @@ button { font-family: inherit; border: 0; cursor: pointer; color: inherit; backg
 .wlayer .mimg { position: absolute; left: 0; top: 0; width: 1440px; height: 1240px; background: url(../img/world/map.png?v=2) 0 0 / 1440px 1240px no-repeat; }
 .hit { position: absolute; background: transparent; border-radius: 18px; }
 .hit:focus-visible { outline: 4px solid #B55573; }
-.hit.glow { box-shadow: 0 0 0 6px rgba(255,255,255,.0); animation: glow 2.4s infinite; }
-@keyframes glow { 50% { box-shadow: 0 0 0 10px rgba(255,255,255,.45); } }
+.hit.glow { border-radius: 22px; box-shadow: 0 0 0 4px rgba(236,92,151,.55); animation: glow 2s infinite ease-in-out; }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 0 4px rgba(236,92,151,.55), 0 0 0 4px rgba(236,92,151,.25); } 60% { box-shadow: 0 0 0 5px rgba(236,92,151,.7), 0 0 0 20px rgba(236,92,151,0); } }
 .hours { position: absolute; width: 236px; padding: 12px 8px; border-radius: 28px; background: #FFF; text-align: center; box-shadow: 0 6px 18px rgba(91,56,67,.2); font-family: 'Baloo 2', sans-serif; }
 .hours .tag { display: inline-block; padding: 2px 18px; border-radius: 14px; background: #D9F0E8; color: #2F6B58; font-weight: 800; font-size: 18px; }
 .hours .tag.closed { background: #F9D6D6; color: #8E2F3F; }
-.hours b { display: block; white-space: nowrap; font-size: 32px; line-height: 1.1; } .hours small { display: block; font-size: 16px; color: #86606B; font-family: 'Nunito', sans-serif; font-weight: 700; }
+.hours b { display: block; white-space: nowrap; font-size: 26px; line-height: 1.1; letter-spacing: -.2px; } .hours small { display: block; font-size: 16px; color: #86606B; font-family: 'Nunito', sans-serif; font-weight: 700; }
 .mkb { position: absolute; padding: 4px 22px; border-radius: 30px; background: #B55573; color: #FFF; font-family: 'Baloo 2', sans-serif; font-size: 30px; font-weight: 800; box-shadow: 0 4px 12px rgba(91,56,67,.25); }
 .cartpill { position: absolute; right: 12px; bottom: 12px; z-index: 6; display: flex; align-items: center; padding: 6px 6px 6px 16px; border-radius: 34px; background: #FFF; box-shadow: 0 0 0 3px #F5B5C8, 0 6px 16px rgba(91,56,67,.22); }
 .cartpill small { display: block; font-size: 11px; color: #86606B; font-weight: 700; } .cartpill b { font-family: 'Baloo 2', sans-serif; font-size: 18px; }
@@ -106,7 +106,7 @@ button { font-family: inherit; border: 0; cursor: pointer; color: inherit; backg
 
 /* hours: live status, vertical week */
 .pill { border: 0; font-family: inherit; cursor: pointer; text-align: start; display: inline-flex; flex-direction: column; justify-content: center; line-height: 1.12; padding: 4px 12px; min-width: 0; } .pill b { font-size: 13.5px; } .pill small { font-size: 11.5px; font-weight: 800; opacity: .9; }
-.hours.ph { width: 200px; padding: 10px 8px; } .hours b.sm { font-size: 24px; white-space: normal; } .hours.ph b { font-size: 22px; } .hours.ph b.sm { font-size: 20px; }
+
 .hstat { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 18px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; margin: 4px 0 12px; }
 .hstat i { width: 16px; height: 16px; border-radius: 50%; flex: none; } .hstat.open { background: #D9F0E8; color: #2F6B58; } .hstat.open i { background: #3C9A78; } .hstat.closed { background: #F9D6D6; color: #8E2F3F; } .hstat.closed i { background: #D2455D; }
 .hweek .hr { display: flex; justify-content: space-between; gap: 12px; padding: 9px 12px; border-radius: 14px; font-weight: 800; font-size: 17px; } .hweek .hr.today { background: #FDEDF1; box-shadow: inset 0 0 0 3px #F5B5C8; } .hweek .hr.off { color: #86606B; font-weight: 700; }
@@ -118,3 +118,23 @@ button { font-family: inherit; border: 0; cursor: pointer; color: inherit; backg
 .hstat span { display: flex; flex-direction: column; line-height: 1.15; } .hstat span small { font-size: 15px; font-weight: 800; opacity: .9; }
 
 .fp.friendly { color: #86606B; font-size: 15px; } .hint.dollars { margin-top: -4px; font-size: 13.5px; opacity: .9; }
+
+/* the menu stands out and the list stays put */
+.mkb.tap { z-index: 5; cursor: pointer; border: 0; animation: tapbob 2s infinite ease-in-out; box-shadow: 0 5px 0 #8E3F59, 0 8px 16px rgba(91,56,67,.3); }
+@keyframes tapbob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.cats { position: sticky; top: 56px; z-index: 6; background: #FFF; margin: 0 -4px; padding: 6px 4px 10px; border-radius: 28px 28px 0 0; scroll-behavior: auto; overscroll-behavior-x: contain; }
+@media (min-width: 700px) { .cats { top: 64px; } }
+html.lock, html.lock body { overflow: hidden; }
+.dcard.modal { overscroll-behavior: contain; }
+@media (prefers-reduced-motion: reduce) { .mkb.tap, .hit.glow { animation: none; } }
+
+/* the hours sign: one line when there is room, stacked when the map is small */
+.hours .rng { display: flex; align-items: baseline; justify-content: center; gap: 6px; margin: 2px 0; }
+.hours .rng b { display: inline-block; font-size: 30px; line-height: 1.05; letter-spacing: -.3px; } .hours .rng em { font-style: normal; font-weight: 800; color: #B55573; font-size: 24px; }
+.hours .rng .ap { font-style: normal; font-size: .52em; font-weight: 800; color: #86606B; margin-left: 2px; letter-spacing: 0; vertical-align: .55em; } .hours .rng .ap .sh { display: none; }
+.hours .rng.nx { display: block; } .hours .rng.nx small.op { font-size: 17px; color: #86606B; }
+.hours.ph { width: 138px; padding: 9px 6px 8px; border-radius: 24px; } .hours.ph .rng { flex-direction: column; align-items: center; gap: 0; } .hours.ph .rng b { font-size: 29px; } .hours.ph .rng em { font-size: 22px; line-height: .7; margin: 0; display: block; }
+.hours.ph .tag { font-size: 15px; padding: 1px 14px; } .hours.ph small { font-size: 14px; }
+@media (max-width: 359px) { .hours .rng .ap .l { display: none; } .hours .rng .ap .sh { display: inline; } }
+@media (max-width: 400px) { .winset { width: 100px; height: 72px; left: 8px; bottom: 8px; } .winset .cap { font-size: 10px; } }
+.mkb.tap { transform: translateX(-50%); white-space: nowrap; font-size: 26px; padding: 3px 20px; } @keyframes tapbob { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -5px); } }
