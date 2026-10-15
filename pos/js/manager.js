@@ -52,7 +52,7 @@
     var r = M.rev, i, b, max = 1, k, bars = '', l, nowQ, left, right, mapCard, chartCard;
     if (!r) { return '<p class="empty">' + esc(M.err || t('loading')) + '</p>'; }
     function chip(name, mins, x, y) { return '<span class="mchip" style="left:' + x + '%;top:' + y + '%"><i></i>' + esc(name) + ' · ' + (mins ? mins + ' ' + t('min') : '—') + '</span>'; }
-    mapCard = '<div class="pcard mmapcard"><div class="mmap" style="background-image:url(../img/world/map.png)">' + chip(t('bar'), r.bar_wait, 40, 10) + chip(t('kitchen'), r.kitchen_wait, 66, 14) + '</div></div>';
+    mapCard = '<div class="pcard mmapcard"><div class="mmap" style="background-image:url(../img/world/map.png?v=2)">' + chip(t('bar'), r.bar_wait, 40, 10) + chip(t('kitchen'), r.kitchen_wait, 66, 14) + '</div></div>';
     for (k in r.buckets) { if (r.buckets.hasOwnProperty(k)) { max = Math.max(max, r.buckets[k]); } }
     var hn = new Date(Date.now() - 6 * 3600 * 1000); nowQ = hn.getUTCHours() * 4 + Math.floor(hn.getUTCMinutes() / 15);
     for (i = 24; i <= 58; i++) { b = r.buckets[i] || 0; bars += '<i class="' + (i === nowQ ? 'now' : '') + '" style="height:' + Math.max(5, Math.round(b / max * 78)) + 'px;opacity:' + (i > nowQ && nowQ >= 24 && nowQ <= 58 ? .28 : (b ? 0.4 + 0.6 * b / max : 0.28)) + '"></i>'; }

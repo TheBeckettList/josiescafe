@@ -4,7 +4,7 @@
    J2CRIT.play(name) = do it. Needs art/critters.css. Plain ES5. */
 (function (w, d) {
   'use strict';
-  var C = w.J2CRIT = { MAP: '/img/world/map.png', active: {} };
+  var C = w.J2CRIT = { MAP: '/img/world/map.png?v=2', active: {} };
   var DUR = { tree: 1.7, iguana: 3.4, crab1: 4, crab2: 4, crab3: 4, ray: 2.4, tuk: 2.6, sail: 1.4, octopus: 1.6, fish: 1.8, buoy: 1.6, diveboat: 1.8 };
   var SAND = '#F6DCC0', HEAD = '#6FA3B8';
 
@@ -76,9 +76,9 @@
   }
 
 
-  /* a map object (not a critter): the pastry stand with its glass dome, on the bar counter beside the coffee machine */
+  /* a map object (not a critter): the pastry stand with its glass dome, on the register counter, beside the printer */
   C.stand = function () {
-    return '<svg class="mapobj" viewBox="0 0 76 76" style="position:absolute;left:752px;top:66px;width:76px;height:76px;pointer-events:none;z-index:4" aria-hidden="true">' +
+    return '<svg class="mapobj" viewBox="0 0 76 76" style="position:absolute;left:676px;top:184px;width:62px;height:62px;pointer-events:none;z-index:4" aria-hidden="true">' +
       '<ellipse cx="38" cy="70" rx="24" ry="3" fill="#3B2925" opacity=".1"/><ellipse cx="38" cy="67" rx="21" ry="5" fill="#F5B5C8"/><rect x="35" y="57" width="6" height="10" fill="#EE95B3"/><ellipse cx="38" cy="57" rx="28" ry="5" fill="#FFFFFF" stroke="#F1D3DD" stroke-width="1.500"/>' +
       '<path d="M15 54 L29 54 L27.500 46 Q22 43 16.500 46 Z" fill="#F5B5C8"/><path d="M13.500 47 Q14 36 22 35 Q30 36 30.500 47 Z" fill="#E2A66A"/><circle cx="19" cy="41" r="1.200" fill="#B98050"/><circle cx="25" cy="40" r="1.200" fill="#B98050"/>' +
       '<circle cx="39" cy="48" r="8.500" fill="#D9A15F"/><circle cx="39" cy="48" r="7" fill="#E5B677"/><g fill="#5A3626"><circle cx="36" cy="46" r="1.300"/><circle cx="42" cy="48" r="1.300"/><circle cx="38" cy="51" r="1.300"/></g>' +
