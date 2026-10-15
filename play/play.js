@@ -3,7 +3,7 @@
    Loaded by /play/app/ (a copy of the POS page, built by tools/play/build.mjs, that loads this after api.js and before the app), so it can preset the session and swap the network call. The real /pos/ knows nothing about it. Modern browsers only. */
 (function (w, d) {
   'use strict';
-  var JC = w.JC, base = (JC.cfg.url || '').replace(/\/$/, ''), db = null, voidFns = null, ready = null, VER = 'v2';
+  var JC = w.JC, base = (JC.cfg.url || '').replace(/\/$/, ''), db = null, voidFns = null, ready = null, VER = 'v3';
   w.J2PLAY = { on: true };
   /* no service worker in the sandbox: the app asks for one, the answer is nothing */
   try { Object.defineProperty(w.navigator, 'serviceWorker', { value: { register: function () { return Promise.resolve(); } }, configurable: true }); } catch (e) {}
@@ -76,9 +76,22 @@
     }).join(', '), call = 'public.' + ident(fn) + '(' + args + ')';
     return isv ? 'select ' + call + " as j, 'null' as n" : 'select to_jsonb(' + call + ') as j';
   }
+  /* The play café is a look-around: counting and ordering work, but nothing about the café itself can be changed.
+     Anything that would edit the menu, prices, hours, ingredients, people or pay is turned away. */
+  var BLOCKED_RPC = ['catalog_write', 'people_save', 'payroll_mark', 'payroll_view', 'tickets_new_code', 'people_list'];
+  function readOnly(method, path, body) {
+    var m = /^\/rest\/v1\/rpc\/([a-z0-9_]+)$/.exec(path);
+    if (m) { return BLOCKED_RPC.indexOf(m[1]) >= 0; }
+    if (/^\/rest\/v1\/[a-z0-9_]+$/.test(path) && method !== 'GET') {
+      var ks = Object.keys(body || {});
+      return !(method === 'PATCH' && /\/items$/.test(path) && ks.length === 1 && ks[0] === 'stock');   // counting pastries is fine
+    }
+    return false;
+  }
   /* handle(method, path, query, body, authed) -> Promise<{status, json}> */
   function handle(method, path, query, body, authed) {
     var m;
+    if (readOnly(method, path, body)) { blockedToast(); return Promise.resolve({ status: 403, json: { message: 'Edits are off in the play café', code: 'play' } }); }
     if ((m = /^\/auth\/v1\/token/.exec(path))) { return Promise.resolve({ status: 200, json: { access_token: 'sandbox-token', refresh_token: 'play', expires_in: 3e9, user: { email: 'pos@josiescafe.com' } } }); }
     if ((m = /^\/rest\/v1\/rpc\/([a-z0-9_]+)$/.exec(path)) && method === 'POST') {
       return isVoid(m[1]).then(function (isv) {
@@ -112,7 +125,7 @@
     if (qi >= 0) { u.slice(qi + 1).split('&').forEach(function (kv) { var p = kv.split('='); if (p[0]) { query[decodeURIComponent(p[0])] = decodeURIComponent((p[1] || '').replace(/\+/g, ' ')); } }); }
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) {} }
     var authed = !!(headers && headers.Authorization);
-    ready.then(function () { return handle(method, path, query, body, authed); }).then(function (r) {
+    ready.then(function () { return handle(method, path, query, body, authed).then(function (r) { if (r.status >= 200 && r.status < 300) { afterWrite(path, body, r.json); } return r; }); }).then(function (r) {
       if (r.status >= 400 && w.console) { w.console.warn('play: ' + method + ' ' + path + ' -> ' + r.status + ' ' + JSON.stringify(r.json)); }
       w.setTimeout(function () { if (r.status >= 200 && r.status < 300) { cb(null, r.json, r.status); } else { cb({ status: r.status, data: r.json }, r.json, r.status); } }, 0);
     });
@@ -153,6 +166,72 @@
       .then(function () { return db.exec("update items set active = true, price = 60, stock = 6 where name->>'en' in ('Brownie','Key lime pie','Croissant'); update items set price = 55, stock = 4 where name->>'en' = 'Cinnamon roll'; update items set active = true, price = 55, stock = 4 where name->>'en' = 'Cinnamon roll'"); });
   }
 
+  /* ───────── gentle messages instead of dialogs, and the admin corners hidden ───────── */
+  var toastEl = null, toastT = null, lastBlock = 0;
+  function toast(msg) {
+    if (!toastEl) { toastEl = d.createElement('div'); toastEl.setAttribute('style', 'position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:150;max-width:min(420px,calc(100vw - 32px));background:#5B3843;color:#fff;font:800 16px/1.3 Nunito,system-ui,sans-serif;padding:12px 18px;border-radius:20px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:opacity .25s'); (d.body || d.documentElement).appendChild(toastEl); }
+    toastEl.textContent = msg; toastEl.style.opacity = '1'; w.clearTimeout(toastT); toastT = w.setTimeout(function () { toastEl.style.opacity = '0'; }, 3200);
+  }
+  function blockedToast() { lastBlock = Date.now(); toast('Edits are turned off in the play café. This is where Josie would change it.'); }
+  w.alert = function (m) { if (Date.now() - lastBlock < 1500) { return; } toast(String(m || '')); };
+  w.confirm = function () { return true; };
+  var css = d.createElement('style');
+  css.textContent = '.mpayroll,.mteam,.mphones,.sgopen{display:none!important}';
+  (d.head || d.documentElement).appendChild(css);
+
+  /* ───────── the pretend kitchen and bar phone: a banner for every order that is pushed ───────── */
+  var phoneEl = null, phoneList = null, pushed = {};
+  function ensurePhone() {
+    if (phoneEl) { return; }
+    var st = d.createElement('style');
+    st.textContent = '@keyframes ph-in{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}@keyframes ph-buzz{0%,100%{transform:none}15%{transform:translateX(-4px) rotate(-1deg)}30%{transform:translateX(4px) rotate(1deg)}45%{transform:translateX(-3px)}60%{transform:translateX(3px)}}' +
+      '#playphone.buzz{animation:ph-buzz .5s}#playphone .nt{animation:ph-in .35s}';
+    d.head.appendChild(st);
+    phoneEl = d.createElement('div'); phoneEl.id = 'playphone';
+    phoneEl.setAttribute('style', 'position:fixed;right:18px;bottom:64px;z-index:83;width:236px;height:430px;border-radius:38px;background:#1D1417;padding:9px;box-shadow:0 18px 44px rgba(0,0,0,.4);font-family:Nunito,system-ui,sans-serif');
+    phoneEl.innerHTML = '<div style="position:relative;height:100%;border-radius:30px;overflow:hidden;background:linear-gradient(170deg,#F7C6D6,#E58AA9 60%,#B55573);color:#fff">' +
+      '<div style="position:absolute;left:50%;top:7px;width:70px;height:18px;margin-left:-35px;border-radius:12px;background:#1D1417"></div>' +
+      '<div style="padding:34px 14px 0;text-align:center"><b style="font:800 44px/1 Baloo 2,Nunito,sans-serif" id="phclock"></b><div style="font-weight:800;font-size:13px;opacity:.9;margin-top:2px">Kitchen and bar phone</div></div>' +
+      '<div id="phlist" style="padding:10px 10px 0;height:290px;overflow:hidden"></div>' +
+      '<button type="button" id="phx" aria-label="Close" style="position:absolute;right:10px;top:8px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.35);color:#fff;font-size:18px;line-height:24px">&times;</button></div>';
+    d.body.appendChild(phoneEl); phoneList = d.getElementById('phlist');
+    d.getElementById('phx').addEventListener('click', function () { phoneEl.style.display = 'none'; });
+    clock(); w.setInterval(clock, 20000);
+  }
+  function placePhone() { if (phoneEl) { phoneEl.style.right = (d.getElementById('playguest') && w.innerWidth > 760) ? '424px' : '18px'; } }
+  function clock() { var c = d.getElementById('phclock'); if (c) { var n = new Date(); c.textContent = n.getHours() % 12 || 12; c.textContent += ':' + ('0' + n.getMinutes()).slice(-2); } }
+  function esc2(x) { return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function banner(station, card) {
+    ensurePhone(); phoneEl.style.display = ''; placePhone();
+    var n = d.createElement('div'); n.className = 'nt';
+    n.setAttribute('style', 'background:rgba(255,255,255,.93);color:#3A2A30;border-radius:18px;padding:9px 11px;margin-bottom:8px;box-shadow:0 4px 12px rgba(0,0,0,.18)');
+    n.innerHTML = '<div style="display:flex;align-items:center;font-size:11px;font-weight:800;color:#86606B;letter-spacing:.04em"><span style="display:inline-block;width:16px;height:16px;border-radius:5px;background:#B55573;color:#fff;text-align:center;line-height:16px;margin-right:6px;font-size:11px">J</span>JOSIE’S · ' + station.toUpperCase() + '<span style="margin-left:auto">now</span></div>' +
+      '<div style="font:800 14px/1.2 Nunito,system-ui,sans-serif;margin-top:4px">' + esc2(card.title) + '</div><div style="font-weight:700;font-size:12.5px;line-height:1.3;white-space:pre-line;margin-top:2px;color:#5B4750">' + esc2(card.body) + '</div>';
+    phoneList.insertBefore(n, phoneList.firstChild);
+    while (phoneList.children.length > 4) { phoneList.removeChild(phoneList.lastChild); }
+    phoneEl.classList.remove('buzz'); void phoneEl.offsetWidth; phoneEl.classList.add('buzz');
+  }
+  /* what the real server would push: the same text, from the same database function */
+  function pushFor(orderId) {
+    ['kitchen', 'bar'].forEach(function (st) {
+      db.query('select public.push_card($1::uuid, $2, $3) as c', [orderId, st, 'en']).then(function (r) {
+        var c = r.rows[0] && r.rows[0].c; if (!c) { return; }
+        var key = orderId + ':' + st + ':' + c.title + ':' + c.body.length; if (pushed[key]) { return; } pushed[key] = 1;
+        banner(st, c);
+      }).catch(function () {});
+    });
+  }
+  function afterWrite(path, body, out) {
+    var m = /^\/rest\/v1\/rpc\/([a-z0-9_]+)$/.exec(path); if (!m) { return; }
+    var fn = m[1], p = (body && body.p) || {};
+    if (fn === 'sync_order2' && p.order && p.order.id) { pushFor(p.order.id); }
+    else if (fn === 'place_online_order2' && p.id) { pushFor(p.id); }
+    else if (fn === 'add_to_online_order' && (p.id || p.order_id)) { pushFor(p.id || p.order_id); }
+    else if (fn === 'stop_item' && p.alert_id) {
+      db.query('select a.station, public.push_alert_card(a.id, $2) as c from public.ticket_alerts a where a.id = $1::uuid', [p.alert_id, 'en']).then(function (r) { var x = r.rows[0]; if (x && x.c) { banner(x.station, x.c); } }).catch(function () {});
+    }
+  }
+
   /* ───────── boot ───────── */
   function deleteIdb() { return new Promise(function (res) { try { var r = w.indexedDB.deleteDatabase('/pglite/josies-play-' + VER); r.onsuccess = r.onerror = r.onblocked = function () { res(); }; } catch (e) { res(); } }); }
   function boot() {
@@ -172,7 +251,7 @@
   ready = boot().then(function () { cover_off(); bar(); }).catch(function (e) { say('Play mode could not start here (' + String(e && e.message || e).slice(0, 90) + '). Try a newer browser.'); throw e; });
 
   /* ───────── the little bar: who you are, switch, start over ───────── */
-  var WHO = [['Josie', 'Josie · owner'], ['Maya', 'Maya · manager'], ['Rosa', 'Rosa · register'], ['Beto', 'Beto · bar'], ['Lupe', 'Lupe · kitchen']];
+  var WHO = [['Rosa', 'Rosa · register'], ['Beto', 'Beto · bar'], ['Lupe', 'Lupe · kitchen'], ['Josie', 'Josie · owner (look only)']];
   function bar() {
     var el = d.createElement('div'), open = false;
     el.id = 'playbar';
@@ -211,7 +290,8 @@
     el.innerHTML = '<div style="position:absolute;left:0;top:0;right:0;bottom:0;background:#fff;overflow:hidden;box-shadow:0 0 0 4px #F5B5C8,0 20px 50px rgba(142,63,89,.4);border-radius:' + (wide ? '26px' : '0') + '"><iframe src="/play/guest/" title="Guest website" style="border:0;width:100%;height:100%"></iframe></div>' +
       '<button type="button" aria-label="Close" style="position:absolute;right:' + (wide ? '-10px' : '8px') + ';top:' + (wide ? '-10px' : '8px') + ';z-index:2;width:36px;height:36px;border-radius:50%;background:#B55573;color:#fff;font-size:24px;line-height:34px;box-shadow:0 3px 10px rgba(0,0,0,.3)">&times;</button>';
     el.lastChild.addEventListener('click', function () { el.parentNode.removeChild(el); });
-    d.body.appendChild(el);
+    d.body.appendChild(el); placePhone();
+    el.lastChild.addEventListener('click', function () { w.setTimeout(placePhone, 0); });
   }
   /* picking a person types the PIN for them: everyone here is 1234 */
   function autopin() { ['1', '2', '3', '4'].forEach(function (k, ix) { w.setTimeout(function () { var kb = d.querySelector('.key[data-arg="' + k + '"]'); if (kb) { kb.click(); } }, 260 + ix * 70); }); }
