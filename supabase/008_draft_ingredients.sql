@@ -126,3 +126,55 @@ from (values
 join public.diets dt on dt.key = m.diet
 join public.ingredients ing on ing.name ->> 'en' = m.ingr
 on conflict (diet_id, ingredient_id) do nothing;
+
+-- Icons: each ingredient points at an icon in the art kit (art/art.js). 'ing:xxx' = ingredient icon, 'menu:xxx' = menu icon.
+update public.ingredients i set icon = v.icon
+from (values
+  ('Bacon', 'ing:bacon'),
+  ('Egg', 'ing:egg'),
+  ('Avocado', 'ing:avocado'),
+  ('Cheese', 'ing:cheese'),
+  ('Cream cheese', 'ing:cream-cheese'),
+  ('Milk', 'ing:milk'),
+  ('Yogurt', 'ing:yogurt'),
+  ('Tomato', 'ing:tomato'),
+  ('Lettuce', 'ing:lettuce'),
+  ('Banana', 'ing:banana'),
+  ('Honey', 'ing:honey'),
+  ('Mayo', 'ing:mayo'),
+  ('Ice', 'ing:ice'),
+  ('Cinnamon', 'ing:cinnamon'),
+  ('Peanut butter', 'ing:peanut-butter'),
+  ('Orange juice', 'ing:orange'),
+  ('Pineapple', 'ing:pineapple'),
+  ('Strawberry', 'ing:strawberry'),
+  ('Lemonade', 'ing:lime-and-lemon'),
+  ('Watermelon', 'ing:watermelon'),
+  ('Mint', 'ing:mint'),
+  ('Fruit', 'ing:watermelon'),
+  ('Granola', 'ing:granola'),
+  ('Beans', 'ing:beans'),
+  ('Chocolate chips', 'ing:chocolate'),
+  ('Red apple', 'ing:red-apple'),
+  ('Arugula', 'ing:arugula'),
+  ('Caramelized onions', 'ing:onion'),
+  ('Red onion', 'ing:onion'),
+  ('Cheddar', 'ing:cheese'),
+  ('Parmesan', 'ing:cheese'),
+  ('Pepper jack', 'ing:cheese'),
+  ('Caesar dressing', 'ing:mayo'),
+  ('Croutons', 'ing:croutons'),
+  ('Greens and veg', 'ing:lettuce'),
+  ('Buffalo sauce', 'ing:chili'),
+  ('Coleslaw', 'ing:cabbage'),
+  ('Fries', 'ing:potato'),
+  ('Coffee beans', 'ing:coffee-beans'),
+  ('Chai', 'ing:chai'),
+  ('Flavor syrup', 'ing:caramel'),
+  ('Pancake mix', 'menu:pancakes'),
+  ('Bagels', 'ing:bagel'),
+  ('Coconut bread', 'ing:coconut-bread'),
+  ('Fritters', 'ing:fritters'),
+  ('Chicken', 'ing:chicken')
+) as v(en, icon)
+where i.name ->> 'en' = v.en;

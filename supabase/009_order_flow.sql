@@ -12,16 +12,24 @@ alter table public.tables
   add column if not exists h      numeric not null default 10,
   add column if not exists picnic boolean not null default false;
 
+-- The 12 table pots on Josie's map (4 inside, 4 picnic tables, 2 long tables, 2 round tables in the schoolhouse overhang).
+-- x, y = where the pot sits, as a percent of the 1440 x 1240 map. w, h are unused (the map art draws the tables).
 insert into public.tables (label, area, x, y, w, h, picnic, seats)
-select * from (values
-  ('1', 'inside',      8,   46.5, 11, 10, false, 4),
-  ('2', 'inside',      23,  46.5, 11, 10, false, 4),
-  ('3', 'inside',      38,  46.5, 11, 10, false, 4),
-  ('4', 'deck',        8,   66,   11, 10, false, 4),
-  ('5', 'outside',     55,  66,   9,  12, true,  6),
-  ('6', 'outside',     68,  66,   9,  12, true,  6),
-  ('7', 'schoolhouse', 78,  16,   15, 8,  false, 8)
-) as v(label, area, x, y, w, h, picnic, seats)
+select v.label, v.area, round(v.px / 14.40, 2), round(v.py / 12.40, 2), 0, 0, v.picnic, v.seats
+from (values
+  ('1',  'inside',      486,  343, false, 4),
+  ('2',  'inside',      674,  343, false, 4),
+  ('3',  'inside',      964,  221, false, 4),
+  ('4',  'inside',      964,  333, false, 4),
+  ('5',  'outside',     450,  530, true,  6),
+  ('6',  'outside',     634,  530, true,  6),
+  ('7',  'outside',     472,  744, true,  4),
+  ('8',  'outside',     318,  880, true,  6),
+  ('9',  'schoolhouse', 1106, 540, false, 8),
+  ('10', 'schoolhouse', 1106, 818, false, 8),
+  ('11', 'schoolhouse', 1112, 651, false, 2),
+  ('12', 'schoolhouse', 1184, 709, false, 2)
+) as v(label, area, px, py, picnic, seats)
 where not exists (select 1 from public.tables);
 
 insert into public.sticks (number) select g from generate_series(1, 20) g on conflict (number) do nothing;
