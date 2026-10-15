@@ -132,7 +132,7 @@
     if (it.description) { h += '<p class="hint" style="margin:0 0 6px">' + esc(it.description) + '</p>'; }
     for (i = 0; i < it.ing.length; i++) {
       g = it.ing[i];
-      h += '<button type="button" class="ing' + (c.removed[g.id] ? ' off' : '') + '"' + (g.core ? ' disabled' : ' data-act="toggleIng" data-arg="' + g.id + '"') + '><span class="ic">' + ico(g.icon, 34) + '</span><span class="nm">' + esc(g.name) + (g.out ? '<small>' + esc(s('ranOut')) + '</small>' : '') + '</span></button>';
+      h += '<button type="button" class="ing' + (c.removed[g.id] ? ' off' : '') + '"' + (g.core ? ' disabled' : ' data-act="toggleIng" data-arg="' + g.id + '"') + '><span class="ic">' + ico(g.icon, 54) + '</span><span class="nm">' + esc(g.name) + (g.out ? '<small>' + esc(s('ranOut')) + '</small>' : '') + '</span></button>';
     }
     if (D.diets.length) {
       h += '<div class="diets">';

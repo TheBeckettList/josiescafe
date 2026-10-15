@@ -3,7 +3,7 @@
   'use strict';
   var STR = {
     en: {
-      app: "Josie's", pos: 'POS', overview: 'Overview', bayMap: 'Utila Bay', cafeMap: 'Josie’s', manager: 'Manager', payroll: 'Payroll', settings: 'Settings',
+      app: "Josie's", pos: 'POS', overview: 'Overview', manager: 'Manager', payroll: 'Payroll', settings: 'Settings',
       whoIsThis: 'Who is this?', enterPin: 'Enter PIN', wrongPin: 'Wrong PIN', locked: 'Too many tries. Wait a few minutes.',
       needsNet: 'Signing in needs internet the first time today.', signOut: 'Sign out', mapAndNumbers: 'Map and numbers',
       owner: 'Owner', register: 'Register', bar: 'Bar', kitchen: 'Kitchen', guest: 'Guest', managerRole: 'Manager',
@@ -41,7 +41,7 @@
       hereWord: 'For here', goWord: 'To go', closedNow: 'Closed right now', openNow: 'Open', till: 'till'
     },
     es: {
-      app: "Josie's", pos: 'Caja', overview: 'Mapa', bayMap: 'Bahía de Utila', cafeMap: 'Josie’s', manager: 'Gerente', payroll: 'Planilla', settings: 'Ajustes',
+      app: "Josie's", pos: 'Caja', overview: 'Mapa', manager: 'Gerente', payroll: 'Planilla', settings: 'Ajustes',
       whoIsThis: '¿Quién eres?', enterPin: 'Escribe tu PIN', wrongPin: 'PIN incorrecto', locked: 'Demasiados intentos. Espera unos minutos.',
       needsNet: 'Entrar necesita internet la primera vez hoy.', signOut: 'Salir', mapAndNumbers: 'Mapa y números',
       owner: 'Dueña', register: 'Caja', bar: 'Bar', kitchen: 'Cocina', guest: 'Cliente', managerRole: 'Gerente',

@@ -39,7 +39,7 @@ button { font-family: inherit; border: 0; cursor: pointer; color: inherit; backg
 .dhead { display: flex; align-items: center; padding-bottom: 10px; border-bottom: 3px dashed #F5C9D6; margin-bottom: 8px; }
 .dhead h2 { flex: 1; margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 28px; }
 .ing { display: flex; align-items: center; width: 100%; text-align: left; padding: 6px 4px; }
-.ing .ic { flex: 0 0 52px; height: 52px; border-radius: 26px; background: #FDEDF1; display: flex; align-items: center; justify-content: center; margin-right: 12px; position: relative; }
+.ing .ic { flex: 0 0 60px; height: 60px; border-radius: 30px; overflow: hidden; background: #FDEDF1; display: flex; align-items: center; justify-content: center; margin-right: 12px; position: relative; }
 .ing .nm { flex: 1; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; line-height: 1.1; } .ing .nm small { display: block; font-family: 'Nunito', sans-serif; font-size: 12px; color: #86606B; font-weight: 700; }
 .ing.off .nm { text-decoration: line-through; color: #A98893; } .ing.off .ic { opacity: .5; } .ing.off .ic:after { content: ''; position: absolute; left: 8px; right: 8px; top: 50%; height: 4px; border-radius: 2px; background: #B55573; -webkit-transform: rotate(-35deg); transform: rotate(-35deg); }
 .ing .tag { padding: 3px 10px; border-radius: 12px; background: #FDEDF1; color: #B55573; font-weight: 800; font-size: 12px; }

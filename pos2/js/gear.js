@@ -86,7 +86,7 @@
     if (J.can('josie')) {
       h += '<p class="sec">' + esc(J.t('ingredients')) + '</p>';
       for (i = 0; i < rows.length; i++) {
-        h += '<div class="ingrow">' + J.ingIcon(rows[i].ingredient_id, 30) + '<span>' + esc(J.ingName(rows[i].ingredient_id)) + (rows[i].is_core ? ' <i class="coretag">' + esc(J.t('isTheDish')) + '</i>' : '') + '</span>' +
+        h += '<div class="ingrow">' + J.ingIcon(rows[i].ingredient_id, 40) + '<span>' + esc(J.ingName(rows[i].ingredient_id)) + (rows[i].is_core ? ' <i class="coretag">' + esc(J.t('isTheDish')) + '</i>' : '') + '</span>' +
           '<button type="button" class="xbtn" data-act="gIngX" data-arg="' + id + '|' + rows[i].ingredient_id + '" aria-label="Remove">' + U.ic('x', 14, '#B55573') + '</button></div>';
       }
       h += '<button type="button" class="bigbtn ghost" data-act="pkOpen" data-arg="' + id + '">' + esc(J.t('addIngredient')) + '</button>';
