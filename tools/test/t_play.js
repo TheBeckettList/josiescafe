@@ -2,7 +2,8 @@ var H = require('./harness');
 function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.exitCode = 1; } }
 (async function () {
   var h = await H.start({ reset: true });
-  var p = await h.page('/pos/?play', { viewport: { width: 1180, height: 820 } });
+  var REAL = { access_token: 'REAL-TOKEN', refresh_token: 'real', expires_at: Date.now() + 1e9, email: 'pos@josiescafe.com' };
+  var p = await h.page('/pos/?play', { viewport: { width: 1180, height: 820 }, init: function () { try { if (!localStorage.getItem('jc.pos.session')) { localStorage.setItem('jc.pos.session', JSON.stringify({ access_token: 'REAL-TOKEN', refresh_token: 'real', expires_at: Date.now() + 1e9, email: 'pos@josiescafe.com' })); localStorage.setItem('jc.p2.person', JSON.stringify({ name: 'RealPerson', token: 'real' })); } } catch (e) {} } });
   p.on('console', function (m) { if (m.type() === 'error' || m.type() === 'warning') { console.log('console:', m.text().slice(0, 200)); } });
   await p.waitForSelector('.person', { timeout: 90000 });
   ok((await p.locator('#playcover').count()) === 0, 'the play café is up');
@@ -32,6 +33,13 @@ function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.
   await p.screenshot({ path: '/tmp/claude-0/shots/play_guest2.png' });
   await p.waitForTimeout(4500);
   ok(/Friend/.test(await p.locator('.orail').innerText()), 'it shows up on the POS map rail');
+  var keys = await p.evaluate(function () { return { s: localStorage.getItem('jc.pos.session'), pr: localStorage.getItem('jc.p2.person'), play: Object.keys(localStorage).filter(function (k) { return k.indexOf('jc.playx.') === 0; }).length }; });
+  ok(/REAL-TOKEN/.test(keys.s) && /RealPerson/.test(keys.pr), 'the real tablet sign-in is untouched by play');
+  ok(keys.play >= 3, 'play keeps its own storage (' + keys.play + ' keys)');
+  // an old build of play left its fake sign-in on this browser: the real POS clears it and asks for setup
+  var p3 = await h.page('/pos/', { viewport: { width: 1180, height: 820 }, init: function () { try { localStorage.clear(); localStorage.setItem('jc.pos.session', JSON.stringify({ access_token: 'play-token', refresh_token: 'play' })); localStorage.setItem('jc.p2.person', JSON.stringify({ name: 'Rosa', token: 'x' })); } catch (e) {} } });
+  await p3.waitForTimeout(1500);
+  ok((await p3.locator('#setupForm').count()) === 1, 'the real POS drops the leftover play sign-in and shows device setup');
   console.log('errors:', p.errors.filter(function (e) { return !/ServiceWorker|fetching the script/.test(e); }));
   await h.stop();
 })().catch(function (e) { console.error('FAILED', String(e).slice(0, 600)); process.exit(1); });

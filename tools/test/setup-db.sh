@@ -22,7 +22,7 @@ SQL
 R="$(cd "$(dirname "$0")/../.." && pwd)/supabase"
 sed 's/create extension if not exists pg_net with schema extensions;//;s/create extension if not exists pg_cron;//' $R/001_schema.sql > /tmp/001_local.sql
 for f in /tmp/001_local.sql $R/002_seed_menu.sql $R/003_online_orders.sql $R/004_tighten_online_functions.sql $R/005_real_menu.sql \
-         $R/006_ticket_phones_and_pastries.sql $R/007_josies_world_schema.sql $R/008_draft_ingredients.sql $R/009_order_flow.sql $R/010_website_orders.sql $R/011_site_catalog.sql $R/012_manager_payroll.sql $R/013_ticket_push.sql $R/014_pastry_bank.sql $R/015_pastries_to_bar_and_checks.sql $R/016_table_13.sql; do
+         $R/006_ticket_phones_and_pastries.sql $R/007_josies_world_schema.sql $R/008_draft_ingredients.sql $R/009_order_flow.sql $R/010_website_orders.sql $R/011_site_catalog.sql $R/012_manager_payroll.sql $R/013_ticket_push.sql $R/014_pastry_bank.sql $R/015_pastries_to_bar_and_checks.sql $R/016_table_13.sql $R/017_item_icon.sql; do
   $P -d t -f $f >/dev/null || { echo "FAILED: $f"; exit 1; }
 done
 # open all hours so the website gate is testable any time; staff get known PINs

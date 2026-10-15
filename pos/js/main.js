@@ -179,6 +179,7 @@
     if (el.id === 'cust') { J.cart().name = el.value; J.saveCart(); }
     else if (el.id === 'givenIn') { R.givenInput(el.value); }
     else if (el.id === 'cardRef') { S.ui.pay.ref = el.value; }
+    else if (J.ov && J.ov.input && J.ov.input(el)) { return; }
     else if (J.team && J.team.input(el)) { return; }
     else if (J.gear && J.gear.input) { J.gear.input(el); }
   }

@@ -1,6 +1,6 @@
 /* Josie's World POS: opens with no internet. App files come from the device at once and refresh in the background.
    Supabase calls are never cached here; the app keeps its own offline copy and queue. Scope: /pos/. */
-var CACHE = 'josies-pos-v20';
+var CACHE = 'josies-pos-v22';
 var SHELL = ['./', './index.html', './manifest.json', './css/pos2.css', './js/strings.js', './js/core.js', './js/engine.js', './js/ui.js', './js/register.js', './js/overview.js', './js/gear.js', './js/manager.js', './js/team.js', './js/tour.js', './js/tourz.js', './js/setup.js', './js/quiet.js', './js/main.js',
   '../js/api.js', '../art/art.js', '../art/dishart.js', '../art/ticketview.js', '../art/ticketview.css', '../art/critters.css', '../art/critters.js', '../img/world/map.png', '../img/logo.png', '../img/josies-wordmark.png', '../img/icon-180.png', '../img/app-icon-180.png',
   './tickets/', './tickets/index.html', './tickets/tickets2.css', './tickets/tickets2.js', './tickets/manifest.json'];

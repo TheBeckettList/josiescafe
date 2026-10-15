@@ -91,8 +91,8 @@
   function t(id) { var o = T.TXT[S.lang] || T.TXT.en; return o[id] || T.TXT.en[id] || id; }
 
   /* where she has been */
-  function doneMap() { try { return JSON.parse(w.localStorage.getItem('jc.p2.setup.done') || '{}'); } catch (e) { return {}; } }
-  function mark(id) { var m = doneMap(); m[id] = 1; try { w.localStorage.setItem('jc.p2.setup.done', JSON.stringify(m)); } catch (e) {} }
+  function doneMap() { return w.JC.get('p2.setup.done', {}); }
+  function mark(id) { var m = doneMap(); m[id] = 1; w.JC.set('p2.setup.done', m); }
 
   /* moving the real app to the right place */
   function ov(popup, flip, id) { S.tab = 'overview'; S.ui.view = 'pos'; S.ui.pick = null; S.ui.popup = popup ? { kind: popup, id: id || null, anchor: popup === 'dish' ? 'menu' : popup, key: id || null } : null; S.ui.flip = !!flip; }
