@@ -23,7 +23,7 @@
   function pick(r, a) { return a[Math.floor(r() * a.length) % a.length]; }
   var NAMES = ['Ana', 'Luis', 'Marta', 'Sam', 'Dani', 'Kai', 'Noa', 'Eli', 'Mia', 'Tomas', 'Rita', 'Jo', 'Pablo', 'Lena', 'Omar', 'Zoe', 'Nico', 'Sara', 'Ivan', 'Maya', 'Beto', 'Lucia', 'Gus', 'Ines'];
   var DRINKS = ['Latte', 'Iced latte', 'Cappuccino', 'Americano', 'Espresso', 'Iced Americano', 'Chai latte', 'Drip coffee'];
-  var FOOD = ['Josie bagel', 'Avocado toast', 'Full plate', 'Pancakes'];
+  var FOOD = ['Josie bagel', 'Avocado toast', 'Full plate', 'Original pancakes'];
 
   /* ───────── the scenarios: [{ t seconds, say, do, ... }] ───────── */
   function rush(seed, n, span, foodShare, onlineShare, extras) {
@@ -46,18 +46,18 @@
         { t: 40, kind: 'addon', ref: 'ana', who: 'Ana', items: [['Croissant', 1]], say: 'Ana adds a croissant: it goes to the bar as an add-on' },
         { t: 70, kind: 'say', say: 'Everyone is being made. The cashier is the runner: no buttons for the bar or kitchen.' }
       ]; } },
-    { id: 'morning', title: 'Morning rush', blurb: 'Twenty-six orders in six minutes, mostly drinks, a few online. One person on the bar, one in the kitchen.', bar: 1, kitchen: 1,
-      build: function () { return rush(7, 26, 360, .35, .15); } },
-    { id: 'lunch', title: 'Lunch rush with add-ons', blurb: 'Food heavy. The kitchen is one person. Add-ons arrive, one order is cancelled and re-rung.', bar: 1, kitchen: 1,
-      build: function () { return rush(21, 22, 300, .85, .1, [
+    { id: 'morning', title: 'Morning rush', blurb: 'Eighteen orders in six minutes, mostly drinks, a few online. Two on the bar, one in the kitchen.', bar: 2, kitchen: 1,
+      build: function () { return rush(7, 18, 360, .35, .15); } },
+    { id: 'lunch', title: 'Lunch rush with add-ons', blurb: 'Food heavy: two in the kitchen, one on the bar. Add-ons arrive, one order is cancelled and re-rung.', bar: 1, kitchen: 2,
+      build: function () { return rush(21, 11, 300, .8, .1, [
         { t: 80, kind: 'order', key: 'a1', who: 'Pablo', type: 'here', items: [['Full plate', 1], ['Latte', 1]], pay: 'now', say: 'Pablo orders a full plate and a latte' },
-        { t: 130, kind: 'addon', ref: 'a1', who: 'Pablo', items: [['Pancakes', 1]], say: 'Pablo adds pancakes' },
+        { t: 130, kind: 'addon', ref: 'a1', who: 'Pablo', items: [['Original pancakes', 1]], say: 'Pablo adds pancakes' },
         { t: 150, kind: 'order', key: 'x1', who: 'Rita', type: 'here', items: [['Full plate', 1]], pay: 'now', say: 'Rita orders a full plate' },
         { t: 175, kind: 'cancel', ref: 'x1', say: 'Rita changes her mind: the order is cancelled' },
         { t: 180, kind: 'order', who: 'Rita', type: 'here', items: [['Avocado toast', 1]], pay: 'now', say: 'Rita orders again, avocado toast' }
       ]); } },
-    { id: 'milk', title: 'Fringe: out of milk mid-rush', blurb: 'The morning rush, and at 1:30 the milk light goes red. Dishes with milk adapt or are refused; at 3:00 the milk is back.', bar: 1, kitchen: 1,
-      build: function () { return rush(11, 22, 300, .3, .25, [
+    { id: 'milk', title: 'Fringe: out of milk mid-rush', blurb: 'The morning rush, and at 1:30 the milk light goes red. Dishes with milk adapt or are refused; at 3:00 the milk is back.', bar: 2, kitchen: 1,
+      build: function () { return rush(11, 15, 300, .3, .25, [
         { t: 90, kind: 'light', ing: 'Milk', light: 'red', say: 'The bar sets milk to Out' },
         { t: 180, kind: 'light', ing: 'Milk', light: 'green', say: 'Milk is back' }
       ]); } },
@@ -71,7 +71,7 @@
         { t: 22, kind: 'probe', name: 'a stick that is taken', say: 'Someone places a stick that is already on a table',
           run: function (x) { return x.q("select state, table_id from sticks where number = $1", [x.stick('p')]).then(function (r) { return x.call('place_stick', { p: { stick: x.stick('p'), table_id: x.freeTable() } }).then(function () { return 'moved it'; }); }).catch(function (e) { return 'refused: ' + String(e.message).slice(0, 60); }); } },
         { t: 30, kind: 'probe', name: 'a huge pastry order', say: 'A guest asks for 40 croissants',
-          run: function (x) { return x.online('Giant', [['Croissant', 40]]).then(function (o) { return 'accepted'; }).catch(function (e) { return /unavailable|stock|limit/i.test(e.message) ? 'refused politely (not enough in the dome)' : 'error: ' + String(e.message).slice(0, 70); }); } },
+          run: function (x) { return x.online('Giant', [['Croissant', 40]]).then(function (o) { return 'accepted'; }).catch(function (e) { return /unavailable|stock|limit|bad_qty/i.test(e.message) ? 'refused politely (too many for one order)' : 'error: ' + String(e.message).slice(0, 70); }); } },
         { t: 40, kind: 'probe', name: 'ordering with the café closed', say: 'Online ordering is paused, a guest tries anyway',
           run: function (x) { return x.q("update settings set online_orders = false").then(function () { return x.online('Late', [['Latte', 1]]); }).then(function () { return 'accepted (unexpected)'; }).catch(function (e) { return /paused/.test(e.message) ? 'refused: orders paused' : 'error: ' + String(e.message).slice(0, 70); }).then(function (m) { return x.q("update settings set online_orders = true").then(function () { return m; }); }); } },
         { t: 60, kind: 'say', say: 'Finishing up: the first order is paid, brought out and its stick returns to the pot.' }
@@ -166,7 +166,7 @@
       if (e.kind === 'online') {
         b = build(e, false); if (!b) { fail('unknown dish in ' + e.say); return Promise.resolve(); }
         return P.call('place_online_order2', { p: { id: b.id, name: e.name, order_type: e.type || 'togo', lines: e.items.map(function (x) { return { item_id: cat[x[0]].id, qty: x[1] }; }) } }, false).then(function () { record(e, b, { pay: 'online' }); }).catch(function (er) {
-          if (/unavailable|stock|paused|closed|limit|too_many/i.test(er.message)) { say('· ' + e.name + ': refused politely (' + String(er.message).replace(/^.*?:/, '').slice(0, 50) + ')', 'warn'); R.refused = (R.refused || 0) + 1; } else { fail(er.message); }
+          if (/unavailable|stock|paused|closed|limit|too_many|bad_qty/i.test(er.message)) { say('· ' + e.name + ': refused politely (' + String(er.message).replace(/^.*?:/, '').slice(0, 50) + ')', 'warn'); R.refused = (R.refused || 0) + 1; } else { fail(er.message); }
         });
       }
       if (e.kind === 'finish') {
@@ -213,8 +213,7 @@
       else { notes.push('Nothing backed up: at most ' + Math.max(peak.bar, peak.kitchen) + ' waiting on any station.'); }
       if (avg > 240) { notes.push('Guests waited ' + mmss(avg) + ' on average, which is long.'); }
       if (peak.waiting >= 4) { notes.push('Up to ' + peak.waiting + ' sticks sat in the waiting pot at once: placing them on tables lagged behind.'); }
-      if (util.kitchen > .9) { notes.push('The kitchen was busy ' + Math.round(util.kitchen * 100) + '% of the time: a second pair of hands would help.'); }
-      if (util.bar > .9) { notes.push('The bar was busy ' + Math.round(util.bar * 100) + '% of the time: a second pair of hands would help.'); }
+      ['bar', 'kitchen'].forEach(function (st) { var need = busy[st] / (dur || 1), has = def[st] || 1; if (tot >= 8 && need > has * .9 && busy[st] > 60) { notes.push('The ' + st + ' had ' + has + ' on and the work asked for about ' + need.toFixed(1) + (need > has ? ': it could not keep up.' : ': it was close to the limit.')); } });
       if (R.refused) { notes.push(R.refused + ' online order' + (R.refused > 1 ? 's were' : ' was') + ' refused politely (out of something, or closed).'); }
       if (R.errors.length) { notes.push(R.errors.length + ' thing' + (R.errors.length > 1 ? 's' : '') + ' went wrong: ' + R.errors.slice(0, 3).map(function (e) { return e.m; }).join(' · ')); }
       return { scenario: def.id, title: def.title, simSeconds: Math.round(dur), orders: tot, finished: fin, avgWait: Math.round(avg), p90Wait: Math.round(p90), worst: worst, peak: peak, utilisation: { bar: +util.bar.toFixed(2), kitchen: +util.kitchen.toFixed(2) }, probes: R.probes || [], errors: R.errors, refused: R.refused || 0, notes: notes, log: R.log };

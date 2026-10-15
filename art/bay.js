@@ -26,8 +26,7 @@
     }
     return out;
   }
-  /* the road runs the whole way along the shore and off the screen at both ends: down the west coast, round the bay, down the east shore,
-     along the sand at Bando and up the ocean side. Parallel to the water, never a hook. */
+  /* the road: off the screen to the south-west along the coast, round the bay, and it ends before Bando */
   function offsetVar(p, offs) {
     var out = [], i, a, b, tx, ty, l;
     for (i = 0; i < p.length; i++) {
@@ -36,13 +35,10 @@
     }
     return out;
   }
-  var ROADRAW = COAST.slice(0, 24), ROADOFF = [], ri;
-  for (ri = 0; ri < ROADRAW.length; ri++) { ROADOFF.push(ri < 22 ? 78 : 78 - (ri - 21) * 10); }
+  var ROADRAW = COAST.slice(0, 23), ROADOFF = [], ri;
+  for (ri = 0; ri < ROADRAW.length; ri++) { ROADOFF.push(78); }
   var roadPts = offsetVar(ROADRAW, ROADOFF);
-  /* off the west end: carry on in the direction the coast runs */
   roadPts.unshift([roadPts[0][0] - 420, roadPts[0][1] + 360]);
-  /* the beach and the ocean side, picture coordinates */
-  [[706, 506], [742, 534], [810, 548], [900, 546], [990, 530], [1050, 500], [1070, 440], [1074, 320], [1074, 150], [1074, -150]].forEach(function (q) { roadPts.push([+((q[0] + 94) / .6).toFixed(1), +((q[1] + 90) / .6).toFixed(1)]); });
   var coastD = smooth(COAST), roadD = smooth(roadPts), shoreLandD = smooth(offset(COAST, 16));
   /* land: everything north and east of the coast, round the spit to Point Pool and up the ocean side */
   var SHORE = coastD + ' Q1105,1030 1100,1066 Q1098,1100 1150,1104 Q1300,1120 1440,1114 Q1560,1094 1660,1034 Q1780,952 1840,832 Q1900,702 1925,562 Q1945,402 1960,202';

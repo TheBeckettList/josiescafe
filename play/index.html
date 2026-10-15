@@ -19,6 +19,7 @@
   .go { display: inline-block; background: var(--pink); color: #fff; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px; padding: 14px 34px; border-radius: 40px; text-decoration: none; box-shadow: 0 6px 0 rgba(142,63,89,.35); }
   .roles { display: flex; flex-wrap: wrap; justify-content: center; margin: 26px -5px 8px; }
   .role { width: calc(50% - 10px); margin: 5px; background: var(--card); border-radius: 22px; padding: 14px 12px; box-shadow: 0 0 0 3px var(--line); text-align: left; }
+  a.role.sc { text-decoration: none; color: inherit; display: block; } a.role.sc:hover { box-shadow: 0 0 0 3px var(--pink); }
   .role b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 20px; } .role span { font-size: 14px; font-weight: 700; color: var(--mute); }
   small { display: block; margin-top: 22px; color: var(--mute); font-weight: 700; }
 </style>
@@ -30,6 +31,15 @@
   <p>A pretend café to poke around in. Ring things up, make them at the bar, watch the kitchen, order as a guest and see the notification land on the kitchen phone. Nothing is real and nothing leaves your device.</p>
   <a class="go" href="/play/app/">Open the play café</a>
   <p style="margin-top:14px"><a href="/play/guest/" style="color:var(--pink);font-weight:800">Or order as a guest</a> and watch your order walk itself through the café.</p>
+  <h2 style="font-family:'Baloo 2',sans-serif;font-size:26px;margin:30px 0 4px">Or watch the café run</h2>
+  <p style="margin-top:0">Preset playthroughs: an order walking through, a rush, and some fringe things. They run on the real POS logic, then tell you where it backed up.</p>
+  <div class="roles">
+    <a class="role sc" href="/play/app/?scenario=one"><b>One order, start to finish</b><span>An online order, a register order, an add-on.</span></a>
+    <a class="role sc" href="/play/app/?scenario=morning"><b>Morning rush</b><span>Eighteen orders in six minutes.</span></a>
+    <a class="role sc" href="/play/app/?scenario=lunch"><b>Lunch rush</b><span>Food heavy, add-ons, a cancel.</span></a>
+    <a class="role sc" href="/play/app/?scenario=milk"><b>Out of milk</b><span>The light goes red mid-rush.</span></a>
+    <a class="role sc" href="/play/app/?scenario=odd"><b>The odd things</b><span>Double pay, taken sticks, huge orders.</span></a>
+  </div>
   <div class="roles">
     <div class="role"><b>Rosa</b><span>Register. Ring up, take payment, place sticks.</span></div>
     <div class="role"><b>Beto</b><span>Bar. Read tickets, count pastries, set the lights.</span></div>
