@@ -8,9 +8,11 @@
 
   var X = {
     en: {
+      startHi: 'Welcome', startTitle: 'Let’s set up your café.', startSub: 'Small bites, about a minute each. Start at the top and go down, or pick any one. Stop whenever you like: it remembers.', startGo: 'Start', startNext: 'Next bite', startList: 'Back to the list', startDone: 'Nice. That one is done.', startEnd: 'Everything is set up. The ? and the pencil are always there if you forget.',
       hi: 'Hi', five: 'I have 5 minutes.', fiveSub: 'Pick one small bite. Each takes about a minute, you do the real thing, and it remembers where you were.', min: '1 min', notNow: 'Not now', done: 'Done', again: 'Again', allDone: 'That is everything. The ? and the pencil are always there if you forget.', setupCard: 'I have 5 minutes', setupCardSub: 'Set the café up one small bite at a time.',
-      b_hours: ['Hours and the sign', 'When you open, and when online orders stop.'], b_menu: ['The menu', 'Prices, favourites, what is in each dish.'], b_shelf: ['The shelf', 'What gets a light: fridge and coffee beans.'], b_pastries: ['The pastry dome', 'Counting what is in it.'],
+      b_pin: ['Your PIN', 'Choose the four digits only you know.'], b_hours: ['Hours and the sign', 'When you open, and when online orders stop.'], b_menu: ['The menu', 'Prices, favourites, what is in each dish.'], b_shelf: ['The shelf', 'What gets a light: fridge and coffee beans.'], b_pastries: ['The pastry dome', 'Counting what is in it.'],
       b_tables: ['Tables and sticks', 'Where everyone is sitting.'], b_register: ['Ringing up', 'The register in four taps.'], b_phones: ['Kitchen and bar phones', 'One link, one code.'], b_team: ['Team and wages', 'Who works here, their station, their wage, their PIN.'], b_day: ['Your day', 'Sales and who is waiting.'], b_ask: ['The ? and the pencil', 'How to ask the app, and how to change things.'],
+      s_pin_1: ['Your PIN', 'This is your own row. Type four new digits in the PIN box and tap Save. Next time you sign in, use them.'],
       s_hours_1: ['Your sign', 'This is the sign on the map. Tap it any time to see if you are open. Now let us set the hours.'],
       s_hours_2: ['Which days?', 'Tap the days you open. A lit day is open.'],
       s_hours_3: ['Open and close', 'Set when the doors open and close. It saves as you go.'],
@@ -27,7 +29,8 @@
       s_shelf_4: ['The coffee beans', 'The beans are checked at the grinder when a shift starts. It is the one check that is required.'],
       s_pastries_1: ['The pastry dome', 'It sits on the register counter with the monitor.'],
       s_pastries_2: ['How many are in it', 'Tap plus and minus to match what is in the dome. The bar hands them out.'],
-      s_pastries_3: ['What you sell', 'Tap the pencil. Switch on the pastries you carry today and set each price. Switch it off and it leaves the register.'],
+      s_pastries_3: ['The squares', 'Tap the pencil. Each pastry is a square. Tap one to set its picture, price and how many, and to switch it on or off.'],
+      s_pastries_4: ['Add your own', 'Tap Add a pastry, give it a name and pick a picture. It goes on the register as soon as it has a price.'],
       s_tables_1: ['The pots', 'Home holds the free sticks. Waiting holds the sticks whose food is on its way.'],
       s_tables_2: ['The tables', 'Each dashed box is a table. A light means someone is sitting there.'],
       s_tables_3: ['Right now', 'Every number, and the next job on each one: Place, Take payment, Stick back.'],
@@ -47,9 +50,11 @@
       s_ask_3: ['This guide', 'Open this guide again from the Manager tab any time.']
     },
     es: {
+      startHi: 'Bienvenida', startTitle: 'Vamos a armar tu café.', startSub: 'Pedacitos de un minuto. Empieza por arriba y sigue hacia abajo, o elige cualquiera. Para cuando quieras: recuerda dónde ibas.', startGo: 'Empezar', startNext: 'Siguiente', startList: 'Volver a la lista', startDone: 'Bien. Ese ya está.', startEnd: 'Todo está listo. El ? y el lápiz siempre están si se te olvida.',
       hi: 'Hola', five: 'Tengo 5 minutos.', fiveSub: 'Elige un pedacito. Cada uno toma un minuto, haces lo de verdad y recuerda dónde ibas.', min: '1 min', notNow: 'Ahora no', done: 'Listo', again: 'Otra vez', allDone: 'Eso es todo. El ? y el lápiz siempre están si se te olvida.', setupCard: 'Tengo 5 minutos', setupCardSub: 'Arma el café de a pedacitos.',
-      b_hours: ['Horario y letrero', 'Cuándo abres y cuándo paran los pedidos en línea.'], b_menu: ['El menú', 'Precios, favoritos, lo que lleva cada plato.'], b_shelf: ['El estante', 'Qué lleva luz: refri y granos de café.'], b_pastries: ['La cúpula de pasteles', 'Contar lo que hay.'],
+      b_pin: ['Tu PIN', 'Elige los cuatro dígitos que solo tú sabes.'], b_hours: ['Horario y letrero', 'Cuándo abres y cuándo paran los pedidos en línea.'], b_menu: ['El menú', 'Precios, favoritos, lo que lleva cada plato.'], b_shelf: ['El estante', 'Qué lleva luz: refri y granos de café.'], b_pastries: ['La cúpula de pasteles', 'Contar lo que hay.'],
       b_tables: ['Mesas y palitos', 'Dónde está sentado cada quien.'], b_register: ['Cobrar', 'La caja en cuatro toques.'], b_phones: ['Teléfonos de cocina y bar', 'Un enlace, un código.'], b_team: ['Equipo y salarios', 'Quién trabaja aquí, su estación, su salario, su PIN.'], b_day: ['Tu día', 'Ventas y quién espera.'], b_ask: ['El ? y el lápiz', 'Cómo preguntarle a la app y cómo cambiar cosas.'],
+      s_pin_1: ['Tu PIN', 'Esta es tu fila. Escribe cuatro dígitos nuevos en el cuadro de PIN y toca Guardar. La próxima vez entras con ellos.'],
       s_hours_1: ['Tu letrero', 'Este es el letrero del mapa. Tócalo cuando quieras para ver si estás abierta. Ahora ponemos el horario.'],
       s_hours_2: ['¿Qué días?', 'Toca los días que abres. Un día encendido está abierto.'],
       s_hours_3: ['Abrir y cerrar', 'Pon la hora en que abren y cierran las puertas. Se guarda solo.'],
@@ -66,7 +71,8 @@
       s_shelf_4: ['Los granos de café', 'Los granos se revisan en el molino al empezar el turno. Es la única revisión obligatoria.'],
       s_pastries_1: ['La cúpula de pasteles', 'Está en el mostrador de la caja, junto al monitor.'],
       s_pastries_2: ['Cuántos hay', 'Toca más y menos para igualar lo que hay en la cúpula. El bar los entrega.'],
-      s_pastries_3: ['Qué vendes', 'Toca el lápiz. Enciende los pasteles que tienes hoy y pon cada precio. Si lo apagas, sale de la caja.'],
+      s_pastries_3: ['Los cuadros', 'Toca el lápiz. Cada pastel es un cuadro. Toca uno para poner su dibujo, precio y cuántos hay, y para encenderlo o apagarlo.'],
+      s_pastries_4: ['Agrega los tuyos', 'Toca Agregar pastel, ponle nombre y elige un dibujo. Sale en la caja en cuanto tiene precio.'],
       s_tables_1: ['Las ollas', 'Casa guarda los palitos libres. Espera guarda los palitos cuyo pedido va en camino.'],
       s_tables_2: ['Las mesas', 'Cada caja punteada es una mesa. Una luz significa que alguien está sentado.'],
       s_tables_3: ['Ahora mismo', 'Cada número, y la siguiente tarea de cada uno: Poner, Cobrar, Devolver palito.'],
@@ -99,6 +105,8 @@
   function firstDish() { var l = S.data.items || [], i; for (i = 0; i < l.length; i++) { if (l[i].active !== false && l[i].available !== false) { return l[i].id; } } return l.length ? l[0].id : null; }
   function hit(k) { return '.hit[data-ov="' + k + '"]'; }
   var BITES = [
+    { id: 'pin', ic: 'lock', steps: [
+      ['s_pin_1', 'do', '#tm_pin', function () { S.ui.popup = null; S.tab = 'manager'; if (J.team && J.team.openSelf) { J.team.openSelf(); } }]] },
     { id: 'hours', ic: 'clock', steps: [
       ['s_hours_1', 'look', hit('sign'), function () { ov(null, false); }],
       ['s_hours_2', 'do', '.daychips', function () { ov('sign', true); }],
@@ -116,7 +124,8 @@
     { id: 'pastries', ic: 'cup', steps: [
       ['s_pastries_1', 'look', hit('pastries'), function () { ov(null, false); }],
       ['s_pastries_2', 'do', '.pop .pstep', function () { ov('pastries', false); }],
-      ['s_pastries_3', 'do', '.pop .psetup', function () { ov('pastries', true); }]] },
+      ['s_pastries_3', 'do', '.ptile.edit', function () { ov('pastries', true); }],
+      ['s_pastries_4', 'do', '.ptile.addnew']] },
     { id: 'tables', ic: 'sticky', steps: [
       ['s_tables_1', 'look', hit('pot-home'), function () { ov(null, false); }],
       ['s_tables_2', 'look', '.hit.tbl', null, 1], ['s_tables_3', 'look', '.orail']] },
@@ -138,22 +147,34 @@
       ['s_ask_2', 'look', '.rb[data-act="ovGear"]', function () { ov('menu', false); }],
       ['s_ask_3', 'look', '.tabs', function () { ov(null, false); S.tab = 'manager'; }]] }
   ];
+  var START = ['pin', 'hours', 'menu', 'pastries', 'shelf', 'team', 'phones', 'tables', 'register', 'day', 'ask'];
+  function nextUndone(after) { var m = doneMap(), i, k = after ? START.indexOf(after) : -1; for (i = k + 1; i < START.length; i++) { if (!m[START[i]]) { return START[i]; } } return null; }
   function biteById(id) { var i; for (i = 0; i < BITES.length; i++) { if (BITES[i].id === id) { return BITES[i]; } } return null; }
 
   function icon(b) {
     if (b.ic === 'q') { return '<span class="sq">?</span>'; }
     return U.ic(b.ic, 34, '#B55573');
   }
+  function startMode() { return S.ui.setupMode === 'start'; }
+  function ordered() { var out = [], i; if (!startMode()) { return BITES; } for (i = 0; i < START.length; i++) { out.push(biteById(START[i])); } return out; }
+  Z.screen = function () { return S.ui.setup === 'next' ? Z.next() : Z.home(); };
+  Z.next = function () {
+    var nx = biteById(S.ui.nextBite), nm = S.person ? S.person.name : '';
+    return '<div class="shell setupgl"><header class="sghead"><img class="wm" src="../img/josies-wordmark.png" alt="Josie’s" height="44"><span class="grow"></span>' + U.langToggle() + '</header><div class="sgbody sgmid">' +
+      '<div class="sgbig">' + U.ic('check', 54, '#3C9A78') + '</div><h1>' + esc(t('startDone')) + '</h1><div class="sgcard sgnext" data-act="biteNext"><span class="sgic">' + icon(nx) + '</span><span class="sgt"><small>' + esc(t('startNext')) + '</small><b>' + esc(t('b_' + nx.id)[0]) + '</b><small>' + esc(t('b_' + nx.id)[1]) + '</small></span></div>' +
+      '<button type="button" class="bigbtn" data-act="biteNext">' + esc(t('startGo')) + '</button><button type="button" class="bigbtn ghost sgnot" data-act="setupList">' + esc(t('startList')) + '</button></div></div>';
+  };
   Z.home = function () {
-    var m = doneMap(), n = 0, i, h, nm = S.person ? S.person.name : '';
-    for (i = 0; i < BITES.length; i++) { if (m[BITES[i].id]) { n += 1; } }
+    var m = doneMap(), n = 0, i, h, nm = S.person ? S.person.name : '', list = ordered(), first = startMode() ? nextUndone(null) : null;
+    for (i = 0; i < list.length; i++) { if (m[list[i].id]) { n += 1; } }
     h = '<div class="shell setupgl"><header class="sghead"><img class="wm" src="../img/josies-wordmark.png" alt="Josie’s" height="44"><span class="grow"></span>' + U.langToggle() + '</header><div class="sgbody">' +
-      '<h1>' + esc(t('hi')) + ', ' + esc(nm) + '. ' + esc(t('five')) + '</h1><p class="psub">' + esc(t('fiveSub')) + '</p><div class="sggrid">';
-    for (i = 0; i < BITES.length; i++) {
-      h += '<button type="button" class="sgcard' + (m[BITES[i].id] ? ' done' : '') + '" data-act="bite" data-arg="' + BITES[i].id + '"><span class="sgic">' + icon(BITES[i]) + '</span><span class="sgt"><b>' + esc(t('b_' + BITES[i].id)[0]) + '</b><small>' + esc(t('b_' + BITES[i].id)[1]) + '</small></span>' +
-        '<span class="sgm">' + (m[BITES[i].id] ? U.ic('check', 22, '#3C9A78') : esc(t('min'))) + '</span></button>';
+      (startMode() ? '<h1>' + esc(t('startHi')) + ', ' + esc(nm) + '. ' + esc(t('startTitle')) + '</h1><p class="psub">' + esc(t('startSub')) + '</p>' + (first ? '<button type="button" class="bigbtn sgstart" data-act="bite" data-arg="' + first + '">' + esc(t('startGo')) + ' · ' + esc(t('b_' + first)[0]) + '</button>' : '')
+        : '<h1>' + esc(t('hi')) + ', ' + esc(nm) + '. ' + esc(t('five')) + '</h1><p class="psub">' + esc(t('fiveSub')) + '</p>') + '<div class="sggrid">';
+    for (i = 0; i < list.length; i++) {
+      h += '<button type="button" class="sgcard' + (m[list[i].id] ? ' done' : '') + '" data-act="bite" data-arg="' + list[i].id + '"><span class="sgic">' + icon(list[i]) + '</span><span class="sgt"><b>' + esc(t('b_' + list[i].id)[0]) + '</b><small>' + esc(t('b_' + list[i].id)[1]) + '</small></span>' +
+        '<span class="sgm">' + (m[list[i].id] ? U.ic('check', 22, '#3C9A78') : esc(t('min'))) + '</span></button>';
     }
-    h += '</div>' + (n === BITES.length ? '<p class="psub">' + esc(t('allDone')) + '</p>' : '') + '<button type="button" class="bigbtn ghost sgnot" data-act="setupClose">' + esc(t('notNow')) + '</button></div></div>';
+    h += '</div>' + (n === list.length ? '<p class="psub">' + esc(t(startMode() ? 'startEnd' : 'allDone')) + '</p>' : '') + '<button type="button" class="bigbtn ghost sgnot" data-act="setupClose">' + esc(t('notNow')) + '</button></div></div>';
     return h;
   };
   Z.card = function () {
@@ -168,17 +189,21 @@
     S.ui.tour = { screen: 'setup', bite: id, ids: ids, i: 0 };
     T.enter(S.ui.tour); J.changed();
   }
-  Z.leave = function (id, finished) { if (finished) { mark(id); } if (J.mgr) { J.mgr.view = 'day'; } if (J.team) { J.team.edit = null; } S.ui.tour = null; S.ui.popup = null; S.ui.flip = false; S.ui.setup = 'home'; J.changed(); };
+  Z.leave = function (id, finished) {
+    var nx = finished && startMode() ? nextUndoneAfter(id) : null; if (finished) { mark(id); } if (J.mgr) { J.mgr.view = 'day'; } if (J.team) { J.team.edit = null; } S.ui.tour = null; S.ui.popup = null; S.ui.flip = false; S.ui.setup = nx ? 'next' : 'home'; S.ui.nextBite = nx; J.changed(); };
+  function nextUndoneAfter(id) { mark(id); return nextUndone(id); }
 
   /* open it from the link, once per sign-in */
   Z.check = function () {
     if (S.ui.setupChecked || !S.person) { return; }
     S.ui.setupChecked = true;
-    if (/[?&]setup\b/.test(w.location.search || '') && J.can('josie')) { S.ui.setup = 'home'; }
+    if (/[?&]setup\b/.test(w.location.search || '') && J.can('josie')) { S.ui.setup = 'home'; S.ui.setupMode = /[?&]setup=start\b/.test(w.location.search || '') ? 'start' : null; }
   };
   Z.handle = function (act, arg) {
     switch (act) {
       case 'bite': begin(arg); return true;
+      case 'biteNext': if (S.ui.nextBite) { begin(S.ui.nextBite); } return true;
+      case 'setupList': S.ui.setup = 'home'; J.changed(); return true;
       case 'setupOpen': S.ui.setup = 'home'; J.changed(); return true;
       case 'setupClose': S.ui.setup = null; S.tab = 'pos'; J.changed(); return true;
     }

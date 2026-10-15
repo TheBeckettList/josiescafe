@@ -81,6 +81,10 @@
       z_mphones2: ['New code', 'Making a new code stops every phone until the new code is typed in. Use it if a phone is lost.'],
       z_mpay1: ['Payroll', 'Only Josie sees this. Hours times rate, per person.'],
       z_mpay2: ['Paid', 'Mark it paid by cash or transfer. Undo is there for a mistake.'],
+      z_dot1: ['The dots', 'Green is fine. Orange means take a look. Red needs you now. Grey is quiet. A number is a count, like orders being made.'],
+      z_ptile1: ['Pastry squares', 'Each square is a pastry. The dot is green when there are plenty, orange when low, red when none. Tap minus and plus to match what is in the dome.'],
+      z_ptile2: ['Set up a pastry', 'Josie taps the pencil, then a square, to set its picture, price and how many, and to switch it on or off.'],
+      z_padd: ['Add a pastry', 'Tap Add a pastry, name it and pick a picture. It shows on the register as soon as it has a price.'],
       z_team1: ['Your people', 'Everyone who can sign in. Tap one to change their station, wage or PIN.'],
       z_mday1: ['The day', 'Move between days to see any day you want.']
     },
@@ -153,6 +157,10 @@
       z_mphones2: ['Código nuevo', 'Un código nuevo detiene todos los teléfonos hasta que lo escriban. Úsalo si se pierde un teléfono.'],
       z_mpay1: ['Planilla', 'Solo Josie ve esto. Horas por tarifa, por persona.'],
       z_mpay2: ['Pagado', 'Márcalo pagado en efectivo o transferencia. Deshacer está para un error.'],
+      z_dot1: ['Los puntos', 'Verde está bien. Naranja es para echar un vistazo. Rojo te necesita ya. Gris es tranquilo. Un número es una cuenta, como pedidos en preparación.'],
+      z_ptile1: ['Cuadros de pasteles', 'Cada cuadro es un pastel. El punto es verde si hay bastante, naranja si hay poco, rojo si no hay. Toca menos y más para igualar lo que hay en la cúpula.'],
+      z_ptile2: ['Configurar un pastel', 'Josie toca el lápiz y luego un cuadro para poner su dibujo, precio y cuántos hay, y encenderlo o apagarlo.'],
+      z_padd: ['Agregar un pastel', 'Toca Agregar pastel, ponle nombre y elige un dibujo. Sale en la caja en cuanto tiene precio.'],
       z_team1: ['Tu gente', 'Todos los que pueden entrar. Toca uno para cambiar su estación, salario o PIN.'],
       z_mday1: ['El día', 'Muévete entre días para ver el que quieras.']
     }
@@ -196,7 +204,10 @@
       { sel: '.lang', steps: [['z_lang1', '.lang']] }
     ],
     overview: [
+      { sel: '.ptile.addnew', steps: [['z_padd', '.ptile.addnew'], ['z_pop2', '.pop']] },
+      { sel: '.ptile', all: 1, steps: [['z_ptile1', '.ptile'], ['z_ptile2', '.ptile']] },
       { sel: '.pop', steps: popSteps },
+      { sel: '.sbadge', steps: [['z_dot1', '.sbadge']] },
       { sel: '.hit[data-ov="bar"]', steps: [['z_bar1', ov('bar')], ['z_bar2', ov('bar')]] },
       { sel: '.hit[data-ov="kitchen"]', steps: [['z_kitchen1', ov('kitchen')], ['z_kitchen2', ov('kitchen')]] },
       { sel: '.hit[data-ov="fridge"]', steps: [['z_fridge1', ov('fridge')], ['z_fridge2', ov('fridge')]] },

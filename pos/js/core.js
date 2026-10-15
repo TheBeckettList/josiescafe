@@ -293,6 +293,15 @@
       cb('ok');
     });
   };
+  /* the hidden owner account: no name to pick, a 6-digit PIN, needs the internet (nothing about it is remembered on the device) */
+  J.signInOwner = function (pin, cb) {
+    J.call('sign_in_owner', { p_pin: pin, p_device: S.device.code }, function (err, r) {
+      if (err || !r) { cb(S.online ? 'wrong' : 'offline-unknown'); return; }
+      if (!r.ok) { cb(r.locked ? 'locked' : 'wrong'); return; }
+      enter({ id: r.id, name: r.name, role: r.role, station: null, language: r.language }, r.token);
+      cb('ok', r);
+    });
+  };
   J.signOut = function () {
     if (S.person && S.person.token) { J.call('sign_out', { p_token: S.person.token }); }
     S.person = null; save('person'); J.changed();

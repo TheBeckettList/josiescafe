@@ -15,7 +15,7 @@
   function html() {
     if (!S.session) { return setupView(); }
     if (!S.person) { return signinView(); }
-    if (J.setup) { J.setup.check(); if (S.ui.setup === 'home') { return J.setup.home(); } }
+    if (J.setup) { J.setup.check(); if (S.ui.setup === 'home' || S.ui.setup === 'next') { return J.setup.screen(); } }
     return shell() + (S.ui.tutorial ? tutorialHTML() : '') + J.tour.html();
   }
   function shell() {
@@ -34,7 +34,7 @@
 
   /* ───────────── device setup (once per tablet; shared with the live /pos/) ───────────── */
   function setupView() {
-    return '<div class="center setup"><img src="../img/josies-wordmark.png" alt="Josie’s" height="86" style="display:block;margin:0 auto 10px"><h1>Set up this device</h1>' +
+    return '<div class="center setup"><img src="../img/josies-wordmark.png" alt="Josie’s" height="86" style="display:block;margin:0 auto 10px"><h1>Set up this device</h1>' + (/[?&]setup=start/.test(w.location.search || '') ? '<p class="muted"><b>Welcome.</b> First this tablet needs the café email and password you were given. Then pick your name and we start.</p>' : '') +
       '<p class="muted">A manager does this once per tablet. It stays signed in, even offline.</p>' +
       '<form id="setupForm" class="pcard form" autocomplete="on"><label>Device email<input id="su_email" type="email" autocapitalize="off" autocorrect="off" value="pos@josiescafe.com"></label>' +
       '<label>Password<input id="su_pass" type="password"></label><label>Device letter<select id="su_code">' + ['A', 'B', 'C', 'D', 'E', 'F'].map(function (c) { return '<option' + (S.device.code === c ? ' selected' : '') + '>' + c + '</option>'; }).join('') + '</select></label>' +
@@ -60,7 +60,7 @@
     return J.t('register');
   }
   function signinView() {
-    var names = S.data.names || [], h = '<div class="signin"><img class="si-brand" src="../img/josies-wordmark.png" alt="Josie’s" height="58">', i, p, pin = S.ui.pin, dots = '';
+    var names = S.data.names || [], h = '<div class="signin"><img class="si-brand" data-act="brandTap" src="../img/josies-wordmark.png" alt="Josie’s" height="58">', i, p, pin = S.ui.pin, dots = '';
     if (!S.ui.pinFor) {
       h += '<div class="si-col"><h1 class="si-h">' + esc(J.t('whoIsThis')) + '</h1>' + (w.J2PLAY ? '<p class="muted" style="text-align:center;margin:-6px 0 10px">' + (S.lang === 'es' ? 'Modo de juego: nada es real. Elige quién eres.' : 'Play mode: nothing here is real. Pick who you are.') + '</p>' : '') + '<div class="plist">';
       for (i = 0; i < names.length; i++) {
@@ -71,8 +71,9 @@
       h += '</div><div class="si-lang">' + U.langToggle() + '</div><p class="tinyv">' + (S.online ? '' : esc(J.t('offlineBand')) + ' · ') + 'v' + J.VERSION + ' · device ' + esc(S.device.code) + '</p></div></div>';
       return h;
     }
-    p = J.byId(names, S.ui.pinFor) || { name: '?' };
-    for (i = 0; i < 4; i++) { dots += '<span class="pdot' + (i < pin.length ? ' on' : '') + '"></span>'; }
+    var owner = S.ui.pinFor === '__owner', len = owner ? 6 : 4;
+    p = owner ? { name: J.t('owner') } : (J.byId(names, S.ui.pinFor) || { name: '?' });
+    for (i = 0; i < len; i++) { dots += '<span class="pdot' + (i < pin.length ? ' on' : '') + '"></span>'; }
     h += '<div class="si-col pinp"><button type="button" class="rb" data-act="pinBack" aria-label="' + esc(J.t('back')) + '">' + U.ic('back', 20, '#B55573') + '</button>' +
       '<div class="si-who">' + U.avatar(p.name, 84) + '<b>' + esc(p.name) + '</b></div><div class="pdots">' + dots + '</div><p class="msg">' + esc(S.ui.pinMsg) + '</p><div class="pad">';
     ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '<'].forEach(function (k) {
@@ -81,14 +82,15 @@
     return h + '</div></div></div>';
   }
   function pinKey(k) {
-    if (k === '<') { S.ui.pin = S.ui.pin.slice(0, -1); } else if (S.ui.pin.length < 4) { S.ui.pin += k; }
+    var owner = S.ui.pinFor === '__owner', len = owner ? 6 : 4;
+    if (k === '<') { S.ui.pin = S.ui.pin.slice(0, -1); } else if (S.ui.pin.length < len) { S.ui.pin += k; }
     S.ui.pinMsg = '';
-    if (S.ui.pin.length === 4) {
+    if (S.ui.pin.length === len) {
       var pin = S.ui.pin, id = S.ui.pinFor; S.ui.pin = '';
-      J.signIn(id, pin, function (res) {
+      (owner ? function (cb) { J.signInOwner(pin, cb); } : function (cb) { J.signIn(id, pin, cb); })(function (res) {
         if (res === 'ok') {
           S.ui.pinFor = null; S.ui.pinMsg = ''; S.tab = roleHome();
-          if (!JC.get('p2.tourSeen.' + id, false)) { S.ui.tutorial = true; JC.set('p2.tourSeen.' + id, true); }
+          if (!owner && !JC.get('p2.tourSeen.' + id, false)) { S.ui.tutorial = true; JC.set('p2.tourSeen.' + id, true); }
           J.pollFloor();
         } else { S.ui.pinMsg = res === 'locked' ? J.t('locked') : res === 'offline-unknown' ? J.t('needsNet') : J.t('wrongPin'); }
         J.changed();
@@ -133,6 +135,7 @@
     ev.preventDefault();
     switch (act) {
       case 'lang': J.setLang(arg); break;
+      case 'brandTap': var nowT = Date.now(); S.ui.brandTaps = (nowT - (S.ui.brandAt || 0) < 1500 ? (S.ui.brandTaps || 0) : 0) + 1; S.ui.brandAt = nowT; if (S.ui.brandTaps >= 7) { S.ui.brandTaps = 0; S.ui.pinFor = '__owner'; S.ui.pin = ''; S.ui.pinMsg = ''; J.changed(); } break;
       case 'pickPerson': S.ui.pinFor = arg; S.ui.pin = ''; S.ui.pinMsg = ''; J.changed(); if (w.J2PLAY && w.J2PLAY.autopin) { w.setTimeout(w.J2PLAY.autopin, 80); } break;
       case 'pinBack': S.ui.pinFor = null; S.ui.pin = ''; S.ui.pinMsg = ''; J.changed(); break;
       case 'pin': pinKey(arg); break;
