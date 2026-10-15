@@ -1,9 +1,10 @@
-/* Josie's World · Play mode. A pretend café that lives in your own browser: the real app runs against a real (tiny) Postgres
-   that is downloaded once, loaded with the menu, five people (PIN 1234) and a few orders. Nothing leaves your device; nothing here is real money.
+/* Josie's World · Play mode. A pretend café that lives in your own browser: the real app runs against a light copy of the café's rules
+   (engine-sim.js, about 30 KB, plus a 100 KB snapshot of the menu) with four people (PIN 1234) and a few orders. Nothing leaves your device; nothing here is real money.
+   Add ?engine=real to the page address to run the very same café on a real Postgres in the browser instead (an 18 MB download, for tests and agents).
    Loaded by /play/app/ (a copy of the POS page, built by tools/play/build.mjs, that loads this after api.js and before the app), so it can preset the session and swap the network call. The real /pos/ knows nothing about it. Modern browsers only. */
 (function (w, d) {
   'use strict';
-  var JC = w.JC, base = (JC.cfg.url || '').replace(/\/$/, ''), db = null, voidFns = null, ready = null, VER = 'v3';
+  var JC = w.JC, base = (JC.cfg.url || '').replace(/\/$/, ''), eng = null, ready = null, VER = 'v4', REAL = /[?&]engine=real/.test(w.location.search || '') || /[?&]engine=real/.test((d.currentScript && d.currentScript.src) || '');
   var me = d.currentScript, GUEST_ONLY = !!(me && /[?&]guest=1/.test(me.src));   // the stand-alone customer link: just the guest website, its own café in memory
   w.J2PLAY = { on: true };
   /* no service worker in the sandbox: the app asks for one, the answer is nothing */
@@ -31,7 +32,36 @@
   if (d.body) { cover_on(); } else { d.addEventListener('DOMContentLoaded', cover_on); }
   function say(t) { var m = d.getElementById('playmsg'); if (m) { m.textContent = t; } }
 
-  /* ───────── the database ───────── */
+
+  /* The play café is a look-around: counting and ordering work, but nothing about the café itself can be changed.
+     Anything that would edit the menu, prices, hours, ingredients, people or pay is turned away. */
+  var BLOCKED_RPC = ['catalog_write', 'people_save', 'payroll_mark', 'payroll_view', 'tickets_new_code', 'people_list'];
+  function readOnly(method, path, body) {
+    var m = /^\/rest\/v1\/rpc\/([a-z0-9_]+)$/.exec(path);
+    if (m) { return BLOCKED_RPC.indexOf(m[1]) >= 0; }
+    if (/^\/rest\/v1\/[a-z0-9_]+$/.test(path) && method !== 'GET') {
+      var ks = Object.keys(body || {});
+      return !(method === 'PATCH' && /\/items$/.test(path) && ks.length === 1 && ks[0] === 'stock');   // counting pastries is fine
+    }
+    return false;
+  }
+  /* ───────── the engines: both answer handle(method, path, query, body, authed) -> Promise<{status, json}> the same way ───────── */
+  function loadScript(src) { return new Promise(function (res, rej) { var el = d.createElement('script'); el.src = src; el.onload = res; el.onerror = function () { rej(new Error('could not load ' + src)); }; d.head.appendChild(el); }); }
+  function wrapSim(sim) {   // the light engine answers at once; the app wants a promise
+    var E = {}; Object.keys(sim).forEach(function (k) { E[k] = sim[k]; });
+    E.handle = function (m, p, qy, b, a) { return Promise.resolve(sim.handle(m, p, qy, b, a)); };
+    return E;
+  }
+  function bootSim(fresh) {
+    return Promise.all([loadScript('/play/engine-sim.js?v=1'), w.fetch('/play/data.json?v=1').then(function (r) { return r.json(); })]).then(function (x) {
+      if (fresh) { try { w.localStorage.removeItem('jc.playx.sim.v1'); } catch (e) {} }
+      return wrapSim(w.J2SIM(x[1], !GUEST_ONLY));
+    });
+  }
+
+  /* the real thing: Postgres in the browser (PGlite) with every migration applied. Heavy (about 18 MB): only with ?engine=real */
+  function bootReal(fresh) {
+    var db = null, voidFns = null, E = { kind: 'real' };
   function q(v) { return "'" + String(v).replace(/'/g, "''") + "'"; }
   function ident(s) { if (!/^[a-z_][a-z0-9_]*$/i.test(s)) { throw new Error('bad identifier ' + s); } return '"' + s + '"'; }
   function roleSql(authed) {
@@ -77,45 +107,63 @@
     }).join(', '), call = 'public.' + ident(fn) + '(' + args + ')';
     return isv ? 'select ' + call + " as j, 'null' as n" : 'select to_jsonb(' + call + ') as j';
   }
-  /* The play café is a look-around: counting and ordering work, but nothing about the café itself can be changed.
-     Anything that would edit the menu, prices, hours, ingredients, people or pay is turned away. */
-  var BLOCKED_RPC = ['catalog_write', 'people_save', 'payroll_mark', 'payroll_view', 'tickets_new_code', 'people_list'];
-  function readOnly(method, path, body) {
-    var m = /^\/rest\/v1\/rpc\/([a-z0-9_]+)$/.exec(path);
-    if (m) { return BLOCKED_RPC.indexOf(m[1]) >= 0; }
-    if (/^\/rest\/v1\/[a-z0-9_]+$/.test(path) && method !== 'GET') {
-      var ks = Object.keys(body || {});
-      return !(method === 'PATCH' && /\/items$/.test(path) && ks.length === 1 && ks[0] === 'stock');   // counting pastries is fine
+    function handleSql(method, path, query, body, authed) {
+      var m;
+      if ((m = /^\/rest\/v1\/rpc\/([a-z0-9_]+)$/.exec(path)) && method === 'POST') {
+        return isVoid(m[1]).then(function (isv) {
+          return run(rpcSql(m[1], body, isv), authed).then(function (r) { return isv ? { status: 204, json: null } : { status: 200, json: r.rows[0].j }; });
+        }).catch(function (e) { return pgErr(e); });
+      }
+      if ((m = /^\/rest\/v1\/([a-z0-9_]+)$/.exec(path))) {
+        var t = m[1];
+        try {
+          if (method === 'GET') { return run(selectSql(t, query), authed).then(function (r) { return { status: 200, json: r.rows[0].j }; }).catch(pgErr); }
+          if (method === 'PATCH') {
+            var ks = Object.keys(body || {}); if (!ks.length) { return Promise.resolve({ status: 204, json: null }); }
+            var js = q(JSON.stringify(body)), sql = 'update public.' + ident(t) + ' set ' + ks.map(function (k) { return ident(k) + ' = (jsonb_populate_record(null::public.' + ident(t) + ', ' + js + ')).' + ident(k); }).join(', ') + filters(query);
+            return run(sql, authed).then(function () { return { status: 204, json: null }; }).catch(pgErr);
+          }
+          if (method === 'POST') {
+            var rows = body instanceof Array ? body : [body], cols = Object.keys(rows[0] || {}).map(ident).join(', ');
+            return run('insert into public.' + ident(t) + ' (' + cols + ') select ' + cols + ' from jsonb_populate_recordset(null::public.' + ident(t) + ', ' + q(JSON.stringify(rows)) + ')', authed)
+              .then(function () { return { status: 204, json: null }; }).catch(pgErr);
+          }
+        } catch (e) { return Promise.resolve(pgErr(e)); }
+      }
+      return Promise.resolve({ status: 404, json: { message: 'not handled in play mode: ' + method + ' ' + path } });
     }
-    return false;
+    function sel(sql, params) { return db.query(sql, params || []).then(function (r) { return r.rows; }); }
+    E.handle = handleSql;
+    E.pushCard = function (oid, st) { return sel('select public.push_card($1::uuid, $2, $3) as c', [oid, st, 'en']).then(function (r) { return r[0] && r[0].c; }).catch(function () { return null; }); };
+    E.alertCard = function (aid) { return sel('select a.station, public.push_alert_card(a.id, $2) as c from public.ticket_alerts a where a.id = $1::uuid', [aid, 'en']).then(function (r) { return r[0] ? { station: r[0].station, card: r[0].c } : null; }).catch(function () { return null; }); };
+    E.menu = function () { return sel("select i.id, i.name->>'en' as n, i.price::float8 as price, c.station, coalesce(c.counted, false) as counted from items i join categories c on c.id = i.category_id where i.active"); };
+    E.tables = function () { return sel('select id, label from tables order by label'); };
+    E.ingredientIds = function () { return sel("select id, name->>'en' as n from ingredients").then(function (g) { var o = {}; g.forEach(function (x) { o[x.n] = x.id; }); return o; }); };
+    E.personId = function (name) { return sel('select id from people where name = $1', [name]).then(function (r) { return r[0] && r[0].id; }); };
+    E.orderTotal = function (id) { return sel('select total::float8 as t from orders where id = $1::uuid', [id]).then(function (r) { return r[0] ? r[0].t : 0; }); };
+    E.payments = function (id) { return sel('select count(*)::int c, coalesce(sum(amount),0)::float8 s from payments where order_id = $1::uuid', [id]).then(function (r) { return r[0]; }); };
+    E.waiting = function () { return sel("select count(*) filter (where state = 'waiting')::int w from sticks").then(function (r) { return r[0].w; }); };
+    E.setOnline = function (on) { return db.exec('update settings set online_orders = ' + (on ? 'true' : 'false')); };
+    E.flush = function () {};
+    E.reset = function () { return db.close().then(deleteIdb); };
+    function deleteIdb() { return new Promise(function (res) { try { var r = w.indexedDB.deleteDatabase('/pglite/josies-play-' + VER); r.onsuccess = r.onerror = r.onblocked = function () { res(); }; } catch (e) { res(); } }); }
+    say('Loading the little database…');
+    return (fresh ? deleteIdb() : Promise.resolve()).then(function () {
+      return Promise.all([import('./vendor/index.js'), fresh ? w.fetch('/play/db.tar.gz').then(function (r) { return r.blob(); }) : Promise.resolve(null)]);
+    }).then(function (x) {
+      var opts = { relaxedDurability: true }; if (x[1]) { opts.loadDataDir = x[1]; }
+      return x[0].PGlite.create(GUEST_ONLY ? 'memory://' : 'idb://josies-play-' + VER, opts);
+    }).then(function (inst) {
+      db = inst;
+      return (fresh ? db.exec("update items set active = true, price = 60, stock = 6 where name->>'en' in ('Brownie','Key lime pie','Croissant'); update items set active = true, price = 55, stock = 4 where name->>'en' = 'Cinnamon roll'") : Promise.resolve()).then(function () { return E; });
+    });
   }
+
   /* handle(method, path, query, body, authed) -> Promise<{status, json}> */
   function handle(method, path, query, body, authed) {
-    var m;
     if (readOnly(method, path, body)) { blockedToast(); return Promise.resolve({ status: 403, json: { message: 'Edits are off in the play café', code: 'play' } }); }
-    if ((m = /^\/auth\/v1\/token/.exec(path))) { return Promise.resolve({ status: 200, json: { access_token: 'sandbox-token', refresh_token: 'play', expires_in: 3e9, user: { email: 'pos@josiescafe.com' } } }); }
-    if ((m = /^\/rest\/v1\/rpc\/([a-z0-9_]+)$/.exec(path)) && method === 'POST') {
-      return isVoid(m[1]).then(function (isv) {
-        return run(rpcSql(m[1], body, isv), authed).then(function (r) { return isv ? { status: 204, json: null } : { status: 200, json: r.rows[0].j }; });
-      }).catch(function (e) { return pgErr(e); });
-    }
-    if ((m = /^\/rest\/v1\/([a-z0-9_]+)$/.exec(path))) {
-      var t = m[1];
-      try {
-        if (method === 'GET') { return run(selectSql(t, query), authed).then(function (r) { return { status: 200, json: r.rows[0].j }; }).catch(pgErr); }
-        if (method === 'PATCH') {
-          var ks = Object.keys(body || {}); if (!ks.length) { return Promise.resolve({ status: 204, json: null }); }
-          var js = q(JSON.stringify(body)), sql = 'update public.' + ident(t) + ' set ' + ks.map(function (k) { return ident(k) + ' = (jsonb_populate_record(null::public.' + ident(t) + ', ' + js + ')).' + ident(k); }).join(', ') + filters(query);
-          return run(sql, authed).then(function () { return { status: 204, json: null }; }).catch(pgErr);
-        }
-        if (method === 'POST') {
-          var rows = body instanceof Array ? body : [body], cols = Object.keys(rows[0] || {}).map(ident).join(', ');
-          return run('insert into public.' + ident(t) + ' (' + cols + ') select ' + cols + ' from jsonb_populate_recordset(null::public.' + ident(t) + ', ' + q(JSON.stringify(rows)) + ')', authed)
-            .then(function () { return { status: 204, json: null }; }).catch(pgErr);
-        }
-      } catch (e) { return Promise.resolve(pgErr(e)); }
-    }
-    return Promise.resolve({ status: 404, json: { message: 'not handled in play mode: ' + method + ' ' + path } });
+    if (/^\/auth\/v1\/token/.test(path)) { return Promise.resolve({ status: 200, json: { access_token: 'sandbox-token', refresh_token: 'play', expires_in: 3e9, user: { email: 'pos@josiescafe.com' } } }); }
+    return eng.handle(method, path, query, body, authed);
   }
 
   /* the app's one network call: Supabase goes to the local database, everything else goes where it was going */
@@ -134,16 +182,15 @@
   w.J2PLAY.handle = handle; w.J2PLAY.http = JC.http;
   w.J2PLAY.ready = function () { return ready; };
 
+
   /* ───────── a moment in the café: two sticks on tables, an add-on, an online order ───────── */
   function rpc(fn, body, authed) { return handle('POST', '/rest/v1/rpc/' + fn, {}, body, authed !== false).then(function (r) { if (r.status >= 300) { throw new Error(fn + ': ' + JSON.stringify(r.json)); } return r.json; }); }
-  function one(sql) { return db.query(sql).then(function (r) { var row = r.rows[0]; return row ? row[Object.keys(row)[0]] : null; }); }
-  var PASTRIES = "update items set active = true, price = 60, stock = 6 where name->>'en' in ('Brownie','Key lime pie','Croissant'); update items set active = true, price = 55, stock = 4 where name->>'en' = 'Cinnamon roll'";
   function seedFloor() {
-    var names = {}, ids = {}, ings = {}, tbls = {}, u = function (n) { return '00000000-0000-0000-0000-0000000000' + ('0' + n).slice(-2); }, now = new Date().toISOString();
+    var ids = {}, ings = {}, tbls = {}, u = function (n) { return '00000000-0000-0000-0000-0000000000' + ('0' + n).slice(-2); }, now = new Date().toISOString();
     function ago(m) { return new Date(Date.now() - m * 60000).toISOString(); }
-    return db.query("select id, name->>'en' as n from items where active").then(function (r) { r.rows.forEach(function (x) { ids[x.n] = x.id; }); })
-      .then(function () { return db.query("select id, name->>'en' as n from ingredients"); }).then(function (r) { r.rows.forEach(function (x) { ings[x.n] = x.id; }); })
-      .then(function () { return db.query('select id, label from tables'); }).then(function (r) { r.rows.forEach(function (x) { tbls[x.label] = x.id; }); })
+    return eng.menu().then(function (r) { r.forEach(function (x) { ids[x.n] = x.id; }); })
+      .then(function () { return eng.ingredientIds(); }).then(function (g) { ings = g; })
+      .then(function () { return eng.tables(); }).then(function (r) { r.forEach(function (x) { tbls[x.label] = x.id; }); })
       .then(function () {
         return rpc('sync_order2', { p: { order: { id: u(1), device: 'A', number: '4', customer_name: 'Ana', order_type: 'here', status: 'paid', subtotal: 330, total: 330, tax: 43, staff_name: 'Rosa', created_at: ago(6), paid_at: ago(5), has_bar: false, has_kitchen: true, stick_number: 4 },
           pieces: [{ id: u(11), station: 'kitchen', kind: 'original' }],
@@ -166,7 +213,7 @@
       .then(function () {
         return rpc('place_online_order2', { p: { id: '00000000-0000-0000-0000-0000000000f1', name: 'Sam', order_type: 'togo', lines: [{ item_id: ids['Iced latte'], qty: 2 }, { item_id: ids['Josie bagel'], qty: 1 }] } }, false);
       })
-      .then(function () { return db.exec("update items set active = true, price = 60, stock = 6 where name->>'en' in ('Brownie','Key lime pie','Croissant'); update items set price = 55, stock = 4 where name->>'en' = 'Cinnamon roll'; update items set active = true, price = 55, stock = 4 where name->>'en' = 'Cinnamon roll'"); });
+      .then(function () { return eng.flush(); });
   }
 
   /* ───────── gentle messages instead of dialogs, and the admin corners hidden ───────── */
@@ -215,20 +262,20 @@
     while (phoneList.children.length > 4) { phoneList.removeChild(phoneList.lastChild); }
     phoneEl.classList.remove('buzz'); void phoneEl.offsetWidth; phoneEl.classList.add('buzz');
   }
-  /* what the real server would push: the same text, from the same database function */
+  /* what the real server would push: the same text, from the same rules */
   function pushFor(orderId) {
     ['kitchen', 'bar'].forEach(function (st) {
-      db.query('select public.push_card($1::uuid, $2, $3) as c', [orderId, st, 'en']).then(function (r) {
-        var c = r.rows[0] && r.rows[0].c; if (!c) { return; }
+      eng.pushCard(orderId, st).then(function (c) {
+        if (!c) { return; }
         var key = orderId + ':' + st + ':' + c.title + ':' + c.body.length; if (pushed[key]) { return; } pushed[key] = 1;
         banner(st, c);
-      }).catch(function () {});
+      });
     });
   }
   /* a guest's order walks itself through the café: the cashier takes payment, then it is picked up, five seconds apart */
   function walkOrder(id) {
     w.setTimeout(function () {
-      one("select total from orders where id = '" + id + "'").then(function (tot) {
+      eng.orderTotal(id).then(function (tot) {
         return rpc('pay_orders', { p: { payments: [{ id: JC.uuid(), order_id: id, method: 'cash_hnl', amount: Number(tot || 0) }] } });
       }).catch(function () {});
     }, 5000);
@@ -239,37 +286,29 @@
     var fn = m[1], p = (body && body.p) || {};
     if (fn === 'sync_order2' && p.order && p.order.id) { pushFor(p.order.id); }
     else if (fn === 'place_online_order2' && p.id) { pushFor(p.id); walkOrder(p.id); }
-    else if (fn === 'add_to_online_order' && (p.id || p.order_id)) { pushFor(p.id || p.order_id); }
-    else if (fn === 'stop_item' && p.alert_id) {
-      db.query('select a.station, public.push_alert_card(a.id, $2) as c from public.ticket_alerts a where a.id = $1::uuid', [p.alert_id, 'en']).then(function (r) { var x = r.rows[0]; if (x && x.c) { banner(x.station, x.c); } }).catch(function () {});
-    }
+    else if (fn === 'add_to_online_order2' && p.order_id) { pushFor(p.order_id); }
+    else if (fn === 'stop_item' && p.alert_id) { eng.alertCard(p.alert_id).then(function (x) { if (x && x.card) { banner(x.station, x.card); } }); }
   }
 
-  /* for the scenarios: call the same functions the POS calls (with the push banners), and ask the café's database things */
+  /* for the scenarios: call the same functions the POS calls (with the push banners), and ask the café things (P.eng answers the same questions on either engine) */
   w.J2PLAY.call = function (fn, body, authed) {
     return handle('POST', '/rest/v1/rpc/' + fn, {}, body || {}, authed !== false).then(function (r) {
       if (r.status >= 300) { throw new Error(fn + ': ' + JSON.stringify(r.json)); }
       afterWrite('/rest/v1/rpc/' + fn, body || {}, r.json); return r.json;
     });
   };
-  w.J2PLAY.q = function (sql, params) { return db.query(sql, params || []).then(function (r) { return r.rows; }); };
   w.J2PLAY.switchTo = function (name) { switchTo(name); };
   w.J2PLAY.seed = seedFloor;
+  w.J2PLAY.engine = function () { return eng && eng.kind; };
   /* ───────── boot ───────── */
-  function deleteIdb() { return new Promise(function (res) { try { var r = w.indexedDB.deleteDatabase('/pglite/josies-play-' + VER); r.onsuccess = r.onerror = r.onblocked = function () { res(); }; } catch (e) { res(); } }); }
   function boot() {
     var fresh = false;
-    try { fresh = GUEST_ONLY || !w.localStorage.getItem('jc.play.seeded.' + VER); } catch (e) {}
-    say('Loading the little database…');
-    return (fresh ? deleteIdb() : Promise.resolve()).then(function () {
-      return Promise.all([import('./vendor/index.js'), fresh ? w.fetch('/play/db.tar.gz').then(function (r) { return r.blob(); }) : Promise.resolve(null)]);
-    }).then(function (x) {
-      var opts = { relaxedDurability: true }; if (x[1]) { opts.loadDataDir = x[1]; }
-      return x[0].PGlite.create(GUEST_ONLY ? 'memory://' : 'idb://josies-play-' + VER, opts);
-    }).then(function (inst) {
-      db = inst;
-      if (GUEST_ONLY) { return db.exec(PASTRIES); }
-      return fresh ? (say('Putting a few guests in the café…'), seedFloor().then(function () { try { w.localStorage.setItem('jc.play.seeded.' + VER, '1'); } catch (e) {} })) : null;
+    try { fresh = GUEST_ONLY || !w.localStorage.getItem('jc.play.seeded.' + VER + (REAL ? 'r' : 's')); } catch (e) {}
+    say(REAL ? 'Loading the real database…' : 'Opening the café…');
+    return (REAL ? bootReal(fresh) : bootSim(fresh)).then(function (e) {
+      eng = e; w.J2PLAY.eng = e;
+      if (GUEST_ONLY) { return null; }
+      return fresh ? (say('Putting a few guests in the café…'), seedFloor().then(function () { try { w.localStorage.setItem('jc.play.seeded.' + VER + (REAL ? 'r' : 's'), '1'); } catch (er) {} })) : null;
     });
   }
   ready = boot().then(function () { cover_off(); if (!GUEST_ONLY) { bar(); } }).catch(function (e) { say('Play mode could not start here (' + String(e && e.message || e).slice(0, 90) + '). Try a newer browser.'); throw e; });
@@ -298,8 +337,8 @@
       if (t.hasAttribute('data-guest')) { open = false; draw(); guestPanel(); return; }
       if (t.hasAttribute('data-reset')) {
         if (!w.confirm('Start the play café over? Everything you did goes away.')) { return; }
-        try { w.localStorage.removeItem('jc.play.seeded.' + VER); } catch (er) {} wipeStore();
-        db.close().then(deleteIdb).then(function () { w.location.reload(); }); return;
+        try { w.localStorage.removeItem('jc.play.seeded.' + VER + 's'); w.localStorage.removeItem('jc.play.seeded.' + VER + 'r'); } catch (er) {} wipeStore();
+        Promise.resolve(eng.reset && eng.reset()).then(function () { w.location.reload(); }); return;
       }
       open = false; draw(); switchTo(t.getAttribute('data-who'));
     });
