@@ -409,3 +409,5 @@ svg { display: block; }
 .teamform .tl { display: block; margin-bottom: 14px; } .teamform .tl > span { display: block; font-family: 'Baloo 2', sans-serif; font-weight: 800; color: #5B3843; margin-bottom: 4px; }
 .teamform input[type=text], .teamform input[type=number], .teamform input[type=tel] { width: 100%; height: 48px; border-radius: 16px; border: 3px solid #F5D3DE; padding: 0 14px; font-size: 18px; font-weight: 800; color: #5B3843; background: #FFFFFF; }
 .tchips { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; }
+.prow.psetup.off { opacity: .6; } .prow.psetup .tg { margin-left: 12px; } .prow.psetup em { min-width: 74px; font-size: 22px; }
+.sbadge.bl { left: -18px; right: auto; top: auto; bottom: -18px; } .sbadge.bc { left: 50%; right: auto; top: auto; bottom: -18px; margin-left: -21px; }

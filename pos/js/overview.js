@@ -19,7 +19,7 @@
   };
   var HIT = {
     kitchen: [[1266, 70, 118, 92], [1146, 212, 184, 216]], bar: [[610, 50, 130, 94]], grinder: [[556, 40, 54, 100]], fridge: [[892, 14, 158, 148]],
-    menu: [[810, 166, 74, 46]], pastries: [[674, 180, 66, 66]], register: [[742, 214, 150, 34]], sign: [[114, 92, 132, 162]], 'pot-home': [[548, 166, 78, 76]], 'pot-wait': [[624, 180, 50, 62]]
+    menu: [[478, 146, 70, 124]], pastries: [[674, 180, 66, 66]], register: [[810, 166, 74, 50]], sign: [[114, 92, 132, 162]], 'pot-home': [[548, 166, 78, 76]], 'pot-wait': [[624, 180, 50, 62]]
   };
   var LABEL = { kitchen: 'Kitchen', bar: 'Bar', grinder: 'Coffee beans', fridge: 'Fridge', menu: 'Menu board', pastries: 'Pastries', register: 'Register', sign: 'Sign', 'pot-home': 'Home pot', 'pot-wait': 'Waiting pot' };
 
@@ -76,7 +76,26 @@
 
 
   function pastryItems() { var l = (S.data && S.data.items) || [], o = [], i; for (i = 0; i < l.length; i++) { if (l[i].active !== false && J.isCounted(l[i])) { o.push(l[i]); } } return o; }
+  function rawItem(id) { var l = (S.data && S.data.items) || [], i; for (i = 0; i < l.length; i++) { if (l[i].id === id) { return l[i]; } } return null; }
+  function allPastries() { var l = (S.data && S.data.items) || [], o = [], i; for (i = 0; i < l.length; i++) { if (J.isCounted(l[i])) { o.push(l[i]); } } o.sort(function (a, b) { return (a.active === false ? 1 : 0) - (b.active === false ? 1 : 0) || a.sort - b.sort; }); return o; }
+  function stockRow(it) {
+    var n = Number(it.stock || 0);
+    return '<div class="prow' + (n < 1 ? ' zero' : '') + '"><span class="lico" style="background:' + U.menuBg(U.dishKey(it)) + '">' + ART.svg('menu', U.dishKey(it), 40) + '</span><b>' + esc(J.nm(it.name)) + '</b>' +
+      '<span class="pstep"><button type="button" data-act="pastryStock" data-arg="' + it.id + '|-1" aria-label="-1">−</button><em>' + n + '</em><button type="button" data-act="pastryStock" data-arg="' + it.id + '|1" aria-label="+1">+</button></span></div>';
+  }
+  /* the setup side: what we sell, at what price (Josie). Stock is counted on the other side, and in the inventory popup. */
+  function pastrySetup() {
+    var l = allPastries(), h = pHead(J.t('pastriesWord') + ' · ' + J.t('setup'), J.t('pastrySetupSub'), 'pastries') + '<div class="pb" data-scroll="pastries">', i, it, on;
+    for (i = 0; i < l.length; i++) {
+      it = l[i]; on = it.active !== false;
+      h += '<div class="prow psetup' + (on ? '' : ' off') + '"><span class="lico" style="background:' + U.menuBg(U.dishKey(it)) + '">' + ART.svg('menu', U.dishKey(it), 40) + '</span><b>' + esc(J.nm(it.name)) + '</b>' +
+        '<span class="pstep"><button type="button" data-act="pastryPrice" data-arg="' + it.id + '|-5" aria-label="-5">−</button><em>L' + Number(it.price || 0) + '</em><button type="button" data-act="pastryPrice" data-arg="' + it.id + '|5" aria-label="+5">+</button></span>' +
+        U.toggle(on, 'pastryOn', it.id, J.t('pastrySell')) + '</div>';
+    }
+    return h + '</div>';
+  }
   function popPastries() {
+    if (ui().flip && J.gear && J.gear.allowed('pastries')) { return pastrySetup(); }
     var l = pastryItems(), h = pHead(J.t('pastriesWord'), J.t('pastriesSub'), 'pastries') + '<div class="pb" data-scroll="pastries">', i, it, n;
     if (!l.length) { return h + '<p class="psub">' + esc(J.t('pastriesNone')) + '</p></div>'; }
     for (i = 0; i < l.length; i++) {
@@ -100,7 +119,7 @@
     if (key === 'pot-wait') { return waitN ? { t: waitN + ' ' + J.t('stWaiting'), tone: 'warn', n: waitN } : { t: J.t('stNoneWaiting'), tone: 'idle' }; }
     return null;
   }
-  var BPOS = { 'pot-home': ' tl' };
+  var BPOS = { menu: ' bl', 'pot-home': ' bc', 'pot-wait': ' bc', grinder: ' tl', sign: ' tl' };
   /* a stoplight: green fine, amber look, red act, grey quiet. A number only where a count helps; the words live in the label. */
   function sbadge(stt, key) { return stt ? '<span class="sbadge ' + stt.tone + (BPOS[key] || '') + '" title="' + esc(stt.t) + '"><i>' + (stt.n ? esc(String(stt.n)) : '') + '</i></span>' : ''; }
   /* ───────────── the screen ───────────── */
@@ -287,8 +306,9 @@
       }
     }
     if (look.length) { h += '<p class="sec">' + esc(J.t('needsLook')) + '</p><div class="igrid">'; for (i = 0; i < look.length; i++) { h += invTile(look[i], sel === look[i].id); } h += '</div>'; }
-    h += '<p class="sec">' + esc(J.t('allGood')) + '</p><div class="igrid">'; for (i = 0; i < good.length; i++) { h += invTile(good[i], sel === good[i].id); } h += '</div></div>';
-    return h;
+    h += '<p class="sec">' + esc(J.t('allGood')) + '</p><div class="igrid">'; for (i = 0; i < good.length; i++) { h += invTile(good[i], sel === good[i].id); } h += '</div>';
+    var pl = pastryItems(); if (pl.length) { h += '<p class="sec">' + esc(J.t('pastriesWord')) + '</p>'; for (i = 0; i < pl.length; i++) { h += stockRow(pl[i]); } }
+    return h + '</div>';
   }
   /* menu board: favourites first, then everything by category. A tap opens that dish's card. */
   function dishRow(it) {
@@ -428,6 +448,8 @@
       case 'quietSet': case 'quietLater': case 'quietBreak': return J.quiet ? J.quiet.handle(act, arg) : false;
       case 'ovClose': closePop(); return true;
       case 'viewAs': if (arg === 'guest') { w.open('/', '_blank'); } else { ui().viewAs = arg || null; ui().popup = null; if (ui().viewAs && J.eff().station !== 'register') { S.tab = 'overview'; } J.changed(); } return true;
+      case 'pastryPrice': var pp = String(arg).split('|'), pi = rawItem(pp[0]); if (pi) { var po = Number(pi.price || 0), pn = Math.max(0, po + Number(pp[1])); if (pn !== po) { pi.price = pn; if (pn < 1) { pi.active = false; } J.save('data'); J.changed(); J.api('PATCH', 'items?id=eq.' + pi.id, pn < 1 ? { price: pn, active: false } : { price: pn }, function (err) { if (err) { pi.price = po; J.save('data'); J.changed(); w.alert(S.online ? 'Couldn’t save. Try again.' : 'Changing this needs internet.'); } }, { Prefer: 'return=minimal' }); } } return true;
+      case 'pastryOn': var oi = rawItem(arg); if (oi) { if (oi.active === false && Number(oi.price || 0) < 1) { w.alert(J.t('pastryPriceFirst')); return true; } var oa = oi.active === false; oi.active = oa; J.save('data'); J.changed(); J.api('PATCH', 'items?id=eq.' + oi.id, { active: oa }, function (err) { if (err) { oi.active = !oa; J.save('data'); J.changed(); w.alert(S.online ? 'Couldn’t save. Try again.' : 'Changing this needs internet.'); } }, { Prefer: 'return=minimal' }); } return true;
       case 'pastryStock': var ps = String(arg).split('|'), pit = J.ix().itemById[ps[0]]; if (pit) { var old = Number(pit.stock || 0), nu = Math.max(0, old + Number(ps[1])); if (nu !== old) { pit.stock = nu; J.save('data'); J.changed(); J.api('PATCH', 'items?id=eq.' + pit.id, { stock: nu }, function (err) { if (err) { pit.stock = old; J.save('data'); J.changed(); w.alert(S.online ? 'Couldn’t save. Try again.' : 'Counting needs internet.'); } }, { Prefer: 'return=minimal' }); } } return true;
       case 'crit': if (w.J2CRIT) { w.J2CRIT.play(arg, d.getElementById('app')); } return true;
       case 'ovGear': ui().flip = !ui().flip; J.changed(); return true;
