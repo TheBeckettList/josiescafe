@@ -32,7 +32,7 @@
       ovrail: ['Right now', 'Every number: who still has to pay, who is being made, who is waiting. It updates by itself.'],
       ovcta: ['One tap per job', 'The button on a row is always the next thing: Place, Take payment, or Stick back.'],
       ovdone: ['Just done', 'Finished numbers stay here for a while. Tap Undo if one was closed by mistake.'],
-      gear: ['The gear', 'Every popup has a gear that flips it to its setup. What you can change depends on who you are.'],
+      gear: ['The pencil', 'Every popup has a pencil that flips it to its setup. What you can change depends on who you are.'],
       ovkitchen: ['The kitchen', 'Tap it to read the kitchen tickets, one at a time. Nothing to press: just read, and scroll for more.'],
       ovbar: ['The bar', 'Tap it to read the bar tickets, one at a time. Nothing to press: just read, and scroll for more.'],
       ovinv: ['The lights', 'Tap the fridge or the coffee beans, pick an item, and set it to Plenty, Low or Out. The menu follows at once.'],
@@ -63,7 +63,7 @@
       ovrail: ['Ahora mismo', 'Cada número: quién falta por pagar, quién se está preparando, quién espera. Se actualiza solo.'],
       ovcta: ['Un toque por tarea', 'El botón de una fila siempre es lo siguiente: Poner, Cobrar o Devolver palito.'],
       ovdone: ['Recién terminados', 'Los números terminados se quedan aquí un rato. Toca Deshacer si cerraste uno por error.'],
-      gear: ['El engrane', 'Cada ventana tiene un engrane que la pasa a su configuración. Lo que puedes cambiar depende de quién eres.'],
+      gear: ['El lápiz', 'Cada ventana tiene un lápiz que la pasa a su configuración. Lo que puedes cambiar depende de quién eres.'],
       ovkitchen: ['La cocina', 'Tócala para leer los tickets de cocina, uno por uno. Nada que presionar: solo lee y desliza para ver más.'],
       ovbar: ['El bar', 'Tócalo para leer los tickets del bar, uno por uno. Nada que presionar: solo lee y desliza para ver más.'],
       ovinv: ['Las luces', 'Toca el refri o los granos, elige un artículo y ponlo en Bastante, Poco o Agotado. El menú lo sigue al instante.'],
@@ -119,7 +119,7 @@
     J.changed();
   };
   T.openHelp = function () { S.ui.tour = null; S.ui.tutorial = false; S.ui.helpOpen = true; J.changed(); };
-  T.close = function () { S.ui.tour = null; S.ui.helpOpen = false; S.ui.tutorial = false; J.changed(); };
+  T.close = function (done) { var bt = S.ui.tour && S.ui.tour.bite; if (bt && J.setup) { J.setup.leave(bt, done === true); return; } S.ui.tour = null; S.ui.helpOpen = false; S.ui.tutorial = false; J.changed(); };
 
   /* markup: the container is always cheap; after() fills it in once the screen is painted */
   T.html = function () { return (S.ui.tour || S.ui.helpOpen) ? '<div id="tourlayer" class="tourlayer"></div>' : ''; };
@@ -127,12 +127,14 @@
     var root = d.getElementById('app'), els, i, r, x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
     if (!step.sel) { return null; }
     els = step.all ? root.querySelectorAll(step.sel) : [root.querySelector(step.sel)];
+    if (!step.all && els[0] && els[0].scrollIntoView) { r = els[0].getBoundingClientRect(); if (r.height < w.innerHeight - 200 && (r.bottom > w.innerHeight - 190 || r.top < 70)) { try { els[0].scrollIntoView({ block: 'start' }); } catch (e) {} } }
     for (i = 0; i < els.length; i++) { if (!els[i]) { continue; } r = els[i].getBoundingClientRect(); if (r.width < 2) { continue; } x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom); }
     return x0 > 1e8 ? null : { l: x0, t: y0, w: x1 - x0, h: y1 - y0 };
   }
   T.after = function () {
     var host = d.getElementById('tourlayer'), t = S.ui.tour, h = '', i, st, r, pad = 8, cw = 330, ch, left, top, vw = w.innerWidth, vh = w.innerHeight;
     if (!host) { return; }
+    host.className = 'tourlayer';
     if (S.ui.helpOpen && !t && T.pick) { T.pick(host); return; }
     if (S.ui.helpOpen && !t) {
       var l = T.list(T.screen());
@@ -144,8 +146,10 @@
     if (!t) { host.innerHTML = ''; return; }
     st = t.ids[t.i]; if (!st) { T.close(); return; }
     r = rectOf(st); var txt = tx(st.id);
-    h = '<div class="tscrim' + (r ? ' clear' : '') + '"></div>';
-    if (r) { h += '<div class="tspot" style="left:' + (r.l - pad) + 'px;top:' + (r.t - pad) + 'px;width:' + (r.w + pad * 2) + 'px;height:' + (r.h + pad * 2) + 'px"></div>'; }
+    var doing = st.mode === 'do';
+    host.className = 'tourlayer' + (doing ? ' tdo' : '');
+    h = doing ? '' : '<div class="tscrim' + (r ? ' clear' : '') + '"></div>';
+    if (r) { h += '<div class="tspot' + (doing ? ' do' : '') + '" style="left:' + (r.l - pad) + 'px;top:' + (r.t - pad) + 'px;width:' + (r.w + pad * 2) + 'px;height:' + (r.h + pad * 2) + 'px"></div>'; }
     var dots = '', n = t.ids.length;
     for (i = 0; i < n; i++) { dots += '<i class="' + (i === t.i ? 'on' : '') + '"></i>'; }
     h += '<div class="tcard" id="tcard"><button type="button" class="tx" data-act="tourClose" aria-label="' + esc(tx('close')) + '">&times;</button><b>' + esc(txt[0]) + '</b><p>' + esc(txt[1]) + '</p><div class="tdots">' + dots + '</div><div class="tbtns">' +
@@ -158,17 +162,19 @@
       top = r.t + r.h + pad + 14; if (top + ch > vh - 12) { top = r.t - pad - 14 - ch; }
       if (top < 12) { top = Math.max(12, Math.min(vh - ch - 12, r.t + 16)); left = (r.l + r.w / 2 > vw / 2) ? Math.max(12, r.l - cw - 20) : Math.min(vw - cw - 12, r.l + r.w + 20); }
     } else { left = (vw - cw) / 2; top = (vh - ch) / 2; }
+    top = Math.max(12, Math.min(top, vh - ch - 12));
     card.style.left = left + 'px'; card.style.top = top + 'px';
   };
 
+  T.enter = function (t) { var st = t.ids[t.i]; if (st && st.go) { st.go(); } };
   T.handle = function (act, arg) {
     var t = S.ui.tour;
     switch (act) {
       case 'help': T.openHelp(); return true;
       case 'tourStart': T.start(0); return true;
       case 'tourGo': T.start(Number(arg) || 0); return true;
-      case 'tourNext': if (t) { if (t.i >= t.ids.length - 1) { T.close(); } else { t.i += 1; J.changed(); } } return true;
-      case 'tourPrev': if (t && t.i > 0) { t.i -= 1; J.changed(); } return true;
+      case 'tourNext': if (t) { if (t.i >= t.ids.length - 1) { T.close(true); } else { t.i += 1; T.enter(t); J.changed(); } } return true;
+      case 'tourPrev': if (t && t.i > 0) { t.i -= 1; T.enter(t); J.changed(); } return true;
       case 'tourClose': T.close(); return true;
     }
     return false;

@@ -31,7 +31,7 @@
       back: '<path d="M15 5l-7 7 7 7" fill="none" stroke="' + c + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>',
       x: '<path d="M6 6l12 12M18 6L6 18" fill="none" stroke="' + c + '" stroke-width="3" stroke-linecap="round"/>',
       check: '<path d="M5 12.5l4.5 4.5L19 7" fill="none" stroke="' + c + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>',
-      gear: '<circle cx="12" cy="12" r="3.6" fill="none" stroke="' + c + '" stroke-width="2.6"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1" stroke="' + c + '" stroke-width="2.6" stroke-linecap="round"/>',
+      gear: '<path d="M4.2 19.8l.9-4.3L16.2 4.4a2.3 2.3 0 0 1 3.3 0l.1.1a2.3 2.3 0 0 1 0 3.3L8.5 18.9z" fill="none" stroke="' + c + '" stroke-width="2.4" stroke-linejoin="round"/><path d="M14.2 6.4l3.4 3.4M5.1 15.5l3.4 3.4" fill="none" stroke="' + c + '" stroke-width="2.4" stroke-linecap="round"/>',
       leaf: '<path d="M5 19C5 10 10 5 19 5c0 9-5 14-14 14z" fill="#8FB98B"/><path d="M5 19L13 11" stroke="#5E8A4C" stroke-width="2" stroke-linecap="round"/>',
       wheat: '<path d="M12 21V8M12 8c-3-1-4-3-4-5 3 1 4 3 4 5zm0 0c3-1 4-3 4-5-3 1-4 3-4 5zm0 5c-3-1-4-3-4-5 3 1 4 3 4 5zm0 0c3-1 4-3 4-5-3 1-4 3-4 5z" fill="none" stroke="' + c + '" stroke-width="1.8" stroke-linecap="round"/><path d="M4 20L20 4" stroke="' + c + '" stroke-width="2.4" stroke-linecap="round"/>',
       cup: '<path d="M5 9h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z" fill="#F5B5C8"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16" fill="none" stroke="#F5B5C8" stroke-width="2.2"/>',

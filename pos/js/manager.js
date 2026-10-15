@@ -81,12 +81,13 @@
     return h;
   }
   M.screen = function () {
+    if (M.view === 'team' && J.team && J.can('manager')) { return J.team.screen(); }
     var pay = M.view === 'pay' && J.can('josie');
     if (!pay && !M.rev && !M.busy) { w.setTimeout(load, 0); }
     if (!pay && !M.phonesLoaded) { M.phonesLoaded = true; w.setTimeout(loadPhones, 0); }
     if (pay && !M.pay && !M.payBusy) { M.payBusy = true; w.setTimeout(function () { M.payBusy = false; loadPay(); }, 0); }
     return '<div class="shell mgr">' + U.topbar('manager', pay ? { back: '<button type="button" class="backbtn" data-act="mgrBack" aria-label="' + esc(t('back')) + '">‹</button><b class="mtitle">' + esc(t('payroll')) + ' <span class="lockpill">🔒 ' + esc(t('onlyJosie')) + '</span></b>' } : {}) +
-      '<div class="mbody">' + (pay ? payView() : dayView() + (J.can('josie') ? '<button type="button" class="paybtn mpayroll" data-act="mgrPay">' + esc(t('payroll')) + '</button>' : '')) + '</div></div>';
+      '<div class="mbody">' + (pay ? payView() : (J.setup ? J.setup.card() : '') + dayView() + (J.team ? J.team.button() : '') + (J.can('josie') ? '<button type="button" class="paybtn mpayroll" data-act="mgrPay">' + esc(t('payroll')) + '</button>' : '')) + '</div></div>';
   };
   M.handle = function (act, arg) {
     var p;

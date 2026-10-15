@@ -387,3 +387,25 @@ svg { display: block; }
 .sbadge.warn i { background: #F2A66B; } .sbadge.bad i { background: #D2455D; } .sbadge.idle i { background: #D9CBD1; color: #86606B; }
 .sbadge.tl { left: -18px; right: auto; top: -18px; } .sbadge.top, .sbadge.tr { top: -18px; left: auto; right: -18px; }
 .hit.tbl .sbadge { right: -10px; top: -14px; }
+/* guided bites: you do the real thing, the card just points */
+.tourlayer.tdo { pointer-events: none; } .tourlayer.tdo .tcard { pointer-events: auto; }
+.tspot.do { box-shadow: 0 0 0 4px #FFFFFF, 0 0 0 7px #B55573; background: transparent; }
+/* the 5-minute guide */
+.setupgl { background: #FDEDF1; overflow-y: auto; }
+.sgbody { max-width: 760px; margin: 0 auto; padding: 18px 20px 40px; }
+.sgbody h1 { font-family: 'Baloo 2', sans-serif; font-size: 34px; line-height: 1.05; margin: 8px 0 6px; color: #5B3843; }
+.sggrid { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; margin: 14px -6px 0; }
+.sgcard { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; width: calc(50% - 12px); margin: 6px; padding: 14px 16px; background: #FFFFFF; border-radius: 24px; text-align: left; box-shadow: 0 2px 0 #F5D3DE; }
+.sgcard.done { background: #F3FBF7; } .sgic { width: 52px; height: 52px; border-radius: 16px; background: #FDEDF1; margin-right: 12px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-pack: center; -webkit-justify-content: center; justify-content: center; -webkit-box-align: center; -webkit-align-items: center; align-items: center; -webkit-flex-shrink: 0; flex-shrink: 0; }
+.sq { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #B55573; }
+.sgt { -webkit-box-flex: 1; -webkit-flex: 1; flex: 1; } .sgt b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 20px; line-height: 1.1; color: #5B3843; } .sgt small { display: block; color: #86606B; font-weight: 700; font-size: 13px; }
+.sgm { font-family: 'Baloo 2', sans-serif; font-weight: 800; color: #B55573; font-size: 14px; margin-left: 8px; }
+.sgnot { margin-top: 18px; }
+.sgopen { display: block; width: 100%; text-align: left; margin-bottom: 12px; } .sgopen b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 22px; color: #B55573; } .sgopen small { color: #86606B; font-weight: 700; }
+.sghead { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; padding: 12px 20px; } .sghead .grow { -webkit-box-flex: 1; -webkit-flex: 1; flex: 1; }
+/* team and wages */
+.teamwrap { max-width: 640px; margin: 0 auto; padding: 8px 6px 40px; } .mteam { margin: 14px 6px 0; }
+.teamrow { width: 100%; text-align: left; } .teamrow.off { opacity: .55; }
+.teamform .tl { display: block; margin-bottom: 14px; } .teamform .tl > span { display: block; font-family: 'Baloo 2', sans-serif; font-weight: 800; color: #5B3843; margin-bottom: 4px; }
+.teamform input[type=text], .teamform input[type=number], .teamform input[type=tel] { width: 100%; height: 48px; border-radius: 16px; border: 3px solid #F5D3DE; padding: 0 14px; font-size: 18px; font-weight: 800; color: #5B3843; background: #FFFFFF; }
+.tchips { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; }

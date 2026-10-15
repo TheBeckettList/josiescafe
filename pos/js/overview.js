@@ -19,7 +19,7 @@
   };
   var HIT = {
     kitchen: [[1266, 70, 118, 92], [1146, 212, 184, 216]], bar: [[610, 50, 130, 94]], grinder: [[556, 40, 54, 100]], fridge: [[892, 14, 158, 148]],
-    menu: [[810, 166, 74, 72]], pastries: [[674, 180, 66, 66]], register: [[744, 196, 148, 76]], sign: [[114, 92, 132, 162]], 'pot-home': [[548, 166, 78, 76]], 'pot-wait': [[624, 180, 50, 62]]
+    menu: [[810, 166, 74, 46]], pastries: [[674, 180, 66, 66]], register: [[742, 214, 150, 34]], sign: [[114, 92, 132, 162]], 'pot-home': [[548, 166, 78, 76]], 'pot-wait': [[624, 180, 50, 62]]
   };
   var LABEL = { kitchen: 'Kitchen', bar: 'Bar', grinder: 'Coffee beans', fridge: 'Fridge', menu: 'Menu board', pastries: 'Pastries', register: 'Register', sign: 'Sign', 'pot-home': 'Home pot', 'pot-wait': 'Waiting pot' };
 
@@ -314,7 +314,7 @@
     var it = J.ix().itemById[id]; if (!it) { return pHead('', '', null); }
     var rows = J.ix().di[id] || [], key = U.dishKey(it), i, h = pHead(J.nm(it.name), '', 'menu') + '<div class="pb" data-scroll="dish"><div class="dishtop"><span class="mico big" style="background:' + U.menuBg(key) + '">' + ART.svg('menu', key, 56) + '</span><b>L' + Number(it.price) + '</b></div><div class="ingrows">';
     for (i = 0; i < rows.length; i++) { h += '<div class="ingrow">' + J.ingIcon(rows[i].ingredient_id, 40) + '<span>' + esc(J.ingName(rows[i].ingredient_id)) + '</span>' + (J.light(rows[i].ingredient_id) !== 'green' ? '<i class="lt ' + J.light(rows[i].ingredient_id) + '"></i>' : '') + '</div>'; }
-    if (!rows.length) { h += '<p class="psub">No ingredients yet. Tap the gear to add them.</p>'; }
+    if (!rows.length) { h += '<p class="psub">No ingredients yet. Tap the pencil to add them.</p>'; }
     h += '</div>' + (it.description ? '<p class="psub">' + esc(J.nm(it.description)) + '</p>' : '') + '</div>';
     return h;
   }
