@@ -3,14 +3,20 @@
    Loaded by /pos/?play (after api.js, before the app), which is why it can preset the session and swap the network call. Modern browsers only. */
 (function (w, d) {
   'use strict';
-  var JC = w.JC, base = (JC.cfg.url || '').replace(/\/$/, ''), db = null, voidFns = null, ready = null, VER = 'v1';
+  var JC = w.JC, base = (JC.cfg.url || '').replace(/\/$/, ''), db = null, voidFns = null, ready = null, VER = 'v2';
   w.J2PLAY = { on: true };
 
+  /* Containment: everything the app stores in play mode lives under its own prefix, so the real café's tablet sign-in,
+     menu cache, queue and people on this same browser are never read or touched. */
+  var PREFIX = 'jc.playx.';
+  JC.get = function (k, fallback) { try { var v = w.localStorage.getItem(PREFIX + k); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; } };
+  JC.set = function (k, v) { try { w.localStorage.setItem(PREFIX + k, JSON.stringify(v)); return true; } catch (e) { return false; } };
+  JC.del = function (k) { try { w.localStorage.removeItem(PREFIX + k); } catch (e) {} };
+  w.J2PLAY.store = { get: JC.get, set: JC.set, del: JC.del };
+  function wipeStore() { try { var i, k, drop = []; for (i = 0; i < w.localStorage.length; i++) { k = w.localStorage.key(i); if (k.indexOf(PREFIX) === 0) { drop.push(k); } } for (i = 0; i < drop.length; i++) { w.localStorage.removeItem(drop[i]); } } catch (e) {} }
   /* the app thinks it is signed in on a shared tablet; people sign in with a PIN as always */
-  try {
-    w.localStorage.setItem('jc.pos.session', JSON.stringify({ access_token: 'play-token', refresh_token: 'play', expires_at: Date.now() + 3e11, email: 'pos@josiescafe.com' }));
-    if (!w.localStorage.getItem('jc.pos.device')) { w.localStorage.setItem('jc.pos.device', JSON.stringify({ code: 'A', mode: 'register', lang: 'en' })); }
-  } catch (e) {}
+  JC.set('pos.session', { access_token: 'play-token', refresh_token: 'play', expires_at: Date.now() + 3e11, email: 'pos@josiescafe.com' });
+  if (!JC.get('pos.device', null)) { JC.set('pos.device', { code: 'A', mode: 'register', lang: 'en' }); }
 
   /* ───────── a little cover while the café is set up ───────── */
   var cover = d.createElement('div');
@@ -83,12 +89,12 @@
         if (method === 'GET') { return run(selectSql(t, query), authed).then(function (r) { return { status: 200, json: r.rows[0].j }; }).catch(pgErr); }
         if (method === 'PATCH') {
           var ks = Object.keys(body || {}); if (!ks.length) { return Promise.resolve({ status: 204, json: null }); }
-          var sql = 'update public.' + ident(t) + ' set ' + ks.map(function (k) { return ident(k) + ' = r.' + ident(k); }).join(', ') +
-            ' from (select * from jsonb_populate_record(null::public.' + ident(t) + ', ' + q(JSON.stringify(body)) + ')) r' + filters(query);
+          var js = q(JSON.stringify(body)), sql = 'update public.' + ident(t) + ' set ' + ks.map(function (k) { return ident(k) + ' = (jsonb_populate_record(null::public.' + ident(t) + ', ' + js + ')).' + ident(k); }).join(', ') + filters(query);
           return run(sql, authed).then(function () { return { status: 204, json: null }; }).catch(pgErr);
         }
         if (method === 'POST') {
-          return run('insert into public.' + ident(t) + ' select * from jsonb_populate_recordset(null::public.' + ident(t) + ', ' + q(JSON.stringify(body instanceof Array ? body : [body])) + ')', authed)
+          var rows = body instanceof Array ? body : [body], cols = Object.keys(rows[0] || {}).map(ident).join(', ');
+          return run('insert into public.' + ident(t) + ' (' + cols + ') select ' + cols + ' from jsonb_populate_recordset(null::public.' + ident(t) + ', ' + q(JSON.stringify(rows)) + ')', authed)
             .then(function () { return { status: 204, json: null }; }).catch(pgErr);
         }
       } catch (e) { return Promise.resolve(pgErr(e)); }
@@ -105,6 +111,7 @@
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) {} }
     var authed = !!(headers && headers.Authorization);
     ready.then(function () { return handle(method, path, query, body, authed); }).then(function (r) {
+      if (r.status >= 400 && w.console) { w.console.warn('play: ' + method + ' ' + path + ' -> ' + r.status + ' ' + JSON.stringify(r.json)); }
       w.setTimeout(function () { if (r.status >= 200 && r.status < 300) { cb(null, r.json, r.status); } else { cb({ status: r.status, data: r.json }, r.json, r.status); } }, 0);
     });
   };
@@ -186,7 +193,7 @@
       if (t.hasAttribute('data-guest')) { open = false; draw(); guestPanel(); return; }
       if (t.hasAttribute('data-reset')) {
         if (!w.confirm('Start the play café over? Everything you did goes away.')) { return; }
-        try { w.localStorage.removeItem('jc.play.seeded.' + VER); w.localStorage.removeItem('jc.pos.person'); } catch (er) {}
+        try { w.localStorage.removeItem('jc.play.seeded.' + VER); } catch (er) {} wipeStore();
         db.close().then(deleteIdb).then(function () { w.location.reload(); }); return;
       }
       open = false; draw(); switchTo(t.getAttribute('data-who'));

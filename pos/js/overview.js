@@ -78,32 +78,55 @@
   function pastryItems() { var l = (S.data && S.data.items) || [], o = [], i; for (i = 0; i < l.length; i++) { if (l[i].active !== false && J.isCounted(l[i])) { o.push(l[i]); } } return o; }
   function rawItem(id) { var l = (S.data && S.data.items) || [], i; for (i = 0; i < l.length; i++) { if (l[i].id === id) { return l[i]; } } return null; }
   function allPastries() { var l = (S.data && S.data.items) || [], o = [], i; for (i = 0; i < l.length; i++) { if (J.isCounted(l[i])) { o.push(l[i]); } } o.sort(function (a, b) { return (a.active === false ? 1 : 0) - (b.active === false ? 1 : 0) || a.sort - b.sort; }); return o; }
-  function stockRow(it) {
-    var n = Number(it.stock || 0);
-    return '<div class="prow' + (n < 1 ? ' zero' : '') + '"><span class="lico" style="background:' + U.menuBg(U.dishKey(it)) + '">' + ART.svg('menu', U.dishKey(it), 40) + '</span><b>' + esc(J.nm(it.name)) + '</b>' +
-      '<span class="pstep"><button type="button" data-act="pastryStock" data-arg="' + it.id + '|-1" aria-label="-1">−</button><em>' + n + '</em><button type="button" data-act="pastryStock" data-arg="' + it.id + '|1" aria-label="+1">+</button></span></div>';
+  /* pastries as inventory squares: the picture, the count, a stoplight. Everyone counts with − and +; Josie's pencil turns them into setup. */
+  var PIC = null;
+  function pastryPics() {
+    var out = [], seen = {}, i, k;
+    if (PIC) { return PIC; }
+    for (i = 0; i < ART.pastryBank.length; i++) { k = ART.keyFor(ART.pastryBank[i][0]); if (k && !seen[k] && ART.menu[k]) { seen[k] = 1; out.push(k); } }
+    PIC = out; return out;
   }
-  /* the setup side: what we sell, at what price (Josie). Stock is counted on the other side, and in the inventory popup. */
-  function pastrySetup() {
-    var l = allPastries(), h = pHead(J.t('pastriesWord') + ' · ' + J.t('setup'), J.t('pastrySetupSub'), 'pastries') + '<div class="pb" data-scroll="pastries">', i, it, on;
-    for (i = 0; i < l.length; i++) {
-      it = l[i]; on = it.active !== false;
-      h += '<div class="prow psetup' + (on ? '' : ' off') + '"><span class="lico" style="background:' + U.menuBg(U.dishKey(it)) + '">' + ART.svg('menu', U.dishKey(it), 40) + '</span><b>' + esc(J.nm(it.name)) + '</b>' +
-        '<span class="pstep"><button type="button" data-act="pastryPrice" data-arg="' + it.id + '|-5" aria-label="-5">−</button><em>L' + Number(it.price || 0) + '</em><button type="button" data-act="pastryPrice" data-arg="' + it.id + '|5" aria-label="+5">+</button></span>' +
-        U.toggle(on, 'pastryOn', it.id, J.t('pastrySell')) + '</div>';
+  function ptile(it, edit) {
+    var n = Number(it.stock || 0), on = it.active !== false, tone = n < 1 ? 'bad' : n <= 4 ? 'warn' : 'ok', key = U.dishKey(it);
+    var top = '<i class="pdot"></i><span class="part" style="background:' + U.menuBg(key) + '">' + ART.svg('menu', key, 62) + '</span><b class="pnm">' + esc(J.nm(it.name)) + '</b>';
+    if (edit) {
+      return '<button type="button" class="ptile edit ' + tone + (on ? '' : ' off') + '" data-act="pastryEdit" data-arg="' + it.id + '">' + top + '<span class="pmeta">' + (on ? 'L' + Number(it.price || 0) + ' · ' + n : esc(J.t('pastryNotSelling'))) + '</span><span class="ppen">' + U.ic('gear', 16, '#B55573') + '</span></button>';
+    }
+    return '<div class="ptile ' + tone + '">' + top + '<span class="pstep"><button type="button" data-act="pastryStock" data-arg="' + it.id + '|-1" aria-label="-1">−</button><em>' + n + '</em><button type="button" data-act="pastryStock" data-arg="' + it.id + '|1" aria-label="+1">+</button></span></div>';
+  }
+  function stepper(act, id, val, step, pre) {
+    return '<span class="pstep"><button type="button" data-act="' + act + '" data-arg="' + id + '|-' + step + '" aria-label="-' + step + '">−</button><em>' + (pre || '') + val + '</em><button type="button" data-act="' + act + '" data-arg="' + id + '|' + step + '" aria-label="+' + step + '">+</button></span>';
+  }
+  /* one pastry, or a new one: picture, price, count, selling */
+  function pastryEditor() {
+    var id = ui().pastryEdit, isNew = id === 'new', it = isNew ? ui().pDraft : rawItem(id), pics = pastryPics(), i, h, cur, on;
+    if (!it) { ui().pastryEdit = null; return pastrySetup(); }
+    cur = isNew ? it.icon : U.dishKey(it); on = isNew ? true : it.active !== false;
+    h = '<div class="ph"><div class="pht"><h2>' + esc(isNew ? J.t('pastryNew') : J.nm(it.name)) + '</h2></div>' + U.roundBtn('pastryBack', U.ic('back', 20, '#B55573'), J.t('back')) + '</div><div class="pb" data-scroll="pedit">';
+    if (isNew) { h += '<label class="pfield"><span>' + esc(J.t('pastryName')) + '</span><input id="pe_name" type="text" value="' + esc(it.name || '') + '" autocomplete="off" autocapitalize="words"></label>'; }
+    h += '<p class="sec">' + esc(J.t('pastryPicture')) + '</p><div class="picgrid">';
+    for (i = 0; i < pics.length; i++) { h += '<button type="button" class="pic' + (pics[i] === cur ? ' on' : '') + '" data-act="pastryIcon" data-arg="' + pics[i] + '" style="background:' + U.menuBg(pics[i]) + '">' + ART.svg('menu', pics[i], 46) + '</button>'; }
+    h += '</div><div class="srow"><span>' + esc(J.t('price')) + '</span>' + stepper('pastryPrice', isNew ? 'new' : it.id, Number(it.price || 0), 5, 'L') + '</div>' +
+      '<div class="srow"><span>' + esc(J.t('pastryHowMany')) + '</span>' + stepper('pastryStock', isNew ? 'new' : it.id, Number(it.stock || 0), 1) + '</div>';
+    if (isNew) { h += '<button type="button" class="bigbtn" data-act="pastryAdd">' + esc(J.t('pastryAdd')) + '</button>'; }
+    else {
+      h += '<div class="srow"><span>' + esc(J.t('pastrySell')) + '</span>' + U.toggle(on, 'pastryOn', it.id, J.t('pastrySell')) + '</div><button type="button" class="bigbtn" data-act="pastryBack">' + esc(J.t('done')) + '</button>';
     }
     return h + '</div>';
+  }
+  function pastrySetup() {
+    if (ui().pastryEdit) { return pastryEditor(); }
+    var l = allPastries(), h = pHead(J.t('pastriesWord') + ' · ' + J.t('setup'), J.t('pastrySetupSub'), 'pastries') + '<div class="pb" data-scroll="pastries"><div class="pgrid">', i;
+    for (i = 0; i < l.length; i++) { h += ptile(l[i], true); }
+    h += '<button type="button" class="ptile addnew" data-act="pastryEdit" data-arg="new"><span class="part plus">+</span><b class="pnm">' + esc(J.t('pastryNew')) + '</b></button>';
+    return h + '</div></div>';
   }
   function popPastries() {
     if (ui().flip && J.gear && J.gear.allowed('pastries')) { return pastrySetup(); }
-    var l = pastryItems(), h = pHead(J.t('pastriesWord'), J.t('pastriesSub'), 'pastries') + '<div class="pb" data-scroll="pastries">', i, it, n;
+    var l = pastryItems(), h = pHead(J.t('pastriesWord'), J.t('pastriesSub'), 'pastries') + '<div class="pb" data-scroll="pastries">', i;
     if (!l.length) { return h + '<p class="psub">' + esc(J.t('pastriesNone')) + '</p></div>'; }
-    for (i = 0; i < l.length; i++) {
-      it = l[i]; n = Number(it.stock || 0);
-      h += '<div class="prow' + (n < 1 ? ' zero' : '') + '"><span class="lico" style="background:' + U.menuBg(U.dishKey(it)) + '">' + ART.svg('menu', U.dishKey(it), 40) + '</span><b>' + esc(J.nm(it.name)) + '</b>' +
-        '<span class="pstep"><button type="button" data-act="pastryStock" data-arg="' + it.id + '|-1" aria-label="-1">−</button><em>' + n + '</em><button type="button" data-act="pastryStock" data-arg="' + it.id + '|1" aria-label="+1">+</button></span></div>';
-    }
-    return h + '</div>';
+    h += '<div class="pgrid">'; for (i = 0; i < l.length; i++) { h += ptile(l[i], false); }
+    return h + '</div></div>';
   }
   /* a small status for each thing on the map (shown on its dashed box) */
   function statusFor(key, homeN, waitN) {
@@ -307,7 +330,7 @@
     }
     if (look.length) { h += '<p class="sec">' + esc(J.t('needsLook')) + '</p><div class="igrid">'; for (i = 0; i < look.length; i++) { h += invTile(look[i], sel === look[i].id); } h += '</div>'; }
     h += '<p class="sec">' + esc(J.t('allGood')) + '</p><div class="igrid">'; for (i = 0; i < good.length; i++) { h += invTile(good[i], sel === good[i].id); } h += '</div>';
-    var pl = pastryItems(); if (pl.length) { h += '<p class="sec">' + esc(J.t('pastriesWord')) + '</p>'; for (i = 0; i < pl.length; i++) { h += stockRow(pl[i]); } }
+    var pl = pastryItems(); if (pl.length) { h += '<p class="sec">' + esc(J.t('pastriesWord')) + '</p><div class="pgrid">'; for (i = 0; i < pl.length; i++) { h += ptile(pl[i], false); } h += '</div>'; }
     return h + '</div>';
   }
   /* menu board: favourites first, then everything by category. A tap opens that dish's card. */
@@ -434,6 +457,7 @@
     c.addTo = { stick: g.stick, number: g.stick ? String(g.stick) : g.orders[0].number, name: g.name || g.orders[0].name || '', type: g.type, label: (g.stick ? 'Stick ' + g.stick : (g.name || g.orders[0].number)) + (tb ? ' · Table ' + tb.label : '') };
     c.type = g.type; J.saveCart(); S.tab = 'pos'; ui().view = 'pos'; ui().popup = null; J.changed();
   }
+  O.input = function (el) { if (el.id === 'pe_name' && ui().pDraft) { ui().pDraft.name = el.value; return true; } return false; };
   O.handle = function (act, arg, el) {
     var g, p;
     switch (act) {
@@ -448,9 +472,27 @@
       case 'quietSet': case 'quietLater': case 'quietBreak': return J.quiet ? J.quiet.handle(act, arg) : false;
       case 'ovClose': closePop(); return true;
       case 'viewAs': if (arg === 'guest') { w.open('/', '_blank'); } else { ui().viewAs = arg || null; ui().popup = null; if (ui().viewAs && J.eff().station !== 'register') { S.tab = 'overview'; } J.changed(); } return true;
-      case 'pastryPrice': var pp = String(arg).split('|'), pi = rawItem(pp[0]); if (pi) { var po = Number(pi.price || 0), pn = Math.max(0, po + Number(pp[1])); if (pn !== po) { pi.price = pn; if (pn < 1) { pi.active = false; } J.save('data'); J.changed(); J.api('PATCH', 'items?id=eq.' + pi.id, pn < 1 ? { price: pn, active: false } : { price: pn }, function (err) { if (err) { pi.price = po; J.save('data'); J.changed(); w.alert(S.online ? 'Couldn’t save. Try again.' : 'Changing this needs internet.'); } }, { Prefer: 'return=minimal' }); } } return true;
+      case 'pastryEdit': ui().pastryEdit = arg; if (arg === 'new') { ui().pDraft = { name: '', icon: pastryPics()[0], price: 60, stock: 6 }; } J.changed(); return true;
+      case 'pastryBack': ui().pastryEdit = null; J.changed(); return true;
+      case 'pastryIcon':
+        if (ui().pastryEdit === 'new') { ui().pDraft.icon = arg; J.changed(); return true; }
+        var ic = rawItem(ui().pastryEdit); if (ic) { var oi0 = ic.icon; ic.icon = arg; J.save('data'); J.changed(); J.api('PATCH', 'items?id=eq.' + ic.id, { icon: arg }, function (err) { if (err) { ic.icon = oi0; J.save('data'); J.changed(); w.alert(S.online ? 'Couldn’t save. Try again.' : 'Changing this needs internet.'); } }, { Prefer: 'return=minimal' }); }
+        return true;
+      case 'pastryAdd':
+        var dr = ui().pDraft, nm0 = dr && String(dr.name || '').replace(/^\s+|\s+$/g, ''), cat = null, ci;
+        if (!nm0) { w.alert(J.t('pastryNameFirst')); return true; }
+        for (ci = 0; ci < S.data.categories.length; ci++) { if (S.data.categories[ci].counted) { cat = S.data.categories[ci]; } }
+        if (!cat) { return true; }
+        J.api('POST', 'items', { id: J.uuid(), category_id: cat.id, sort: 300 + allPastries().length, name: { en: nm0, es: nm0 }, price: Number(dr.price || 0), show_online: false, available: true, active: Number(dr.price || 0) > 0, stock: Number(dr.stock || 0), starred: false, icon: dr.icon },
+          function (err) { if (err) { w.alert(S.online ? 'Couldn’t save. Try again.' : 'Adding needs internet.'); return; } ui().pastryEdit = null; ui().pDraft = null; J.loadData(function () { J.changed(); }); }, { Prefer: 'return=minimal' });
+        return true;
+      case 'pastryPrice': var pp = String(arg).split('|');
+        if (pp[0] === 'new') { ui().pDraft.price = Math.max(0, Number(ui().pDraft.price || 0) + Number(pp[1])); J.changed(); return true; }
+        var pi = rawItem(pp[0]); if (pi) { var po = Number(pi.price || 0), pn = Math.max(0, po + Number(pp[1])); if (pn !== po) { pi.price = pn; if (pn < 1) { pi.active = false; } J.save('data'); J.changed(); J.api('PATCH', 'items?id=eq.' + pi.id, pn < 1 ? { price: pn, active: false } : { price: pn }, function (err) { if (err) { pi.price = po; J.save('data'); J.changed(); w.alert(S.online ? 'Couldn’t save. Try again.' : 'Changing this needs internet.'); } }, { Prefer: 'return=minimal' }); } } return true;
       case 'pastryOn': var oi = rawItem(arg); if (oi) { if (oi.active === false && Number(oi.price || 0) < 1) { w.alert(J.t('pastryPriceFirst')); return true; } var oa = oi.active === false; oi.active = oa; J.save('data'); J.changed(); J.api('PATCH', 'items?id=eq.' + oi.id, { active: oa }, function (err) { if (err) { oi.active = !oa; J.save('data'); J.changed(); w.alert(S.online ? 'Couldn’t save. Try again.' : 'Changing this needs internet.'); } }, { Prefer: 'return=minimal' }); } return true;
-      case 'pastryStock': var ps = String(arg).split('|'), pit = J.ix().itemById[ps[0]]; if (pit) { var old = Number(pit.stock || 0), nu = Math.max(0, old + Number(ps[1])); if (nu !== old) { pit.stock = nu; J.save('data'); J.changed(); J.api('PATCH', 'items?id=eq.' + pit.id, { stock: nu }, function (err) { if (err) { pit.stock = old; J.save('data'); J.changed(); w.alert(S.online ? 'Couldn’t save. Try again.' : 'Counting needs internet.'); } }, { Prefer: 'return=minimal' }); } } return true;
+      case 'pastryStock': var ps = String(arg).split('|');
+        if (ps[0] === 'new') { ui().pDraft.stock = Math.max(0, Number(ui().pDraft.stock || 0) + Number(ps[1])); J.changed(); return true; }
+        var pit = rawItem(ps[0]); if (pit) { var old = Number(pit.stock || 0), nu = Math.max(0, old + Number(ps[1])); if (nu !== old) { pit.stock = nu; J.save('data'); J.changed(); J.api('PATCH', 'items?id=eq.' + pit.id, { stock: nu }, function (err) { if (err) { pit.stock = old; J.save('data'); J.changed(); w.alert(S.online ? 'Couldn’t save. Try again.' : 'Counting needs internet.'); } }, { Prefer: 'return=minimal' }); } } return true;
       case 'crit': if (w.J2CRIT) { w.J2CRIT.play(arg, d.getElementById('app')); } return true;
       case 'ovGear': ui().flip = !ui().flip; J.changed(); return true;
       case 'tablePick':
