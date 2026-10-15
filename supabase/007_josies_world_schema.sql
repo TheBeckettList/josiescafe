@@ -26,6 +26,8 @@ create table if not exists public.people (
   language      text    not null default 'en' check (language in ('en','es')),
   tutorial_seen boolean not null default false,
   active        boolean not null default true,
+  fail_count    int     not null default 0,      -- wrong PINs in a row; 5 locks sign-in for 5 minutes
+  locked_until  timestamptz,
   created_at    timestamptz not null default now()
 );
 
@@ -68,14 +70,33 @@ begin
   return p;
 end $$;
 
-create or replace function public.sign_in(p_pin text, p_device text default null) returns jsonb
+-- The name picker on the sign-in screen: names, roles and stations only. No PINs, no pay.
+create or replace function public.people_names() returns jsonb
+language sql stable security definer set search_path = public as $$
+  select case when public.is_pos() then coalesce((select jsonb_agg(jsonb_build_object(
+    'id', id, 'name', name, 'role', role, 'station', station, 'language', language) order by name)
+    from public.people where active), '[]') end;
+$$;
+
+-- Pick your name, enter your PIN. 5 wrong PINs in a row lock that name for 5 minutes.
+create or replace function public.sign_in(p_person uuid, p_pin text, p_device text default null) returns jsonb
 language plpgsql security definer set search_path = public, extensions as $$
 declare p public.people; sh uuid;
 begin
   if not public.is_pos() then raise exception 'not allowed'; end if;
-  select * into p from public.people
-   where active and p_pin ~ '^[0-9]{4}$' and pin_hash = extensions.crypt(p_pin, pin_hash) limit 1;
+  select * into p from public.people where id = p_person and active for update;
   if p.id is null then return jsonb_build_object('ok', false); end if;
+  if p.locked_until is not null and p.locked_until > now() then
+    return jsonb_build_object('ok', false, 'locked', true);
+  end if;
+  if p_pin !~ '^[0-9]{4}$' or p.pin_hash <> extensions.crypt(p_pin, p.pin_hash) then
+    update public.people
+       set fail_count   = case when fail_count + 1 >= 5 then 0 else fail_count + 1 end,
+           locked_until = case when fail_count + 1 >= 5 then now() + interval '5 minutes' end
+     where id = p.id;
+    return jsonb_build_object('ok', false);
+  end if;
+  update public.people set fail_count = 0, locked_until = null where id = p.id;
   -- Already on shift (second device, app reopened): same shift, hours never double.
   select id into sh from public.shifts
    where person_id = p.id and out_at is null and in_at > now() - interval '16 hours';
@@ -113,20 +134,14 @@ begin
             order by x.name) from public.people x), '[]');
 end $$;
 
--- Josie: add or change a person. PIN is optional when changing. PINs stay unique among active people,
--- because the PIN alone is how someone signs in.
+-- Josie: add or change a person. PIN is optional when changing. (People sign in by name + PIN, so PINs may repeat.)
 create or replace function public.people_save(p_token uuid, p jsonb) returns uuid
 language plpgsql security definer set search_path = public, extensions as $$
 declare me public.people := public.need_role(p_token, 'josie');
         pid uuid := nullif(p ->> 'id', '')::uuid;
         pin text := nullif(p ->> 'pin', '');
 begin
-  if pin is not null then
-    if pin !~ '^[0-9]{4}$' then raise exception 'PIN must be 4 digits'; end if;
-    if exists (select 1 from public.people where active and id is distinct from pid and pin_hash = extensions.crypt(pin, pin_hash)) then
-      raise exception 'that PIN is taken';
-    end if;
-  end if;
+  if pin is not null and pin !~ '^[0-9]{4}$' then raise exception 'PIN must be 4 digits'; end if;
   if pid is null then
     if pin is null then raise exception 'new people need a PIN'; end if;
     insert into public.people (name, role, station, pin_hash, rate, language)
@@ -164,41 +179,61 @@ create table if not exists public.ingredients (
   active         boolean not null default true
 );
 
--- What each dish is made of. Marking a dish Out never touches this; marking an ingredient does the cascade.
+-- What each dish is made of. is_core: the ingredient IS the dish (bacon on a BLT), so a diet can't adapt it:
+-- the tile reads "bacon is the dish" and can still be added anyway.
+-- Marking a dish Out never touches this; marking an ingredient does the cascade.
 create table if not exists public.dish_ingredients (
   item_id       uuid not null references public.items(id) on delete cascade,
   ingredient_id uuid not null references public.ingredients(id) on delete cascade,
+  is_core       boolean not null default false,
   primary key (item_id, ingredient_id)
 );
 create index if not exists dish_ingredients_ing on public.dish_ingredients (ingredient_id);
 
--- When an element is out, these are offered (only the ones still green).
-create table if not exists public.swaps (
-  element_id     uuid not null references public.ingredients(id) on delete cascade,
-  alternative_id uuid not null references public.ingredients(id) on delete cascade,
-  sort           int  not null default 0,
-  primary key (element_id, alternative_id),
-  check (element_id <> alternative_id)
-);
+-- Meat and dairy flags drive the one kosher-style warning (chicken with cheese or milk in one dish).
+alter table public.ingredients
+  add column if not exists meat  boolean not null default false,
+  add column if not exists dairy boolean not null default false;
 
--- Diets (kosher-style etc.). A mark sits on a dish or on an ingredient. The mark words are not decided yet,
--- so `mark` is free text for now (josies-diets.md was not in the handoff).
+-- Diets: Vegan, Gluten free, Kosher-style. `key` is what orders store. Names stay honest: "Kosher-style" never
+-- "Kosher"; gluten free reads "gluten-free ingredients" unless Josie can guarantee no cross-contact.
 create table if not exists public.diets (
   id   uuid primary key default gen_random_uuid(),
+  key  text unique,
   name jsonb not null,
   sort int   not null default 0
 );
+insert into public.diets (key, name, sort) values
+  ('vegan',        '{"en":"Vegan","es":"Vegano"}', 1),
+  ('gluten_free',  '{"en":"Gluten free","es":"Sin gluten"}', 2),
+  ('kosher_style', '{"en":"Kosher-style","es":"Estilo kosher"}', 3)
+on conflict (key) do nothing;
+
+-- Per ingredient and diet: yes / no. No row = not confirmed yet (Josie fills these in; the register treats
+-- an unconfirmed ingredient as fine and the admin gear lists what is still to confirm).
 create table if not exists public.diet_marks (
-  id            uuid primary key default gen_random_uuid(),
   diet_id       uuid not null references public.diets(id) on delete cascade,
-  item_id       uuid references public.items(id) on delete cascade,
-  ingredient_id uuid references public.ingredients(id) on delete cascade,
-  mark          text not null default 'fits',
-  note          text,
-  check ((item_id is null) <> (ingredient_id is null))
+  ingredient_id uuid not null references public.ingredients(id) on delete cascade,
+  mark          text not null check (mark in ('yes','no')),
+  primary key (diet_id, ingredient_id)
 );
-create unique index if not exists diet_marks_item on public.diet_marks (diet_id, item_id) where item_id is not null;
-create unique index if not exists diet_marks_ing  on public.diet_marks (diet_id, ingredient_id) where ingredient_id is not null;
+
+-- Swaps. diet_id null = general (what to offer when the element is out of stock).
+-- diet_id set = what to offer for that diet; is_default is the one used automatically (one per element and diet).
+-- Options are only shown while the alternative's light is green.
+create table if not exists public.swaps (
+  id             bigint generated always as identity primary key,
+  element_id     uuid not null references public.ingredients(id) on delete cascade,
+  alternative_id uuid not null references public.ingredients(id) on delete cascade,
+  diet_id        uuid references public.diets(id) on delete cascade,
+  is_default     boolean not null default false,
+  sort           int  not null default 0,
+  check (element_id <> alternative_id),
+  check (not is_default or diet_id is not null)
+);
+create unique index if not exists swaps_unique on public.swaps
+  (element_id, alternative_id, coalesce(diet_id, '00000000-0000-0000-0000-000000000000'::uuid));
+create unique index if not exists swaps_one_default on public.swaps (element_id, diet_id) where is_default;
 
 -- Light changes, kept only so the day in review can say "what ran low". No person is recorded.
 create table if not exists public.ingredient_log (
@@ -243,7 +278,7 @@ language sql stable security definer set search_path = public as $$
         select jsonb_agg(jsonb_build_object('id', g.id, 'name', g.name, 'swaps', coalesce((
             select jsonb_agg(jsonb_build_object('id', a.id, 'name', a.name) order by s.sort)
             from public.swaps s join public.ingredients a on a.id = s.alternative_id
-            where s.element_id = g.id and a.light = 'green' and a.active), '[]')))
+            where s.element_id = g.id and s.diet_id is null and a.light = 'green' and a.active), '[]')))
         from public.dish_ingredients di join public.ingredients g on g.id = di.ingredient_id
         where di.item_id = i.id and g.kind = 'element' and g.light = 'red'), '[]')
   )), '{}'::jsonb)
@@ -251,47 +286,46 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 -- Josie's admin gear: one document in, upserted. Keys are all optional:
---   ingredients[], dish_ingredients[{item_id, ingredient_ids[]}] (replaces that dish's list), swaps[{element_id, alternative_ids[]}]
---   (replaces that element's list), diets[], diet_marks[], tables[]
+--   ingredients[], dish_ingredients[{item_id, rows[]}], swaps[{element_id, diet_id, rows[]}], diet_marks[]
+--   (shapes are noted inline below)
 create or replace function public.catalog_write(p_token uuid, p jsonb) returns void
 language plpgsql security definer set search_path = public as $$
 declare x jsonb;
 begin
   perform public.need_role(p_token, 'josie');
   for x in select * from jsonb_array_elements(coalesce(p -> 'ingredients', '[]')) loop
-    insert into public.ingredients (id, name, icon, kind, inventoried, location, required_check, active)
+    insert into public.ingredients (id, name, icon, kind, inventoried, location, required_check, active, meat, dairy)
     values (coalesce(nullif(x ->> 'id', '')::uuid, gen_random_uuid()), x -> 'name', x ->> 'icon',
             coalesce(x ->> 'kind', 'element'), coalesce((x ->> 'inventoried')::boolean, false),
             coalesce(x ->> 'location', 'other'), coalesce((x ->> 'required_check')::boolean, false),
-            coalesce((x ->> 'active')::boolean, true))
+            coalesce((x ->> 'active')::boolean, true),
+            coalesce((x ->> 'meat')::boolean, false), coalesce((x ->> 'dairy')::boolean, false))
     on conflict (id) do update set name = excluded.name, icon = excluded.icon, kind = excluded.kind,
       inventoried = excluded.inventoried, location = excluded.location, required_check = excluded.required_check,
-      active = excluded.active;
+      active = excluded.active, meat = excluded.meat, dairy = excluded.dairy;
   end loop;
   for x in select * from jsonb_array_elements(coalesce(p -> 'dish_ingredients', '[]')) loop
+    -- {item_id, rows:[{ingredient_id, is_core}]} replaces that dish's list
     delete from public.dish_ingredients where item_id = (x ->> 'item_id')::uuid;
-    insert into public.dish_ingredients (item_id, ingredient_id)
-    select (x ->> 'item_id')::uuid, v::uuid from jsonb_array_elements_text(x -> 'ingredient_ids') v;
+    insert into public.dish_ingredients (item_id, ingredient_id, is_core)
+    select (x ->> 'item_id')::uuid, (r ->> 'ingredient_id')::uuid, coalesce((r ->> 'is_core')::boolean, false)
+    from jsonb_array_elements(x -> 'rows') r;
   end loop;
   for x in select * from jsonb_array_elements(coalesce(p -> 'swaps', '[]')) loop
-    delete from public.swaps where element_id = (x ->> 'element_id')::uuid;
-    insert into public.swaps (element_id, alternative_id, sort)
-    select (x ->> 'element_id')::uuid, v.value::uuid, (v.ordinality)::int
-    from jsonb_array_elements_text(x -> 'alternative_ids') with ordinality v(value, ordinality);
-  end loop;
-  for x in select * from jsonb_array_elements(coalesce(p -> 'diets', '[]')) loop
-    insert into public.diets (id, name, sort)
-    values (coalesce(nullif(x ->> 'id', '')::uuid, gen_random_uuid()), x -> 'name', coalesce((x ->> 'sort')::int, 0))
-    on conflict (id) do update set name = excluded.name, sort = excluded.sort;
+    -- {element_id, diet_id|null, rows:[{alternative_id, is_default}]} replaces that element's list for that diet
+    delete from public.swaps where element_id = (x ->> 'element_id')::uuid
+      and diet_id is not distinct from nullif(x ->> 'diet_id', '')::uuid;
+    insert into public.swaps (element_id, alternative_id, diet_id, is_default, sort)
+    select (x ->> 'element_id')::uuid, (r.value ->> 'alternative_id')::uuid, nullif(x ->> 'diet_id', '')::uuid,
+           coalesce((r.value ->> 'is_default')::boolean, false), r.ordinality::int
+    from jsonb_array_elements(x -> 'rows') with ordinality r(value, ordinality);
   end loop;
   for x in select * from jsonb_array_elements(coalesce(p -> 'diet_marks', '[]')) loop
-    delete from public.diet_marks where diet_id = (x ->> 'diet_id')::uuid
-      and item_id is not distinct from nullif(x ->> 'item_id', '')::uuid
-      and ingredient_id is not distinct from nullif(x ->> 'ingredient_id', '')::uuid;
+    -- {diet_id, ingredient_id, mark:'yes'|'no'|''}  (empty mark = back to "not confirmed")
+    delete from public.diet_marks where diet_id = (x ->> 'diet_id')::uuid and ingredient_id = (x ->> 'ingredient_id')::uuid;
     if coalesce(x ->> 'mark', '') <> '' then
-      insert into public.diet_marks (diet_id, item_id, ingredient_id, mark, note)
-      values ((x ->> 'diet_id')::uuid, nullif(x ->> 'item_id', '')::uuid, nullif(x ->> 'ingredient_id', '')::uuid,
-              x ->> 'mark', nullif(x ->> 'note', ''));
+      insert into public.diet_marks (diet_id, ingredient_id, mark)
+      values ((x ->> 'diet_id')::uuid, (x ->> 'ingredient_id')::uuid, x ->> 'mark');
     end if;
   end loop;
 end $$;
@@ -322,7 +356,8 @@ alter table public.orders
   add column if not exists phase         text not null default 'open' check (phase in ('open','done')),
   add column if not exists completed_at  timestamptz,
   add column if not exists completed_by  uuid references public.people(id),
-  add column if not exists created_by    uuid references public.people(id);
+  add column if not exists created_by    uuid references public.people(id),
+  add column if not exists diets         text[] not null default '{}';   -- diet toggles on this order, e.g. {vegan,kosher_style}
 create index if not exists orders_stick on public.orders (stick_number) where stick_number is not null;
 create index if not exists orders_open  on public.orders (phase, created_at) where phase = 'open';
 
@@ -332,7 +367,10 @@ update public.orders set phase = 'done', completed_at = coalesce(paid_at, create
 update public.orders set phase = 'done', completed_at = coalesce(paid_at, created_at)
  where phase = 'open' and status = 'void';
 
--- Chips on a line: [{"type":"no","ingredient_id":…}, {"type":"add",…}, {"type":"swap","ingredient_id":…,"with_id":…}]
+-- Chips on a line, each optionally tagged with the diet that caused it (shown on the ticket and to the guest):
+--   {"type":"no","ingredient_id":…,"diet":"kosher_style"}  "no bacon · kosher-style"
+--   {"type":"swap","ingredient_id":…,"with_id":…,"diet":…}  "bacon → turkey"
+--   {"type":"add",…}  extra   ·   {"type":"back","ingredient_id":…}  non-compliant ingredient put back anyway
 alter table public.order_items
   add column if not exists chips      jsonb not null default '[]',
   add column if not exists stopped_at timestamptz;    -- stop/change after send: line is struck through, not deleted
@@ -368,9 +406,13 @@ create index if not exists ticket_alerts_live on public.ticket_alerts (station, 
 
 -- ═════════════════════════════ hours, cutoff, payroll ═════════════════════════════
 -- Hours and "closed today" already live in settings (hours, closed_until). Add the online cutoff.
--- NOTE: live hours are Tue–Sat 6:15–14:30 (closed Mon). The handoff says Mon–Sat; hours are data, so
--- change them in Manage › Money & hours, not here.
 alter table public.settings add column if not exists online_cutoff time not null default '14:00';
+-- Hours per the Oct 14 notes: Mon–Sat 6:15 am–2:30 pm, closed Sunday. (Was Tue–Sat.) Website Open and the
+-- 2 pm online cutoff both read these.
+update public.settings
+   set hours = '{"mon":"6:15-14:30","tue":"6:15-14:30","wed":"6:15-14:30","thu":"6:15-14:30","fri":"6:15-14:30","sat":"6:15-14:30","sun":"closed"}',
+       updated_at = now()
+ where id = 1;
 
 create table if not exists public.payroll_periods (
   id         uuid primary key default gen_random_uuid(),
@@ -437,7 +479,8 @@ grant select, insert, update, delete on public.sticks, public.order_pieces, publ
 
 revoke execute on function public.person_of(uuid)                      from public, anon, authenticated;
 revoke execute on function public.need_role(uuid, text)                from public, anon, authenticated;
-revoke execute on function public.sign_in(text, text)                  from public, anon;
+revoke execute on function public.people_names()                       from public, anon;
+revoke execute on function public.sign_in(uuid, text, text)            from public, anon;
 revoke execute on function public.sign_out(uuid)                       from public, anon;
 revoke execute on function public.my_settings(uuid, text, boolean)     from public, anon;
 revoke execute on function public.people_list(uuid)                    from public, anon;
@@ -446,7 +489,8 @@ revoke execute on function public.set_light(uuid, uuid, text)          from publ
 revoke execute on function public.set_dish_out(uuid, uuid, boolean)    from public, anon;
 revoke execute on function public.catalog_write(uuid, jsonb)           from public, anon;
 revoke execute on function public.dish_state()                         from public;
-grant  execute on function public.sign_in(text, text)                  to authenticated;
+grant  execute on function public.people_names()                       to authenticated;
+grant  execute on function public.sign_in(uuid, text, text)            to authenticated;
 grant  execute on function public.sign_out(uuid)                       to authenticated;
 grant  execute on function public.my_settings(uuid, text, boolean)     to authenticated;
 grant  execute on function public.people_list(uuid)                    to authenticated;
