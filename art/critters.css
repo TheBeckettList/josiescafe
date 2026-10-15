@@ -78,3 +78,10 @@
 .bc-bub { opacity: 0; }
 .bc-bub.on { -webkit-animation: bcBub 1.8s ease-out both; animation: bcBub 1.8s ease-out both; }
 @keyframes bcBub { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: .9; } 100% { opacity: 0; transform: translateY(-24px); } }
+
+.bc-ray.on { -webkit-animation: bcGlide 2.2s ease-in-out both; animation: bcGlide 2.2s ease-in-out both; -webkit-transform-origin: 50% 50%; transform-origin: 50% 50%; }
+@-webkit-keyframes bcGlide { 0%, 100% { -webkit-transform: translate(0, 0) rotate(0); } 50% { -webkit-transform: translate(26px, -12px) rotate(-4deg); } }
+@keyframes bcGlide { 0%, 100% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(26px, -12px) rotate(-4deg); } }
+.bc-moray.on { -webkit-animation: bcPeek 1.6s ease-in-out both; animation: bcPeek 1.6s ease-in-out both; -webkit-transform-origin: 50% 85%; transform-origin: 50% 85%; }
+@-webkit-keyframes bcPeek { 0%, 100% { -webkit-transform: scale(1); } 40% { -webkit-transform: scale(1.22) rotate(-5deg); } }
+@keyframes bcPeek { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.22) rotate(-5deg); } }
