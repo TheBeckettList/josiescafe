@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Josie's Cafe · Utila, Honduras</title>
+<meta name="description" content="Josie's Cafe in Utila, Honduras: coffee, breakfast and lunch from early morning. Menu and order ahead in many languages.">
+<meta name="theme-color" content="#FBF8F4">
+<link rel="apple-touch-icon" href="/img/app-icon-180.png">
+<link rel="icon" href="/img/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@600&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="/css/site.css">
+</head>
+<body data-page="home">
+<header class="top">
+  <div class="wrap flex center-y">
+    <a class="brandlink" href="/"><img src="/img/logo-full.png" alt="Josie's Cafe" width="42" height="56"></a>
+    <div class="flex center-y">
+      <nav class="nav" aria-label="Main">
+        <a href="/" class="home on" data-t="home">Home</a><a href="/menu/" data-t="menu">Menu</a><a href="/order/" class="cta"><span data-t="order">Order</span><span class="count" id="navCount" style="display:none">0</span></a>
+      </nav>
+      <label class="langpick"><span class="sr" data-t="lang">Language</span><select id="lang" aria-label="Language"></select></label>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="hero flex">
+      <div class="copy">
+        <h1 class="line"><span class="a" data-t="little">A little bit</span><span class="hand bounce" data-t="ofhome">of home.</span></h1>
+        <p id="status" class="status"><span class="dot"></span>&nbsp;</p>
+        <div id="closedNote" class="note" style="display:none"><span class="hand"></span></div>
+        <p class="lead" data-t="lead">Coffee&rsquo;s on before the sun is. Come as you are, sandy feet and all, and stay as long as you like.</p>
+        <div class="acts"><a class="btn" href="/order/" data-t="orderAhead">Order ahead</a><a class="btn soft" href="/menu/" data-t="seeMenu">See the menu</a></div>
+      </div>
+      <div class="art"><img src="/img/morning.svg" alt="" width="500" height="400"></div>
+    </section>
+    <section class="three flex">
+      <div><div class="tile"><img src="/img/tile-sunrise.svg" alt=""><h3 data-t="b1h">Before the boat</h3><p data-t="b1p">Order the night before. It&rsquo;ll be warm and waiting on your way to the dock.</p></div></div>
+      <div><div class="tile"><img src="/img/tile-umbrella.svg" alt=""><h3 data-t="b2h">Stay a while</h3><p data-t="b2p">Cool inside or breezy out, a chair or a picnic bench. Settle in and take your time.</p></div></div>
+      <div><div class="tile"><img src="/img/tile-table.svg" alt=""><h3 data-t="b3h">Lunch, too</h3><p data-t="b3p">Bagel sandwiches, chicken burgers, a big Caesar, and a Sunset smoothie to finish.</p></div></div>
+    </section>
+    <section class="visit flex">
+      <div>
+        <span class="kicker" data-t="hours">Hours</span>
+        <h2 data-t="hoursH">Mornings, mostly</h2>
+        <table class="hours"><tbody id="hours"></tbody></table>
+        <p class="muted small" style="margin-top:12px" data-t="hnTime">Honduras time. If anything changes, you&rsquo;ll see it here first.</p>
+      </div>
+      <div class="where">
+        <span class="kicker" data-t="find">Find us</span>
+        <h2 data-t="findH">Right by the ferry dock</h2>
+        <svg class="map" viewBox="0 0 520 360" role="img" aria-label="Map of Utila Bay: Josie's Cafe is at the land end of the ferry dock, on the ferry road just off Main Street">
+          <defs><clipPath id="mapclip"><rect width="520" height="360" rx="24"/></clipPath></defs>
+          <g clip-path="url(#mapclip)">
+            <rect width="520" height="360" fill="#FBEFE4"/>
+            <path d="M0,135 C60,105 120,92 190,100 C260,108 300,140 345,180 C400,228 460,280 520,320 L520,360 L0,360 Z" fill="#7FC6D6"/>
+            <path d="M0,135 C60,105 120,92 190,100 C260,108 300,140 345,180 C400,228 460,280 520,320" stroke="#B9E2EA" stroke-width="30" fill="none"/>
+            <path d="M0,135 C60,105 120,92 190,100 C260,108 300,140 345,180 C400,228 460,280 520,320 L520,0 L0,0 Z" fill="#FBEFE4"/>
+            <path d="M70,300 q14,-6 28,0 M150,250 q14,-6 28,0 M60,210 q12,-5 24,0" stroke="#FFFFFF" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/>
+            <g transform="translate(46,-58)">
+              <path id="mainst" d="M0,135 C60,105 120,92 190,100 C260,108 300,140 345,180 C400,228 460,280 520,320" stroke="#E9E1D8" stroke-width="16" fill="none" stroke-linecap="round"/>
+              <path d="M0,135 C60,105 120,92 190,100 C260,108 300,140 345,180 C400,228 460,280 520,320" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>
+            </g>
+            <path d="M345,180 L396.5,121.4" stroke="#E9E1D8" stroke-width="14" stroke-linecap="round"/>
+            <path d="M345,180 L396.5,121.4" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round"/>
+            <g transform="translate(345,180) rotate(41.3)">
+              <rect x="-13" y="-4" width="26" height="150" rx="4" fill="#F6F1EA" stroke="#D2C6BA" stroke-width="2"/>
+              <path d="M-13,24 h26 M-13,52 h26 M-13,80 h26 M-13,108 h26 M-13,136 h26" stroke="#D2C6BA" stroke-width="1.5"/>
+              <g transform="translate(34,58)">
+                <path d="M-11,0 Q0,-14 11,0 V66 Q0,74 -11,66 Z" fill="#FFFFFF" stroke="#E6DCD2" stroke-width="1.5"/>
+                <rect x="-6" y="14" width="12" height="30" rx="3" fill="#B9E2EA"/>
+                <path d="M-11,56 H11" stroke="#EC5C97" stroke-width="3"/>
+              </g>
+            </g>
+            <g transform="translate(30,34)" fill="#7A625B"><path d="M0,-12 l6,14 h-12 z"/><text y="16" font-size="11" font-weight="800" text-anchor="middle">N</text></g>
+            <ellipse cx="372" cy="191" rx="16" ry="4" fill="#3B2925" opacity=".14"/>
+            <rect x="367" y="22" width="10" height="169" rx="2" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="1.5"/>
+            <rect x="364" y="16" width="16" height="8" rx="2" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="1.5"/>
+            <rect x="272" y="25" width="105" height="8" rx="2" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="1.5"/>
+            <path d="M367,58 L343,33" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round"/>
+            <path d="M367,58 L343,33" stroke="#E2D7CC" stroke-width="1.1" stroke-linecap="round" opacity=".7"/>
+            <path d="M302,33 V58 M346,33 V46" stroke="#7A625B" stroke-width="1.5" stroke-dasharray="2.5 1.5"/>
+            <image href="/img/sign.png" x="280" y="42" width="84" height="108"/>
+          </g>
+        </svg>
+        <p class="findp" data-t="findP">Look for the pink sign.</p>
+        <p id="address">Utila, Honduras</p>
+        <p data-t="pay">Lempiras, dollars or card, whatever&rsquo;s in your pocket.</p>
+        <p><a class="btn soft" href="https://maps.google.com/?q=Josie%27s+Cafe+Utila+Honduras" target="_blank" rel="noopener" data-t="map">Open in Maps</a></p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="foot"><div class="wrap">© <span id="year">2026</span> Josie's Cafe · <span data-t="tagline">Coffee · Breakfast · Lunch</span> · Utila, Honduras</div></footer>
+
+<script src="/js/api.js"></script>
+<script src="/js/site.js"></script>
+</body>
+</html>

@@ -3,10 +3,12 @@ function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.
 (async function () {
   var h = await H.start({ reset: true });
   shim.psql("update settings set online_cutoff='23:59', online_orders=true");
-  var p = await h.page('/world/', { viewport: { width: 390, height: 800 }, touch: true, mobile: true, init: function () { try { localStorage.clear(); } catch (e) {} } });
+  var p = await h.page('/', { viewport: { width: 390, height: 800 }, touch: true, mobile: true, init: function () { try { localStorage.clear(); } catch (e) {} } });
   await p.waitForTimeout(1800);
   await p.screenshot({ path: '/tmp/claude-0/shots/w_phone_home.png' });
   ok((await p.locator('.mrow').count()) >= 1, 'menu rows (' + await p.locator('.mrow').count() + ')');
+  await p.click('[data-act="bayFlip"]'); await p.waitForTimeout(300); await p.screenshot({ path: '/tmp/claude-0/shots/w_bay.png' });
+  ok((await p.locator('.baylayer').count()) === 1, 'website flips to the bay map'); await p.click('[data-act="bayFlip"]'); await p.waitForTimeout(300);
   await p.click('.cat >> nth=1'); await p.waitForTimeout(200);
   await p.click('.mrow >> nth=1'); await p.waitForTimeout(300);
   await p.screenshot({ path: '/tmp/claude-0/shots/w_phone_dish.png' });
@@ -23,7 +25,7 @@ function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.
   await p.screenshot({ path: '/tmp/claude-0/shots/w_phone_status.png', fullPage: true });
   shim.psql("update orders set phase='done' where source='online'"); await p.waitForTimeout(5800);
   ok((await p.locator('.state').innerText()) === 'Picked up', 'status shows Picked up');
-  var p2 = await h.page('/world/', { viewport: { width: 1280, height: 900 }, init: function () { try { localStorage.clear(); } catch (e) {} } });
+  var p2 = await h.page('/', { viewport: { width: 1280, height: 900 }, init: function () { try { localStorage.clear(); } catch (e) {} } });
   await p2.waitForTimeout(1800); await p2.click('.mrow >> nth=1'); await p2.waitForTimeout(300);
   await p2.screenshot({ path: '/tmp/claude-0/shots/w_desk.png', fullPage: true });
   shim.psql("update settings set online_cutoff='00:01'"); await p2.evaluate(function () { }); await p2.reload(); await p2.waitForTimeout(1800);

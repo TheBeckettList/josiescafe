@@ -95,7 +95,7 @@
 
   /* an ingredient as a round dot (26px on tiles, bigger on tickets). state: in | no | swap | back | add */
   U.dot = function (ingId, state, size, withId) {
-    var s = size || 26, inner = J.ingIcon(ingId, Math.round(s * 0.7)), cls = 'dot ' + (state || 'in');
+    var s = size || 26, inner = J.ingIcon(ingId, Math.round(s * 0.92)), cls = 'dot ' + (state || 'in');
     var slash = state === 'no' || (state === 'swap');
     return '<span class="' + cls + '" style="width:' + s + 'px;height:' + s + 'px">' + (slash ? '<span class="dimmed">' + inner + '</span><i class="slash"></i>' : inner) +
       (state === 'swap' && withId ? '<b class="swapb">⇄</b>' : '') + (state === 'add' ? '<b class="plusb">+</b>' : '') + '</span>';

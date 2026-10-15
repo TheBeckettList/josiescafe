@@ -1,32 +1,15 @@
 {
-  "name": "Josie's POS",
-  "short_name": "Josie's POS",
+  "name": "Josie's",
+  "short_name": "Josie's",
   "start_url": "/pos/",
   "scope": "/pos/",
   "display": "standalone",
-  "background_color": "#FFF7F8",
+  "background_color": "#FCE3E8",
   "theme_color": "#FCE3E8",
   "icons": [
-    {
-      "src": "/img/app-icon-180.png",
-      "sizes": "180x180",
-      "type": "image/png"
-    },
-    {
-      "src": "/img/app-icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/img/app-icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "/img/app-icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "/img/app-icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/img/app-icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/img/app-icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/img/app-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

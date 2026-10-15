@@ -282,7 +282,7 @@
   function popDish(id) {
     var it = J.ix().itemById[id]; if (!it) { return pHead('', '', null); }
     var rows = J.ix().di[id] || [], key = U.dishKey(it), i, h = pHead(J.nm(it.name), '', 'menu') + '<div class="pb" data-scroll="dish"><div class="dishtop"><span class="mico big" style="background:' + U.menuBg(key) + '">' + ART.svg('menu', key, 56) + '</span><b>L' + Number(it.price) + '</b></div><div class="ingrows">';
-    for (i = 0; i < rows.length; i++) { h += '<div class="ingrow">' + J.ingIcon(rows[i].ingredient_id, 30) + '<span>' + esc(J.ingName(rows[i].ingredient_id)) + '</span>' + (J.light(rows[i].ingredient_id) !== 'green' ? '<i class="lt ' + J.light(rows[i].ingredient_id) + '"></i>' : '') + '</div>'; }
+    for (i = 0; i < rows.length; i++) { h += '<div class="ingrow">' + J.ingIcon(rows[i].ingredient_id, 40) + '<span>' + esc(J.ingName(rows[i].ingredient_id)) + '</span>' + (J.light(rows[i].ingredient_id) !== 'green' ? '<i class="lt ' + J.light(rows[i].ingredient_id) + '"></i>' : '') + '</div>'; }
     if (!rows.length) { h += '<p class="psub">No ingredients yet. Tap the gear to add them.</p>'; }
     h += '</div>' + (it.description ? '<p class="psub">' + esc(J.nm(it.description)) + '</p>' : '') + '</div>';
     return h;

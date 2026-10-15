@@ -43,14 +43,14 @@
   function chip(c, lang) {
     var name = c.ing && c.ing.name ? c.ing.name : '', h = '';
     if (c.type === 'no') {
-      h = '<span class="tv-chip no"><span class="tv-cd">' + slashed(c.ing.icon, 18) + '</span>' + esc(s(lang, 'no')) + ' ' + esc(name.toLowerCase()) + '</span>';
+      h = '<span class="tv-chip no"><span class="tv-cd">' + slashed(c.ing.icon, 26) + '</span>' + esc(s(lang, 'no')) + ' ' + esc(name.toLowerCase()) + '</span>';
     } else if (c.type === 'add') {
-      h = '<span class="tv-chip add"><span class="tv-cd">' + ico(c.ing.icon, 18) + '</span>+ ' + esc(name.toLowerCase()) + '</span>';
+      h = '<span class="tv-chip add"><span class="tv-cd">' + ico(c.ing.icon, 26) + '</span>+ ' + esc(name.toLowerCase()) + '</span>';
     } else if (c.type === 'swap') {
-      h = '<span class="tv-chip swap"><span class="tv-cd">' + slashed(c.ing.icon, 18) + '</span><b>&rarr;</b><span class="tv-cd">' + ico(c.with && c.with.icon, 18) + '</span>' +
+      h = '<span class="tv-chip swap"><span class="tv-cd">' + slashed(c.ing.icon, 26) + '</span><b>&rarr;</b><span class="tv-cd">' + ico(c.with && c.with.icon, 26) + '</span>' +
         esc(((c.with && c.with.name) || '').toLowerCase()) + '</span>';
     } else if (c.type === 'back') {
-      h = '<span class="tv-chip back"><span class="tv-cd">' + ico(c.ing.icon, 18) + '</span>' + esc(name.toLowerCase()) + '</span>';
+      h = '<span class="tv-chip back"><span class="tv-cd">' + ico(c.ing.icon, 26) + '</span>' + esc(name.toLowerCase()) + '</span>';
     }
     return h;
   }
