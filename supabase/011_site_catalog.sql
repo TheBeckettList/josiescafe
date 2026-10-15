@@ -8,6 +8,7 @@ begin
   return jsonb_build_object(
     'gate', public.online_gate(),
     'hours', s.hours, 'closed_note', s.closed_note, 'cutoff', s.online_cutoff,
+    'open_now', public.open_at(public.hn_now()), 'closed_until', s.closed_until,
     'categories', (select coalesce(jsonb_agg(jsonb_build_object('id', c.id, 'name', coalesce(c.name ->> lang, c.name ->> 'en'), 'en', c.name ->> 'en', 'station', c.station) order by c.sort), '[]')
                      from public.categories c where c.active and exists (select 1 from public.items i where i.category_id = c.id and i.active and i.show_online)),
     'items', (select coalesce(jsonb_agg(jsonb_build_object('id', i.id, 'category_id', i.category_id, 'name', coalesce(i.name ->> lang, i.name ->> 'en'), 'en', i.name ->> 'en',
