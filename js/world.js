@@ -300,7 +300,7 @@
   }, false);
   app.addEventListener('input', function (ev) { if (ev.target.id === 'gname') { W.name = ev.target.value; save(); } }, false);
   w.addEventListener('resize', function () { if (!W.sheet) { paint(); } }, false);
-  w.setInterval(function () { if (W.order && !W.sheet) { pollStatus(); } }, 5000);
+  w.setInterval(function () { if (W.order && !W.sheet) { pollStatus(); } }, 3000);
   w.setInterval(function () { if (!d.hidden && !W.sheet) { load(); } }, 60000);
   paint(); load(function () { if (W.order) { pollStatus(); } });
 }(window, document, window.JC));
