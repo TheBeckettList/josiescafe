@@ -98,35 +98,34 @@
   }
 
 
-  /* a building seen from above-ish: soft shadow, white walls, a coloured roof band, a little door */
-  function bldg(x, y, w, h, roof, rot) {
-    return '<g transform="translate(' + x + ',' + y + ') rotate(' + (rot || 0) + ')"><rect x="' + (-w / 2 + 2) + '" y="' + (-h / 2 + 3) + '" width="' + w + '" height="' + h + '" rx="3" fill="#3B2925" opacity=".12"/>' +
-      '<rect x="' + (-w / 2) + '" y="' + (-h / 2) + '" width="' + w + '" height="' + h + '" rx="3.5" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="1.6"/><rect x="' + (-w / 2) + '" y="' + (-h / 2) + '" width="' + w + '" height="' + (h * .42).toFixed(1) + '" rx="3.5" fill="' + roof + '"/>' +
-      '<rect x="' + (-w * .1).toFixed(1) + '" y="' + (h * .04).toFixed(1) + '" width="' + (w * .2).toFixed(1) + '" height="' + (h * .4).toFixed(1) + '" rx="1.5" fill="#C9A98F"/></g>';
+  /* a cottage seen from above: an organic roof with a ridge, a hint of wall on the shady side, a porch blob, a bush */
+  function bldg(x, y, w, h, roof, rot, seed) {
+    seed = seed || (Math.round(x * 3 + y * 7) % 90) + 3;
+    return '<g transform="translate(' + x + ',' + y + ') rotate(' + (rot || 0) + ')"><ellipse cx="2" cy="' + (h * .52).toFixed(1) + '" rx="' + (w * .56).toFixed(1) + '" ry="' + (h * .22).toFixed(1) + '" fill="#3B2925" opacity=".13"/>' +
+      '<path d="' + blob(0, 3, w * .5, h * .46, seed + 1, .1) + '" fill="#FFF8F0" stroke="#E2D7CC" stroke-width="1.4"/>' +
+      '<path d="' + blob(0, -1, w * .52, h * .44, seed, .13) + '" fill="' + roof + '" stroke="#FFFFFF" stroke-opacity=".6" stroke-width="1.2"/>' +
+      '<path d="M' + (-w * .34).toFixed(1) + ',-1 Q0,' + (-h * .1).toFixed(1) + ' ' + (w * .34).toFixed(1) + ',-1" stroke="#FFFFFF" stroke-opacity=".55" stroke-width="1.8" fill="none" stroke-linecap="round"/>' +
+      '<path d="' + blob(w * .12, h * .46, w * .14, h * .1, seed + 2, .2) + '" fill="#C9A98F"/></g>';
   }
   /* the town: a dense cluster on the north-west shore: shops in rows, a little church, a plaza with a palm */
   function town() {
-    var R = ['#F5B5C8', '#F2A66B', '#EAD9C5', '#F5B5C8', '#C9A98F', '#7FC6D6'], out = '', pts = [
-      [346, 30, 26, 19, 0], [374, 28, 24, 20, 2], [402, 30, 24, 19, -2],
-      [344, 54, 24, 20, -2], [372, 56, 26, 19, 3], [400, 56, 24, 20, 0],
-      [348, 80, 26, 19, 2], [378, 84, 22, 18, -3], [405, 82, 24, 19, 4],
-      [344, 102, 24, 16, 0], [372, 104, 24, 16, 3]
+    var R = ['#F5B5C8', '#F2A66B', '#EAD9C5', '#7FC6D6', '#C9A98F', '#F5B5C8', '#F2A66B'], out = '', pts = [
+      [350, 32, 32, 24, -4], [398, 36, 30, 22, 6], [362, 68, 30, 24, 3], [346, 100, 28, 22, -6], [392, 98, 30, 22, 5]
     ], i;
-    for (i = 0; i < pts.length; i++) { out += bldg(pts[i][0], pts[i][1], pts[i][2], pts[i][3], R[i % R.length], pts[i][4]); }
+    for (i = 0; i < pts.length; i++) { out += bldg(pts[i][0], pts[i][1], pts[i][2], pts[i][3], R[i % R.length], pts[i][4], 11 + i * 7); }
     /* the church: taller, with a bell tower and a cross, at the head of the little plaza */
-    out += '<g transform="translate(424,84) rotate(4)"><rect x="-13" y="-8" width="28" height="30" rx="3" fill="#3B2925" opacity=".12" transform="translate(2,3)"/><rect x="-13" y="-10" width="26" height="28" rx="3.5" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="1.6"/><rect x="-13" y="-10" width="26" height="9" rx="3" fill="#EAD9C5"/><rect x="-4" y="-22" width="8" height="12" rx="2" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="1.4"/><path d="M0,-30 v8 M-3,-27 h6" stroke="#B55573" stroke-width="1.8" stroke-linecap="round"/><rect x="-3" y="6" width="6" height="10" rx="3" fill="#C9A98F"/></g>';
+    out += '<g transform="translate(424,62) rotate(4)"><rect x="-13" y="-8" width="28" height="30" rx="3" fill="#3B2925" opacity=".12" transform="translate(2,3)"/><rect x="-13" y="-10" width="26" height="28" rx="3.5" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="1.6"/><rect x="-13" y="-10" width="26" height="9" rx="3" fill="#EAD9C5"/><rect x="-4" y="-22" width="8" height="12" rx="2" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="1.4"/><path d="M0,-30 v8 M-3,-27 h6" stroke="#B55573" stroke-width="1.8" stroke-linecap="round"/><rect x="-3" y="6" width="6" height="10" rx="3" fill="#C9A98F"/></g>';
     /* plaza, a palm, a bush or two */
-    out += '<ellipse cx="392" cy="106" rx="12" ry="7" fill="#FBEFE4"/>' + palm(394, 108, .3) + '<circle cx="330" cy="44" r="4.5" fill="#7DBE9C"/><circle cx="332" cy="92" r="5" fill="#7DBE9C"/><circle cx="420" cy="58" r="4" fill="#97D0B1"/>';
+    out += '<ellipse cx="396" cy="72" rx="13" ry="7.5" fill="#FBEFE4"/>' + palm(398, 74, .3) + '<circle cx="328" cy="48" r="4.5" fill="#7DBE9C"/><circle cx="332" cy="86" r="5" fill="#7DBE9C"/><circle cx="378" cy="50" r="3.6" fill="#97D0B1"/><circle cx="424" cy="104" r="4.4" fill="#97D0B1"/>';
     return out;
   }
   /* the houses: a tight little neighbourhood on the east shore, set back from the road, with yards */
   function neighbourhood() {
-    var R = ['#F5B5C8', '#F2A66B', '#EAD9C5', '#C9A98F', '#7FC6D6', '#F5B5C8', '#F2A66B', '#EAD9C5'], out = '', pts = [
-      [716, 262, 26, 20, 8], [748, 276, 24, 20, -6], [722, 300, 24, 20, 4], [754, 312, 26, 20, 10],
-      [722, 338, 26, 20, -4], [752, 350, 24, 20, 6], [730, 378, 24, 20, 2], [758, 392, 24, 18, -8]
+    var R = ['#F5B5C8', '#F2A66B', '#7FC6D6', '#EAD9C5', '#F5B5C8'], out = '', pts = [
+      [718, 270, 30, 23, 10], [752, 304, 28, 22, -8], [722, 344, 30, 24, 5], [756, 380, 28, 22, -6], [728, 414, 26, 20, 8]
     ], i;
-    for (i = 0; i < pts.length; i++) { out += bldg(pts[i][0], pts[i][1], pts[i][2], pts[i][3], R[i], pts[i][4]); }
-    out += '<circle cx="738" cy="290" r="5" fill="#7DBE9C"/><circle cx="739" cy="364" r="5.5" fill="#7DBE9C"/><circle cx="772" cy="338" r="5" fill="#97D0B1"/><circle cx="706" cy="318" r="4.5" fill="#97D0B1"/>';
+    for (i = 0; i < pts.length; i++) { out += bldg(pts[i][0], pts[i][1], pts[i][2], pts[i][3], R[i], pts[i][4], 41 + i * 5); }
+    out += '<circle cx="740" cy="288" r="5" fill="#7DBE9C"/><circle cx="728" cy="322" r="4.6" fill="#97D0B1"/><circle cx="772" cy="344" r="5.4" fill="#7DBE9C"/><circle cx="744" cy="404" r="4.6" fill="#97D0B1"/>';
     return out;
   }
   /* a dive boat moored to its buoy: a short rope, one flag (on the boat) */
@@ -198,9 +197,9 @@
       '</g>';
     /* the little things, drawn upright in map coordinates */
     h += '<g class="bc bc-sail" data-crit="sail">' + sail(X(1125), Y(1125, 745), 0.46, '#EC5C97') + '</g><g class="bc bc-sail" data-crit="sail">' + sail(X(1178), Y(1178, 786), 0.44, '#F2A66B') + '</g><g class="bc bc-sail" data-crit="sail">' + sail(X(1120), Y(1120, 822), 0.42, '#7FC6D6') + '</g>';
-    /* one cluster of reef fish on the big reef beside the pier */
-    h += '<g data-crit="fish">' + school(436, 408, '#F5B5C8', 4, 20, 8) + school(486, 416, '#F2A66B', 4, 20, -10) + school(452, 446, '#7FC6D6', 4, 20, 172) + school(494, 448, '#EC5C97', 3, 16, 6) + school(430, 440, '#F7D365', 3, 16, -6) + school(470, 392, '#B79BE0', 3, 14, 12) +
-      fish(458, 428, 1.25, -8, '#F7D365') + fish(480, 436, 1.1, 170, '#EC5C97') + '</g>';
+    /* one cluster of reef fish, on the south reef, well away from the dock */
+    h += '<g data-crit="fish">' + school(436, 524, '#F5B5C8', 3, 16, 8) + school(468, 530, '#F2A66B', 3, 16, -10) + school(450, 552, '#7FC6D6', 3, 16, 172) + school(480, 550, '#EC5C97', 2, 12, 6) +
+      fish(452, 538, 1.2, -8, '#F7D365') + fish(470, 543, 1.05, 170, '#EC5C97') + '</g>';
     var ox = 266, oy = 360, bx = 150, by = 418;
     /* the cluster over the little reef: two octopus, a spotted eagle ray gliding past, a moray looking out of its rock */
     h += '<g class="bc bc-oct" data-crit="octopus">' + octopus(ox, oy, 0.5) + '<g class="bc-ink" data-crit="octopus"><circle cx="' + (ox - 12) + '" cy="' + (oy + 6) + '" r="7" fill="#7A5A8D"/><circle cx="' + (ox + 11) + '" cy="' + (oy + 8) + '" r="8" fill="#7A5A8D"/><circle cx="' + ox + '" cy="' + (oy + 16) + '" r="6" fill="#8B6A9C"/></g></g>' +
@@ -214,9 +213,9 @@
     /* the two clusters of buildings */
     h += town() + neighbourhood();
     /* chairs on Bando Beach */
-    h += umbrella(572, 548, '#EC5C97') + umbrella(606, 538, '#F2A66B') + umbrella(640, 552, '#7FC6D6') +
-      chair(556, 566, '#7FC6D6', -10) + chair(576, 572, '#F2A66B', 6) + chair(594, 560, '#EC5C97', -4) + chair(614, 564, '#F5B5C8', 8) + chair(628, 570, '#EC5C97', -6) + chair(648, 566, '#F2A66B', 4) + chair(664, 560, '#7FC6D6', 10) +
-      '<rect x="580" y="580" width="22" height="9" rx="3" fill="#FFFFFF" stroke="#F5B5C8" stroke-width="2" transform="rotate(-6 591 584)"/><rect x="620" y="582" width="20" height="8" rx="3" fill="#7FC6D6" opacity=".9" transform="rotate(4 630 586)"/>';
+    h += umbrella(574, 546, '#EC5C97') + umbrella(632, 548, '#7FC6D6') +
+      chair(558, 566, '#7FC6D6', -10) + chair(584, 570, '#F2A66B', 6) + chair(612, 562, '#EC5C97', -4) + chair(638, 568, '#F5B5C8', 8) + chair(662, 562, '#F2A66B', 4) +
+      '<rect x="592" y="581" width="22" height="9" rx="4" fill="#FFFFFF" stroke="#F5B5C8" stroke-width="2" transform="rotate(-6 603 585)"/>';
     h += '<g transform="translate(860,50)" fill="#7A625B"><path d="M0,-20 l9,22 h-18 z"/><text y="22" font-size="16" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">N</text></g>';
     /* Josie's hanging sign, oversized, on the land beside the dock end: a tall post with a long arm */
     h += '<g transform="translate(-60,0)"><ellipse cx="645" cy="233" rx="28" ry="7" fill="#3B2925" opacity=".14"/>' +
