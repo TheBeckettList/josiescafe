@@ -12,7 +12,7 @@
   /* the bay's coast: west shore, north shore past Josie's pier, down the east shore to Bando Beach */
   var COAST = [[-400, 1110], [-100, 1020], [0, 965], [100, 905], [190, 825], [260, 745], [330, 690], [400, 640], [460, 590], [500, 545], [560, 490], [620, 462], [700, 445], [800, 435], [900, 432], [990, 448], [1050, 480], [1085, 518], [1120, 548], [1170, 592], [1215, 642], [1250, 702], [1268, 762], [1272, 822], [1255, 882], [1230, 936], [1195, 976], [1155, 1006], [1125, 1032]];
   var TOWN = COAST.slice(10, 27);
-  var ROADPTS = COAST.slice(9, 28);
+  var ROADPTS = COAST.slice(9, 26);
   function smooth(p) {
     var d = 'M' + p[0][0] + ',' + p[0][1], i, mx, my;
     for (i = 1; i < p.length - 1; i++) { mx = (p[i][0] + p[i + 1][0]) / 2; my = (p[i][1] + p[i + 1][1]) / 2; d += ' Q' + p[i][0] + ',' + p[i][1] + ' ' + mx.toFixed(1) + ',' + my.toFixed(1); }
@@ -96,6 +96,13 @@
       '<path d="M38,4 V-30" stroke="#7A625B" stroke-width="2.4"/><path d="M38,-30 h22 v14 h-22 z" fill="#E24D5C"/><path d="M38,-30 L60,-16" stroke="#FFFFFF" stroke-width="3.4"/>' +
       '<circle cx="-70" cy="30" r="3" fill="#FFFFFF" opacity=".8"/><circle cx="-78" cy="38" r="2.2" fill="#FFFFFF" opacity=".7"/></g>';
   }
+
+  function chair(x, y, col, rot) {
+    return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(1.5)"><rect x="-5" y="-3" width="10" height="9" rx="2.5" fill="' + col + '"/><rect x="-5" y="-9" width="10" height="7" rx="2.5" fill="#FFFFFF" stroke="' + col + '" stroke-width="1.6"/><path d="M-5,0 h10" stroke="#FFFFFF" stroke-width="1.4"/><rect x="-6" y="5" width="2" height="4" rx="1" fill="#B98C66"/><rect x="4" y="5" width="2" height="4" rx="1" fill="#B98C66"/></g>';
+  }
+  function umbrella(x, y, col) {
+    return '<g transform="translate(' + x + ',' + y + ') scale(1.4)"><ellipse cx="0" cy="14" rx="14" ry="3.4" fill="#3B2925" opacity=".12"/><rect x="-1" y="-6" width="2" height="20" rx="1" fill="#B98C66"/><path d="M-17,-5 Q0,-26 17,-5 Z" fill="' + col + '"/><path d="M-17,-5 Q-9,-12 0,-5 Q9,-12 17,-5" fill="#FFFFFF" opacity=".85"/></g>';
+  }
   function bush(x, y, r) { return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#7DBE9C"/><circle cx="' + (x - r * .35) + '" cy="' + (y - r * .3) + '" r="' + r * .55 + '" fill="#97D0B1"/>'; }
   function sail(x, y, s, col) {
     return '<g transform="translate(' + x + ',' + y + ') scale(' + s + ')">' +
@@ -126,7 +133,8 @@
         '<path d="' + blob(1710, 470, 55, 75, 18, .2) + '" fill="#BEE5EA"/>' +
         '<path d="' + shoreLandD + '" stroke="#FBEFE4" stroke-width="70" fill="none" opacity=".85"/>' +
         '<path d="M1180,1062 Q1300,1100 1440,1108 Q1560,1090 1660,1030 Q1780,950 1840,830 Q1900,700 1925,560 Q1945,400 1960,200" stroke="#FBEFE4" stroke-width="40" fill="none" stroke-linecap="round" opacity=".9"/>' +
-        houses() + palm(1250, 1060, 1.5) + palm(1180, 1072, 1.25) + palm(1335, 1078, 1.35) +
+        '<path d="' + blob(1128, 1040, 100, 56, 33, .12) + '" fill="#DDF3F7" opacity=".9"/><path d="' + blob(1126, 1036, 84, 44, 34, .1) + '" fill="#FBEFE4"/><path d="' + blob(1124, 1034, 62, 30, 35, .1) + '" fill="#FFF6EA"/>' +
+        houses() + palm(1290, 1070, 1.5) + palm(1350, 1086, 1.3) +
         '<path d="' + coastD + '" stroke="#FFFFFF" stroke-width="10" fill="none" stroke-dasharray="3 26" stroke-linecap="round" opacity=".9"/>' +
         '<path d="' + roadD + '" stroke="#E9E1D8" stroke-width="64" fill="none" stroke-linecap="round"/><path d="' + roadD + '" stroke="#FFFFFF" stroke-width="50" fill="none" stroke-linecap="round"/><path d="' + roadD + '" stroke="#F5C9D6" stroke-width="6" fill="none" stroke-dasharray="38 34"/>' +
         /* waves */
@@ -144,6 +152,8 @@
     h += '<g>' + sail(X(1125), Y(1125, 745), 0.46, '#EC5C97') + sail(X(1178), Y(1178, 786), 0.44, '#F2A66B') + sail(X(1120), Y(1120, 822), 0.42, '#7FC6D6') + '</g>';
     h += school(X(822), Y(822, 506), '#F5B5C8', 4, 22, 10) + school(X(930), Y(930, 860), '#F2A66B', 5, 26, -8) + school(X(940), Y(940, 880), '#7FC6D6', 3, 16, 170) + school(X(905), Y(905, 1045), '#EC5C97', 4, 22, 6) + school(X(962), Y(962, 636), '#F2A66B', 3, 16, -4) + school(X(1260), Y(1260, 1152), '#7FC6D6', 4, 22, -6);
     h += octopus(X(610), Y(610, 765) - 6, 0.5) + buoy(X(528), Y(528, 722), 0.55) + diveBoat(X(425), Y(425, 842), 0.5);
+    /* chairs on Bando Beach */
+    h += umbrella(X(1142) + 2, Y(1142, 1038) - 4, '#EC5C97') + chair(X(1100), Y(1100, 1046), '#7FC6D6', -8) + chair(X(1117), Y(1117, 1056), '#F2A66B', 6) + chair(X(1160), Y(1160, 1052), '#EC5C97', -4) + chair(X(1086), Y(1086, 1030), '#F5B5C8', -14);
     h += '<g transform="translate(860,50)" fill="#7A625B"><path d="M0,-20 l9,22 h-18 z"/><text y="22" font-size="16" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">N</text></g>';
     /* Josie's hanging sign, oversized, on the land beside the dock end: a tall post with a long arm */
     h += '<g transform="translate(-60,0)"><ellipse cx="645" cy="233" rx="28" ry="7" fill="#3B2925" opacity=".14"/>' +
