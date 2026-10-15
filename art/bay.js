@@ -1,23 +1,23 @@
 /* Josie's World · the bay map for the website's home page, drawn from the real shape of Utila's bay (traced from the satellite view):
-   the town and road along the north and east shore, the reef flats to the south, Josie's at the ferry dock. North is up. The pier and
-   the hanging sign are drawn oversized; the boats are small. Plain ES5. */
+   the town and road along the north and east shore, Bando Beach and the reef flat that closes the bay to the south, the spit running out to
+   Point Pool, and the open sea beyond. North is up. The pier and the hanging sign are drawn oversized; the boats are small. Plain ES5. */
 (function (w) {
   'use strict';
-  /* picture coordinates (the satellite view, 1914 x 1326) -> map design box (1440 x 1240): north up, scaled K, nudged right */
-  var K = 0.56, OX = 130, OY = 50;
+  /* picture coordinates (the satellite view, 2000 x 1281) -> map design box (1440 x 1240) */
+  var K = 0.6, OX = -94, OY = -90;
   function X(x) { return +(K * x + OX).toFixed(1); }
   function Y(x, y) { return +(K * y + OY).toFixed(1); }
   var G = 'translate(' + OX + ',' + OY + ') scale(' + K + ')';
 
-  /* the coast, traced along the red line: north shore (left to right), then down the east shore, then round to the reef */
-  var COAST = [[-500, 560], [10, 400], [100, 330], [200, 250], [300, 160], [400, 120], [520, 85], [650, 70], [760, 80], [870, 95], [1000, 105], [1080, 125], [1140, 170], [1200, 215], [1280, 270], [1340, 340], [1380, 430], [1392, 560], [1386, 680], [1370, 780], [1345, 845], [1352, 940], [1285, 1020], [1200, 1075], [1160, 1082], [1060, 1100], [960, 1150], [850, 1200], [740, 1232]];
-  function smooth(p, close) {
+  /* the bay's coast: west shore, north shore past Josie's pier, down the east shore to Bando Beach */
+  var COAST = [[-400, 1110], [-100, 1020], [0, 965], [100, 905], [190, 825], [260, 745], [330, 690], [400, 640], [460, 590], [500, 545], [560, 490], [620, 462], [700, 445], [800, 435], [900, 432], [990, 448], [1050, 480], [1085, 518], [1120, 548], [1170, 592], [1215, 642], [1250, 702], [1268, 762], [1272, 822], [1255, 882], [1230, 936], [1195, 976], [1155, 1006], [1125, 1032]];
+  var TOWN = COAST.slice(10, 27);
+  var ROADPTS = COAST.slice(9, 28);
+  function smooth(p) {
     var d = 'M' + p[0][0] + ',' + p[0][1], i, mx, my;
     for (i = 1; i < p.length - 1; i++) { mx = (p[i][0] + p[i + 1][0]) / 2; my = (p[i][1] + p[i + 1][1]) / 2; d += ' Q' + p[i][0] + ',' + p[i][1] + ' ' + mx.toFixed(1) + ',' + my.toFixed(1); }
-    d += ' L' + p[p.length - 1][0] + ',' + p[p.length - 1][1];
-    return d;
+    return d + ' L' + p[p.length - 1][0] + ',' + p[p.length - 1][1];
   }
-  /* a line parallel to the coast, pushed toward the land by `off` */
   function offset(p, off) {
     var out = [], i, a, b, tx, ty, l;
     for (i = 0; i < p.length; i++) {
@@ -26,12 +26,15 @@
     }
     return out;
   }
-  var coastD = smooth(COAST), roadD = smooth(offset(COAST.slice(1, 23), 62)), shoreLandD = smooth(offset(COAST, 14));
-  var WATER = coastD + ' L740,1232 L-500,1232 Z';
+  var coastD = smooth(COAST), roadD = smooth(offset(ROADPTS, 78)), shoreLandD = smooth(offset(COAST, 16));
+  /* land: everything north and east of the coast, round the spit to Point Pool and up the ocean side */
+  var LAND = coastD + ' L1180,1062 Q1300,1100 1440,1108 Q1560,1090 1660,1030 Q1780,950 1840,830 Q1900,700 1925,560 Q1945,400 1960,200 L1990,-500 L-400,-500 Z';
+  var WATERCLIP = coastD + ' L1125,1032 L600,1190 L-400,1320 Z';
+  var REEFFLAT = 'M1125,1032 Q1000,1085 880,1128 Q760,1160 640,1196 L600,1226 Q780,1206 930,1218 Q1100,1226 1270,1198 Q1420,1168 1530,1128 Q1620,1090 1670,1040 L1440,1108 Q1300,1100 1180,1062 Z';
 
   /* little town: a few small houses with pink and cream roofs, set back from the road, in groups with gaps */
   function houses() {
-    var out = '', pts = COAST.slice(2, 23), i, j, a, b, n, px, py, t, tx, ty, l, k, hsh, roofs = ['#F5B5C8', '#F2A66B', '#EAD9C5', '#F5B5C8', '#C9A98F'], ang;
+    var out = '', pts = TOWN, i, j, a, b, n, px, py, t, tx, ty, l, k, hsh, roofs = ['#F5B5C8', '#F2A66B', '#EAD9C5', '#F5B5C8', '#C9A98F'], ang;
     for (i = 0; i < pts.length - 1; i++) {
       a = pts[i]; b = pts[i + 1]; tx = b[0] - a[0]; ty = b[1] - a[1]; l = Math.sqrt(tx * tx + ty * ty); n = Math.max(1, Math.floor(l / 70));
       ang = (Math.atan2(ty, tx) * 57.3).toFixed(0);
@@ -46,6 +49,7 @@
     }
     return out;
   }
+
   /* a soft organic blob (deterministic): used for reef patches, mangroves and the lagoon */
   function blob(cx, cy, rx, ry, seed, irr) {
     var n = 11, pts = [], i, a, r, k = seed * 9301 + 49297;
@@ -101,61 +105,62 @@
       '<path d="M5,-84 L5,-5 L42,-5 Z" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="2.5" stroke-linejoin="round"/>' +
       '<path d="M-5,-74 L-5,-5 L-30,-5 Z" fill="' + col + '" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/><path d="M0,-88 l16,5 l-16,5 z" fill="' + col + '"/></g>';
   }
+
   function content() {
-    var h = '<rect x="-700" y="-900" width="3000" height="3200" fill="#F7DCC4"/>' +
+    var h = '<defs><linearGradient id="seag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93D1E2"/><stop offset=".55" stop-color="#85C8DC"/><stop offset="1" stop-color="#6DB5D0"/></linearGradient></defs>' +
+      '<rect x="-700" y="-900" width="3000" height="3200" fill="url(#seag)"/>' +
       '<g transform="' + G + '">' +
-        /* land: mangrove green far in, then the town */
-        '<path d="' + blob(1700, 700, 330, 520, 4, .16) + '" fill="#9BCDAB"/><path d="' + blob(1690, 700, 270, 440, 5, .18) + '" fill="#86C09B"/><path d="' + blob(1585, 735, 115, 150, 6, .2) + '" fill="#BEE5EA"/><path d="' + blob(1585, 735, 90, 120, 7, .2) + '" fill="#A5D8E2"/>' +
-        '<path d="' + blob(1560, 140, 210, 110, 8, .2) + '" fill="#9BCDAB"/><path d="' + blob(1000, -60, 230, 90, 9, .2) + '" fill="#A9D6B5"/><path d="' + blob(520, -40, 190, 80, 10, .2) + '" fill="#A9D6B5"/>' +
-        '<path d="' + blob(1560, 1010, 150, 90, 11, .2) + '" fill="#9BCDAB"/>' +
-        palm(1330, 1030, 1.1) + palm(1260, 1065, .9) + palm(1395, 985, .95) +
-        '<path d="' + shoreLandD + '" stroke="#FBEFE4" stroke-width="64" fill="none" opacity=".8"/>' +
-        houses() +
-        /* the outer reef sea to the south */
-        '<path d="M-500,1232 L740,1232 L900,1250 L1200,1235 L1500,1195 L1780,1138 L2400,1138 L2400,1900 L-500,1900 Z" fill="#B7E7DE"/>' +
-        '<path d="M740,1232 L900,1250 L1200,1235 L1500,1195 L1780,1138" stroke="#FBEFE4" stroke-width="40" fill="none" stroke-linecap="round"/>' +
-        /* the bay */
-        '<clipPath id="bayclip"><path d="' + WATER + '"/></clipPath><path d="' + WATER + '" fill="#8FCFE0"/>' +
-        '<g clip-path="url(#bayclip)"><path d="' + coastD + '" stroke="#C6E9F0" stroke-width="150" fill="none"/><path d="' + coastD + '" stroke="#DDF3F7" stroke-width="64" fill="none"/>' +
-          reef(470, 320, 150, 105, 21) + reef(850, 770, 170, 150, 31) + reef(255, 600, 110, 62, 41) + reef(235, 930, 130, 200, 51) + reef(770, 1150, 230, 80, 61) + reef(880, 440, 100, 62, 71) +
-          reef(1020, 1010, 70, 45, 81) + reef(560, 960, 60, 40, 91) + '</g>' +
+        /* reef flat that closes the bay to the south, and the shallows round the shore */
+        '<path d="' + REEFFLAT + '" fill="#B9E7E1"/><path d="M1090,1070 Q990,1100 880,1140 Q770,1172 680,1202 Q800,1196 940,1206 Q1100,1214 1250,1186 Q1400,1156 1500,1116 Q1590,1080 1640,1044 Q1500,1100 1440,1112 Q1300,1100 1200,1072 Z" fill="#9ADDD3"/>' +
+        '<ellipse cx="900" cy="1160" rx="190" ry="26" fill="#C9EEDF" opacity=".8"/><ellipse cx="1260" cy="1150" rx="150" ry="22" fill="#C9EEDF" opacity=".7"/><ellipse cx="760" cy="1190" rx="110" ry="18" fill="#C9EEDF" opacity=".7"/>' +
+        '<clipPath id="bayclip"><path d="' + WATERCLIP + '"/></clipPath>' +
+        '<g clip-path="url(#bayclip)"><path d="' + coastD + '" stroke="#C6E9F0" stroke-width="170" fill="none"/><path d="' + coastD + '" stroke="#DDF3F7" stroke-width="72" fill="none"/>' +
+          reef(822, 506, 70, 42, 21) + reef(962, 636, 58, 38, 31) + reef(930, 860, 92, 78, 41) + reef(560, 890, 52, 128, 51) + reef(905, 1045, 72, 46, 61) + reef(610, 765, 84, 48, 71) + reef(380, 960, 70, 40, 81) +
+        '</g>' +
+        /* land */
+        '<path d="' + LAND + '" fill="#F7DCC4"/>' +
+        '<path d="' + blob(1620, 560, 300, 470, 4, .14) + '" fill="#9BCDAB"/><path d="' + blob(1610, 560, 235, 400, 5, .16) + '" fill="#86C09B"/><path d="' + blob(1450, 980, 190, 80, 12, .18) + '" fill="#9BCDAB"/>' +
+        '<path d="' + blob(300, 140, 420, 190, 8, .16) + '" fill="#A9D6B5"/><path d="' + blob(1020, -100, 360, 150, 9, .16) + '" fill="#A9D6B5"/><path d="' + blob(1600, 150, 280, 150, 13, .16) + '" fill="#9BCDAB"/>' +
+        '<path d="' + blob(1590, 175, 120, 92, 14, .2) + '" fill="#BEE5EA"/><path d="' + blob(1590, 175, 92, 70, 15, .2) + '" fill="#A5D8E2"/>' +
+        '<path d="' + blob(1400, 905, 98, 66, 16, .2) + '" fill="#BEE5EA"/><path d="' + blob(1400, 905, 72, 46, 17, .2) + '" fill="#A5D8E2"/>' +
+        '<path d="' + blob(1710, 470, 55, 75, 18, .2) + '" fill="#BEE5EA"/>' +
+        '<path d="' + shoreLandD + '" stroke="#FBEFE4" stroke-width="70" fill="none" opacity=".85"/>' +
+        '<path d="M1180,1062 Q1300,1100 1440,1108 Q1560,1090 1660,1030 Q1780,950 1840,830 Q1900,700 1925,560 Q1945,400 1960,200" stroke="#FBEFE4" stroke-width="40" fill="none" stroke-linecap="round" opacity=".9"/>' +
+        houses() + palm(1250, 1060, 1.5) + palm(1180, 1072, 1.25) + palm(1335, 1078, 1.35) +
         '<path d="' + coastD + '" stroke="#FFFFFF" stroke-width="10" fill="none" stroke-dasharray="3 26" stroke-linecap="round" opacity=".9"/>' +
-        /* the road along the shore */
         '<path d="' + roadD + '" stroke="#E9E1D8" stroke-width="64" fill="none" stroke-linecap="round"/><path d="' + roadD + '" stroke="#FFFFFF" stroke-width="50" fill="none" stroke-linecap="round"/><path d="' + roadD + '" stroke="#F5C9D6" stroke-width="6" fill="none" stroke-dasharray="38 34"/>' +
+        /* waves */
+        '<path d="M700,680 q22,-10 44,0 M470,700 q22,-10 44,0 M760,930 q22,-10 44,0 M1010,990 q22,-10 44,0 M1120,640 q22,-10 44,0 M300,1000 q22,-10 44,0 M640,560 q22,-10 44,0 M1000,780 q22,-10 44,0 M200,1100 q22,-10 44,0 M1500,1220 q22,-10 44,0" stroke="#FFFFFF" stroke-width="7" fill="none" stroke-linecap="round" opacity=".8"/>' +
         /* the ferry pier, oversized: the pink end is the land end */
-        '<g transform="translate(1062,170) rotate(30.2)"><rect x="-58" y="-6" width="116" height="560" rx="12" fill="#3B2925" opacity=".1" transform="translate(26,26)"/>' +
-          '<rect x="-65" y="-10" width="130" height="560" rx="12" fill="#F6F1EA" stroke="#D2C6BA" stroke-width="7"/>' +
-          '<path d="M-65,50 h130 M-65,100 h130 M-65,150 h130 M-65,200 h130 M-65,250 h130 M-65,300 h130 M-65,350 h130 M-65,400 h130 M-65,450 h130 M-65,500 h130" stroke="#D2C6BA" stroke-width="4"/>' +
-                    '<rect x="-65" y="-10" width="130" height="36" rx="10" fill="#F5B5C8"/>' +
-          '<g fill="#CDBFB0" stroke="#B9AB9C" stroke-width="3"><circle cx="-65" cy="140" r="12"/><circle cx="65" cy="140" r="12"/><circle cx="-65" cy="300" r="12"/><circle cx="65" cy="300" r="12"/><circle cx="-65" cy="460" r="12"/><circle cx="65" cy="460" r="12"/><circle cx="-65" cy="548" r="12"/><circle cx="65" cy="548" r="12"/></g>' +
-          '<g transform="translate(-118,230) scale(3.4)"><path d="M-11,0 Q0,-14 11,0 V66 Q0,74 -11,66 Z" fill="#FFFFFF" stroke="#E6DCD2" stroke-width="1.5"/><rect x="-6" y="14" width="12" height="30" rx="3" fill="#B9E2EA"/><path d="M-11,56 H11" stroke="#EC5C97" stroke-width="3"/></g>' +
+        '<g transform="translate(1086,520) rotate(30)"><rect x="-44" y="-4" width="96" height="360" rx="10" fill="#3B2925" opacity=".1" transform="translate(22,22)"/>' +
+          '<rect x="-48" y="-8" width="96" height="360" rx="10" fill="#F6F1EA" stroke="#D2C6BA" stroke-width="6"/>' +
+          '<path d="M-48,32 h96 M-48,66 h96 M-48,100 h96 M-48,134 h96 M-48,168 h96 M-48,202 h96 M-48,236 h96 M-48,270 h96 M-48,304 h96" stroke="#D2C6BA" stroke-width="3.5"/>' +
+          '<rect x="-48" y="-8" width="96" height="30" rx="8" fill="#F5B5C8"/>' +
+          '<g fill="#CDBFB0" stroke="#B9AB9C" stroke-width="3"><circle cx="-48" cy="90" r="9"/><circle cx="48" cy="90" r="9"/><circle cx="-48" cy="200" r="9"/><circle cx="48" cy="200" r="9"/><circle cx="-48" cy="310" r="9"/><circle cx="48" cy="310" r="9"/><circle cx="-48" cy="352" r="9"/><circle cx="48" cy="352" r="9"/></g>' +
+          '<g transform="translate(-92,140) scale(2.5)"><path d="M-11,0 Q0,-14 11,0 V66 Q0,74 -11,66 Z" fill="#FFFFFF" stroke="#E6DCD2" stroke-width="1.5"/><rect x="-6" y="14" width="12" height="30" rx="3" fill="#B9E2EA"/><path d="M-11,56 H11" stroke="#EC5C97" stroke-width="3"/></g>' +
         '</g>' +
       '</g>';
-    /* waves, boats and words are drawn upright in the map's own coordinates */
-    h += '<path d="M640,420 q18,-8 36,0 M700,610 q18,-8 36,0 M520,690 q18,-8 36,0 M860,520 q18,-8 36,0 M960,690 q18,-8 36,0 M1180,470 q18,-8 36,0 M1260,640 q18,-8 36,0 M820,330 q18,-8 36,0 M1100,380 q18,-8 36,0" stroke="#FFFFFF" stroke-width="4.5" fill="none" stroke-linecap="round" opacity=".85"/>';
-    /* three sailboats anchored together */
-    h += sail(778, 352, 0.46, '#EC5C97') + sail(832, 384, 0.44, '#F2A66B') + sail(784, 418, 0.42, '#7FC6D6');
-    /* fish over the reefs */
-    h += school(X(850), Y(850, 770), '#F2A66B', 5, 26, -8) + school(X(880), Y(880, 800), '#7FC6D6', 3, 18, 170) + school(X(470), Y(470, 320), '#F5B5C8', 4, 24, 12) + school(X(235), Y(235, 930), '#F2A66B', 4, 22, -4) + school(X(770), Y(770, 1150), '#EC5C97', 4, 26, 6) + school(X(1020), Y(1020, 1010), '#7FC6D6', 3, 14, -170);
-    /* Sturch Bank dive site, left side of the cove: dive boat, buoy, octopus on the reef */
-    h += octopus(X(255), Y(255, 600) - 6, 0.55) + buoy(214, 352, 0.6) + diveBoat(132, 448, 0.55);
-    h += '<g transform="translate(900,52)" fill="#7A625B"><path d="M0,-20 l9,22 h-18 z"/><text y="22" font-size="16" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">N</text></g>' +
-      /* Josie's hanging sign, oversized, at the land end of the pier */
-      '<g transform="translate(80,50)"><ellipse cx="731" cy="104" rx="26" ry="6" fill="#3B2925" opacity=".14"/>' +
-      '<rect x="724" y="14" width="14" height="90" rx="4" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3"/><rect x="719" y="6" width="24" height="12" rx="4" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3"/>' +
-      '<rect x="566" y="18" width="168" height="11" rx="4" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3"/>' +
-      '<path d="M724,50 L700,26" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/><path d="M724,50 L700,26" stroke="#E2D7CC" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>' +
-      '<path d="M606,29 V44 M690,29 V38" stroke="#7A625B" stroke-width="2.5" stroke-dasharray="4 3"/>' +
-      '<image href="/img/sign.png" x="582" y="38" width="132" height="162"/></g>';
+    /* the little things, drawn upright in map coordinates */
+    h += '<g>' + sail(X(1125), Y(1125, 745), 0.46, '#EC5C97') + sail(X(1178), Y(1178, 786), 0.44, '#F2A66B') + sail(X(1120), Y(1120, 822), 0.42, '#7FC6D6') + '</g>';
+    h += school(X(822), Y(822, 506), '#F5B5C8', 4, 22, 10) + school(X(930), Y(930, 860), '#F2A66B', 5, 26, -8) + school(X(940), Y(940, 880), '#7FC6D6', 3, 16, 170) + school(X(905), Y(905, 1045), '#EC5C97', 4, 22, 6) + school(X(962), Y(962, 636), '#F2A66B', 3, 16, -4) + school(X(1260), Y(1260, 1152), '#7FC6D6', 4, 22, -6);
+    h += octopus(X(610), Y(610, 765) - 6, 0.5) + buoy(X(528), Y(528, 722), 0.55) + diveBoat(X(425), Y(425, 842), 0.5);
+    h += '<g transform="translate(860,50)" fill="#7A625B"><path d="M0,-20 l9,22 h-18 z"/><text y="22" font-size="16" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">N</text></g>';
+    /* Josie's hanging sign, oversized, on the land beside the dock end: a tall post with a long arm */
+    h += '<ellipse cx="645" cy="233" rx="28" ry="7" fill="#3B2925" opacity=".14"/>' +
+      '<rect x="638" y="26" width="14" height="206" rx="4" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3"/><rect x="633" y="16" width="24" height="12" rx="4" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3"/>' +
+      '<rect x="478" y="34" width="174" height="11" rx="4" fill="#FFFFFF" stroke="#E2D7CC" stroke-width="3"/>' +
+      '<path d="M638,76 L612,48" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/><path d="M638,76 L612,48" stroke="#E2D7CC" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>' +
+      '<path d="M520,45 V62 M606,45 V54" stroke="#7A625B" stroke-width="2.5" stroke-dasharray="4 3"/>' +
+      '<image href="/img/sign.png" x="496" y="56" width="132" height="162"/>';
     return h;
   }
   w.J2BAY = {
-    sign: [662, 88, 132, 162],
+    sign: [496, 56, 132, 162],
     layer: function () {
       return '<svg class="baylayer" width="1440" height="1240" viewBox="0 0 1440 1240" role="img" aria-label="Map of Utila Bay: Josie\'s Cafe is at the land end of the ferry dock, on the ferry road just off Main Street">' + content() + '</svg>';
     },
     thumb: function () {
-      return '<svg viewBox="60 20 860 620" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + content().replace('id="bayclip"', 'id="bayclip2"').replace('url(#bayclip)', 'url(#bayclip2)') + '</svg>';
+      return '<svg viewBox="150 0 820 640" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + content().replace(/bayclip/g, 'bayclip2').replace('id="seag"', 'id="seag2"').replace('url(#seag)', 'url(#seag2)') + '</svg>';
     }
   };
 }(window));
