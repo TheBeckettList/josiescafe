@@ -16,7 +16,7 @@
     [/bagel/i, 'bagel'], [/lunch/i, 'sandwich'], [/pastr/i, 'croissant']];
   function pick(list, name) { for (var i = 0; i < list.length; i++) { if (list[i][0].test(name)) { return list[i][1]; } } return null; }
   U.dishKey = function (item) {
-    var en = JC.tr(item.name, 'en'), k = pick(NAME_ICON, en);
+    var en = JC.tr(item.name, 'en'), k = (ART.keyFor && ART.keyFor(en)) || pick(NAME_ICON, en);
     if (k) { return k; }
     var c = J.ix().catById[item.category_id];
     return (c && pick(CAT_ICON, JC.tr(c.name, 'en'))) || 'full-plate';

@@ -27,6 +27,7 @@
     [/espresso|americano|latte|cappuccino|chai|drip|coffee|flavor/i, 'hot-coffee']
   ];
   T.dishKey = function (en, station) {
+    var own = ART && ART.keyFor && ART.keyFor(en); if (own) { return own; }
     for (var i = 0; i < NAME_ICON.length; i++) { if (NAME_ICON[i][0].test(en || '')) { return NAME_ICON[i][1]; } }
     return station === 'bar' ? 'hot-coffee' : 'full-plate';
   };
