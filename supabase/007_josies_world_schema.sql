@@ -198,16 +198,21 @@ alter table public.ingredients
 -- Diets: Vegan, Gluten free, Kosher-style. `key` is what orders store. Names stay honest: "Kosher-style" never
 -- "Kosher"; gluten free reads "gluten-free ingredients" unless Josie can guarantee no cross-contact.
 create table if not exists public.diets (
-  id   uuid primary key default gen_random_uuid(),
-  key  text unique,
-  name jsonb not null,
-  sort int   not null default 0
+  id    uuid primary key default gen_random_uuid(),
+  key   text unique,
+  name  jsonb not null,          -- the toggle on the register
+  claim jsonb,                   -- the honest wording shown to guests and on tickets
+  sort  int   not null default 0
 );
-insert into public.diets (key, name, sort) values
-  ('vegan',        '{"en":"Vegan","es":"Vegano"}', 1),
-  ('gluten_free',  '{"en":"Gluten free","es":"Sin gluten"}', 2),
-  ('kosher_style', '{"en":"Kosher-style","es":"Estilo kosher"}', 3)
-on conflict (key) do nothing;
+alter table public.diets add column if not exists claim jsonb;
+insert into public.diets (key, name, claim, sort) values
+  ('vegan',        '{"en":"Vegan","es":"Vegano"}',
+                   '{"en":"vegan","es":"vegano"}', 1),
+  ('gluten_free',  '{"en":"Gluten free","es":"Sin gluten"}',
+                   '{"en":"gluten-free ingredients","es":"ingredientes sin gluten"}', 2),
+  ('kosher_style', '{"en":"Kosher-style","es":"Estilo kosher"}',
+                   '{"en":"kosher-style","es":"estilo kosher"}', 3)
+on conflict (key) do update set claim = excluded.claim;
 
 -- Per ingredient and diet: yes / no. No row = not confirmed yet (Josie fills these in; the register treats
 -- an unconfirmed ingredient as fine and the admin gear lists what is still to confirm).
