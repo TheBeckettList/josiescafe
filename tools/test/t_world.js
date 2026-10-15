@@ -7,6 +7,8 @@ function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.
   await p.waitForTimeout(1800);
   await p.screenshot({ path: '/tmp/claude-0/shots/w_phone_home.png' });
   ok((await p.locator('.mrow').count()) >= 1, 'menu rows (' + await p.locator('.mrow').count() + ')');
+  await p.click('[data-act="bayFlip"]'); await p.waitForTimeout(300); await p.screenshot({ path: '/tmp/claude-0/shots/w_bay.png' });
+  ok((await p.locator('.baylayer').count()) === 1, 'website flips to the bay map'); await p.click('[data-act="bayFlip"]'); await p.waitForTimeout(300);
   await p.click('.cat >> nth=1'); await p.waitForTimeout(200);
   await p.click('.mrow >> nth=1'); await p.waitForTimeout(300);
   await p.screenshot({ path: '/tmp/claude-0/shots/w_phone_dish.png' });

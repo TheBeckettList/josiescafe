@@ -1,4 +1,6 @@
-// kitchen-push · sends "new ticket" alerts to the kitchen and bar phones (josiescafe.com/pos/tickets).
+// kitchen-push · sends "new ticket" alerts to the kitchen and bar phones (josiescafe.com/pos2/tickets).
+// v2: the text comes from public.push_card (stick first, chips written out, ADD-ON), stops/changes arrive as {alert_id}.
+// Orders from the old register (no pieces) fall back to the old text, so nothing goes quiet during the changeover.
 //
 // Called by the database (orders_push trigger) with {order_id} when an order with bar or kitchen items arrives,
 // and by a phone with {test: endpoint, code} right after it turns alerts on.
@@ -68,8 +70,15 @@ async function orderAlert(orderId: string) {
   const subs = (await sql`select endpoint, p256dh, auth, station, lang from public.push_subs where station in ${sql(stations)}`) as unknown as Sub[];
   if (!subs.length) return { sent: 0 };
 
+  const cards: Record<string, unknown> = {};
+  for (const s of subs) {
+    const lang = s.lang === 'en' ? 'en' : 'es', k = `${s.station}:${lang}`;
+    if (!(k in cards)) { try { cards[k] = (await sql`select public.push_card(${orderId}, ${s.station}, ${lang}) as c`)[0]?.c ?? null; } catch (_e) { cards[k] = null; } }
+  }
   const statuses = await deliver(subs, (s) => {
     const lang = s.lang === 'en' ? 'en' : 'es';
+    const card = cards[`${s.station}:${lang}`];
+    if (card) return card;
     const mine = items.filter((i) => i.station === s.station);
     const head = [String(o.number)];
     if (o.source === 'online') head.push(w(lang, 'online') + (o.pickup_at ? ' · ' + w(lang, 'pickup') + ' ' + clock(o.pickup_at) : ''));
@@ -81,9 +90,23 @@ async function orderAlert(orderId: string) {
       return `${i.qty}× ${nm}${i.note ? ' → ' + i.note : ''}`;
     });
     if (o.note) lines.push(`${w(lang, 'note')}: ${o.note}`);
-    return { title: head.join(' · '), body: lines.join('\n'), tag: `${o.id}:${s.station}`, url: `/pos/tickets/#o=${o.id}` };
+    return { title: head.join(' · '), body: lines.join('\n'), tag: `${o.id}:${s.station}`, url: `/pos2/tickets/#o=${o.id}` };
   }, String(o.id).replace(/-/g, '').slice(0, 32));
   return { sent: statuses.filter((x) => x >= 200 && x < 300).length, statuses };
+}
+
+async function stopAlert(alertId: string) {
+  const claimed = await sql`
+    update public.ticket_alerts set pushed_at = now()
+     where id = ${alertId} and pushed_at is null and created_at > now() - interval '5 minutes' returning station`;
+  if (!claimed.length) return { skipped: true };
+  const st = claimed[0].station as string;
+  const subs = (await sql`select endpoint, p256dh, auth, station, lang from public.push_subs where station = ${st}`) as unknown as Sub[];
+  if (!subs.length) return { sent: 0 };
+  const cards: Record<string, unknown> = {};
+  for (const l of ['en', 'es']) cards[l] = (await sql`select public.push_alert_card(${alertId}, ${l}) as c`)[0]?.c ?? null;
+  const statuses = await deliver(subs, (s) => cards[s.lang === 'en' ? 'en' : 'es'], String(alertId).replace(/-/g, '').slice(0, 32));
+  return { sent: statuses.filter((x) => x >= 200 && x < 300).length };
 }
 
 async function testAlert(endpoint: string, code: string, lang: string) {
@@ -92,7 +115,7 @@ async function testAlert(endpoint: string, code: string, lang: string) {
   const subs = (await sql`select endpoint, p256dh, auth, station, lang from public.push_subs where endpoint = ${endpoint}`) as unknown as Sub[];
   if (!subs.length) return json({ error: 'not signed up' }, 404);
   const l = lang === 'en' ? 'en' : 'es';
-  const statuses = await deliver(subs, () => ({ title: w(l, 'testT'), body: w(l, 'testB'), tag: 'test', url: '/pos/tickets/' }));
+  const statuses = await deliver(subs, () => ({ title: w(l, 'testT'), body: w(l, 'testB'), tag: 'test', url: '/pos2/tickets/' }));
   return json({ statuses });
 }
 
@@ -103,6 +126,7 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     if (body.test) return await testAlert(String(body.test), String(body.code || ''), String(body.lang || 'es'));
     if (body.order_id && /^[0-9a-f-]{36}$/i.test(body.order_id)) return json(await orderAlert(body.order_id));
+    if (body.alert_id && /^[0-9a-f-]{36}$/i.test(body.alert_id)) return json(await stopAlert(body.alert_id));
     if (body.init) return json({ vapid: (await vapidKeys()).publicKey });
     return json({ error: 'nothing to do' }, 400);
   } catch (e) {

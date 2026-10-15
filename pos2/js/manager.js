@@ -7,10 +7,12 @@
   var X = {
     en: { sales: 'sales', orders: 'orders', online: 'online', wait: 'average wait', busiest: 'busiest 15 min', loved: 'Most loved', low: 'Ran low today', out: 'out', lowWord: 'low', day: 'Today by the quarter hour',
       darker: 'Darker = busier', bar: 'Bar', kitchen: 'Kitchen', none: 'Nothing yet today.', payroll: 'Payroll', onlyJosie: 'Only Josie', back: 'Back', toPay: 'To pay', cash: 'Cash', transfer: 'Transfer', undo: 'Undo',
-      needNet: 'Needs internet. Try again in a moment.', loading: 'Loading…', min: 'min', empty: 'No one to pay in this period.' },
+      needNet: 'Needs internet. Try again in a moment.', loading: 'Loading…', min: 'min', empty: 'No one to pay in this period.',
+      phones: 'Kitchen and bar phones', phoneLink: 'Open this link on the phone', phoneCode: 'Ticket code', phoneHow: 'Then tap Share › Add to Home Screen, open it from there, and tap Turn on alerts.', phoneCount: 'phones with alerts on', newCode: 'New code', newCodeAsk: 'Make a new code? Every phone has to type it again and alerts stop until they do.', share: 'Share link', kitchen2: 'Kitchen', bar2: 'Bar' },
     es: { sales: 'ventas', orders: 'pedidos', online: 'en línea', wait: 'espera promedio', busiest: 'los 15 min más ocupados', loved: 'Lo más pedido', low: 'Se acabó hoy', out: 'agotado', lowWord: 'poco', day: 'Hoy cada cuarto de hora',
       darker: 'Más oscuro = más ocupado', bar: 'Bar', kitchen: 'Cocina', none: 'Todavía nada hoy.', payroll: 'Planilla', onlyJosie: 'Solo Josie', back: 'Atrás', toPay: 'Por pagar', cash: 'Efectivo', transfer: 'Transferencia', undo: 'Deshacer',
-      needNet: 'Necesita internet. Inténtalo en un momento.', loading: 'Cargando…', min: 'min', empty: 'Nadie por pagar en este período.' }
+      needNet: 'Necesita internet. Inténtalo en un momento.', loading: 'Cargando…', min: 'min', empty: 'Nadie por pagar en este período.',
+      phones: 'Teléfonos de cocina y bar', phoneLink: 'Abre este enlace en el teléfono', phoneCode: 'Código de tickets', phoneHow: 'Luego toca Compartir › Agregar a pantalla de inicio, ábrelo desde ahí y toca Activar avisos.', phoneCount: 'teléfonos con avisos', newCode: 'Código nuevo', newCodeAsk: '¿Hacer un código nuevo? Cada teléfono tendrá que escribirlo otra vez y los avisos paran hasta entonces.', share: 'Compartir enlace', kitchen2: 'Cocina', bar2: 'Bar' }
   };
   function t(k) { return (X[S.lang] || X.en)[k]; }
   function money(n) { return JC.money(n, 'L '); }
@@ -20,6 +22,17 @@
     if (M.busy || !S.person || !S.person.token) { return; }
     M.busy = true;
     J.call('day_review', { p_token: S.person.token }, function (err, r) { M.busy = false; M.err = err ? t('needNet') : ''; if (r) { M.rev = r; } J.changed(); });
+  }
+  function loadPhones() {
+    J.api('GET', 'ticket_link?select=code', null, function (e, rows) { if (!e && rows && rows[0]) { M.code = rows[0].code; J.changed(); } });
+    J.call('tickets_phones', {}, function (e, c) { if (!e && c) { M.phones = c; J.changed(); } });
+  }
+  function phonesCard() {
+    var link = 'https://josiescafe.com/pos2/tickets/';
+    return '<div class="pcard mphones"><h3>' + esc(t('phones')) + '</h3><p class="psub">' + esc(t('phoneLink')) + '</p><div class="plink">' + esc(link.replace('https://', '')) + '</div>' +
+      '<div class="pcode"><small>' + esc(t('phoneCode')) + '</small><b>' + esc(M.code || '······') + '</b></div>' +
+      '<p class="psub">' + esc(t('phoneHow')) + '</p><p class="psub"><b>' + (M.phones ? M.phones.kitchen : 0) + '</b> ' + esc(t('kitchen2')) + ' · <b>' + (M.phones ? M.phones.bar : 0) + '</b> ' + esc(t('bar2')) + ' — ' + esc(t('phoneCount')) + '</p>' +
+      '<div class="prow3"><button type="button" class="pbtn ghost" data-act="phShare">' + esc(t('share')) + '</button><button type="button" class="pbtn ghost" data-act="phNew">' + esc(t('newCode')) + '</button></div></div>';
   }
   function period(offset) {
     var n = new Date(Date.now() - 6 * 3600 * 1000), y = n.getUTCFullYear(), m = n.getUTCMonth(), half = n.getUTCDate() <= 15 ? 0 : 1, idx = y * 24 + m * 2 + half + (offset || 0);
@@ -50,7 +63,7 @@
     for (k in r.buckets) { if (r.buckets.hasOwnProperty(k)) { max = Math.max(max, r.buckets[k]); } }
     for (i = 24; i <= 58; i++) { b = r.buckets[i] || 0; bars += '<i style="height:' + Math.max(4, Math.round(b / max * 70)) + 'px;opacity:' + (b ? 0.35 + 0.65 * b / max : 0.25) + '"></i>'; }
     h += '<div class="pcard mbars"><h3>' + esc(t('day')) + '</h3><div class="bars">' + bars + '</div><div class="bax"><span>6 am</span><span>8</span><span>10</span><span>12</span><span>2 pm</span></div><small>' + esc(t('darker')) + '</small></div>';
-    return h;
+    return h + phonesCard();
   }
   function payView() {
     var p = M.pay, h = '<div class="paytop"><div class="perpick"><button type="button" data-act="payPer" data-arg="-1">‹</button><b>' + esc(M.per ? M.per.label : '') + '</b><button type="button" data-act="payPer" data-arg="1">›</button></div><span class="topay">' + esc(t('toPay')) + ' <b>' + (p ? money(p.to_pay) : '') + '</b></span></div>', i, l;
@@ -67,6 +80,7 @@
   M.screen = function () {
     var pay = M.view === 'pay' && J.can('josie');
     if (!pay && !M.rev && !M.busy) { w.setTimeout(load, 0); }
+    if (!pay && !M.phonesLoaded) { M.phonesLoaded = true; w.setTimeout(loadPhones, 0); }
     if (pay && !M.pay && !M.payBusy) { M.payBusy = true; w.setTimeout(function () { M.payBusy = false; loadPay(); }, 0); }
     return '<div class="shell mgr">' + U.topbar('manager', pay ? { back: '<button type="button" class="backbtn" data-act="mgrBack" aria-label="' + esc(t('back')) + '">‹</button><b class="mtitle">' + esc(t('payroll')) + ' <span class="lockpill">🔒 ' + esc(t('onlyJosie')) + '</span></b>' } : {}) +
       '<div class="mbody">' + (pay ? payView() : dayView() + (J.can('josie') ? '<button type="button" class="paybtn mpayroll" data-act="mgrPay">' + esc(t('payroll')) + '</button>' : '')) + '</div></div>';
@@ -74,8 +88,13 @@
   M.handle = function (act, arg) {
     var p;
     switch (act) {
+      case 'phShare':
+        if (w.navigator.share) { try { w.navigator.share({ title: "Josie's Tickets", url: 'https://josiescafe.com/pos2/tickets/' }); } catch (e) {} }
+        else if (w.navigator.clipboard) { w.navigator.clipboard.writeText('https://josiescafe.com/pos2/tickets/'); }
+        return true;
+      case 'phNew': if (w.confirm(t('newCodeAsk'))) { J.call('tickets_new_code', {}, function (e, c) { if (!e && c) { M.code = c; M.phones = { kitchen: 0, bar: 0 }; J.changed(); } }); } return true;
       case 'mgrPay': M.view = 'pay'; M.pay = null; M.off = 0; J.changed(); return true;
-      case 'mgrBack': M.view = 'day'; M.rev = null; J.changed(); return true;
+      case 'mgrBack': M.view = 'day'; M.rev = null; M.phonesLoaded = false; J.changed(); return true;
       case 'payPer': M.off = (M.off || 0) + Number(arg); M.pay = null; J.changed(); return true;
       case 'payMark': p = arg.split('|'); J.call('payroll_mark', { p_token: S.person.token, p_period: M.pay.period_id, p_person: p[0], p_method: p[1] || null }, function (e) { if (!e) { loadPay(); } }); return true;
     }

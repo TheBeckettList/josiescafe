@@ -73,10 +73,20 @@
   function inCartTables() { var o = {}, l = J.sticks(), i; for (i = 0; i < l.length; i++) { if (l[i].state === 'table') { o[l[i].table_id] = l[i].number; } } return o; }
   function tableByLabel(label) { var t = (S.floor && S.floor.tables) || [], i; for (i = 0; i < t.length; i++) { if (t[i].label === String(label)) { return t[i]; } } return null; }
 
+  /* the small inset in the corner: tap it and the map flips between the cafe and the bay, the hanging sign staying put */
+  function insetBtn(inBay) {
+    return '<button type="button" class="inset' + (inBay ? ' cafe' : '') + '" data-act="bayFlip" aria-label="' + esc(J.t(inBay ? 'cafeMap' : 'bayMap')) + '">' +
+      (inBay ? '<span class="insetimg"></span>' : w.J2BAY.thumb()) + '<span class="cap">' + esc(J.t(inBay ? 'cafeMap' : 'bayMap')) + '</span></button>';
+  }
   /* ───────────── the screen ───────────── */
   O.screen = function () {
     var f = S.floor, h = '<div class="shell">' + U.topbar('overview') + U.band() + '<div class="ovbody"><div class="mapcol" id="mapcol"><div class="mapbox" id="mapbox"><div class="mapscale" id="mapscale">';
-    h += '<div class="mapimg"></div>';
+    var bay = !!ui().bay;
+    h += bay ? w.J2BAY.layer() : '<div class="mapimg"></div>';
+    if (bay) {
+      h += '<button type="button" class="hit' + (ui().popup && ui().popup.kind === 'sign' ? ' on' : '') + '" data-act="ovOpen" data-arg="sign" data-ov="sign" style="' + px(HIT.sign[0]) + '" aria-label="' + esc(LABEL.sign) + '"></button>' + insetBtn(true) + '</div>';
+      return h + '<div class="poplayer" id="poplayer">' + popupHTML() + '</div></div></div>' + rail() + '</div>' + sheetLayer() + '</div>';
+    }
     if (!f) { return h + '</div></div></div><aside class="orail"><p class="empty">Loading…</p></aside></div></div>'; }
     var ts = inCartTables(), i, k, label, t, st = ui().placing, sticks = J.sticks(), homeN = [], waitN = [];
     for (i = 0; i < sticks.length; i++) { if (sticks[i].state === 'home') { homeN.push(sticks[i].number); } else if (sticks[i].state === 'waiting') { waitN.push(sticks[i].number); } }
@@ -116,7 +126,7 @@
       var on = popKind === 'table' && ui().popup.id === label;
       h += '<button type="button" class="hit tbl' + (st ? ' pick' : '') + (on ? ' on' : '') + '" data-act="tablePick" data-arg="' + label + '" data-ov="table-' + label + '" style="' + px(TABLES[label].box) + '" aria-label="Table ' + label + '"></button>';
     }
-    h += '</div>';                                           // mapscale
+    h += insetBtn(false) + '</div>';                         // mapscale
     if (st) { h += '<div class="placehint">' + esc(J.t('placeOnTable')) + ' · ' + st + '<button type="button" data-act="placeCancel">' + esc(J.t('cancel')) + '</button></div>'; }
     h += '<div class="poplayer" id="poplayer">' + popupHTML() + '</div></div></div>' + rail() + '</div>' + sheetLayer() + '</div>';
     return h;
@@ -395,6 +405,7 @@
         if (arg === 'kitchen' || arg === 'bar') { O.pollFeeds(); }
         return true;
       case 'ovClose': closePop(); return true;
+      case 'bayFlip': ui().bay = !ui().bay; ui().popup = null; ui().placing = null; J.changed(); return true;
       case 'ovGear': ui().flip = !ui().flip; J.changed(); return true;
       case 'tablePick':
         if (ui().placing) {
