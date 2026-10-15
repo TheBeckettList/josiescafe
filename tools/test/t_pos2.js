@@ -14,7 +14,7 @@ var INIT = function () {
   console.log('errors after load:', p.errors);
   await p.screenshot({ path: '/tmp/claude-0/shots/pos2_signin.png' });
   console.log('people buttons:', await p.locator('.person').count());
-  await p.click('.person');
+  await p.click('.person:has-text("Manager")');
   for (var k of ['1', '2', '3', '4']) { await p.click('.key[data-arg="' + k + '"]'); }
   await p.waitForTimeout(1800);
   console.log('after pin, tabs:', await p.locator('.tab').allTextContents());

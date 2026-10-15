@@ -7,7 +7,7 @@ var INIT = function () { try { if (!localStorage.getItem('jc.pos.session')) {
   var h = await H.start({ reset: true });
   var p = await h.page('/pos2/', { init: INIT, viewport: { width: 390, height: 780 }, touch: true, mobile: true });
   await p.waitForTimeout(1200);
-  await p.click('.person'); for (var k of ['1','2','3','4']) { await p.click('.key[data-arg="' + k + '"]'); }
+  await p.click('.person:has-text("Manager")'); for (var k of ['1','2','3','4']) { await p.click('.key[data-arg="' + k + '"]'); }
   await p.waitForTimeout(1500);
   if (await p.locator('[data-act="tourClose"]').count()) { await p.click('[data-act="tourClose"] >> nth=0'); }
   ok((await p.locator('.itile').count()) > 3, 'inventory tiles (' + await p.locator('.itile').count() + ')');

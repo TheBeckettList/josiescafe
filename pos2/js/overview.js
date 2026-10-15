@@ -464,7 +464,7 @@
     var p = pt(e);
     if (!drag.moved && Math.abs(p.x - drag.x) + Math.abs(p.y - drag.y) > 8) {
       drag.moved = true; ui().dragging = true;
-      var g = d.createElement('div'); g.className = 'ghost'; g.textContent = drag.n; d.body.appendChild(g); drag.g = g;
+      var g = d.createElement('div'); g.className = 'dragghost'; g.textContent = drag.n; d.body.appendChild(g); drag.g = g;
     }
     if (drag.g) {
       e.preventDefault();

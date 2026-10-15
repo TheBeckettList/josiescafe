@@ -6,7 +6,7 @@ function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.
 (async function () {
   var h = await H.start(), p = await h.page('/pos2/', { init: INIT });
   await p.waitForTimeout(1200);
-  await p.click('.person'); for (var k of ['1','2','3','4']) { await p.click('.key[data-arg="' + k + '"]'); }
+  await p.click('.person:has-text("Manager")'); for (var k of ['1','2','3','4']) { await p.click('.key[data-arg="' + k + '"]'); }
   await p.waitForTimeout(1500);
   await p.click('[data-act="tourClose"]');
   await p.click('.cat:has-text("Breakfast")');

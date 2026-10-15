@@ -8,7 +8,7 @@ function q(s) { return shim.psql(s).out; }
   var h = await H.start({ reset: true }); seed.seed();
   var p = await h.page('/pos2/', { init: INIT, viewport: { width: 1024, height: 768 } });
   await p.waitForTimeout(1200);
-  await p.click('.person'); for (var k of ['1','2','3','4']) { await p.click('.key[data-arg="' + k + '"]'); }
+  await p.click('.person:has-text("Manager")'); for (var k of ['1','2','3','4']) { await p.click('.key[data-arg="' + k + '"]'); }
   await p.waitForTimeout(1200);
   if (await p.locator('[data-act="tourClose"]').count()) { await p.click('[data-act="tourClose"] >> nth=0'); }
   await p.click('.tab:has-text("Overview")'); await p.waitForTimeout(2200);
