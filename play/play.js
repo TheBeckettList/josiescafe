@@ -1,10 +1,12 @@
 /* Josie's World · Play mode. A pretend café that lives in your own browser: the real app runs against a real (tiny) Postgres
    that is downloaded once, loaded with the menu, five people (PIN 1234) and a few orders. Nothing leaves your device; nothing here is real money.
-   Loaded by /pos/?play (after api.js, before the app), which is why it can preset the session and swap the network call. Modern browsers only. */
+   Loaded by /play/app/ (a copy of the POS page, built by tools/play/build.mjs, that loads this after api.js and before the app), so it can preset the session and swap the network call. The real /pos/ knows nothing about it. Modern browsers only. */
 (function (w, d) {
   'use strict';
   var JC = w.JC, base = (JC.cfg.url || '').replace(/\/$/, ''), db = null, voidFns = null, ready = null, VER = 'v2';
   w.J2PLAY = { on: true };
+  /* no service worker in the sandbox: the app asks for one, the answer is nothing */
+  try { Object.defineProperty(w.navigator, 'serviceWorker', { value: { register: function () { return Promise.resolve(); } }, configurable: true }); } catch (e) {}
 
   /* Containment: everything the app stores in play mode lives under its own prefix, so the real café's tablet sign-in,
      menu cache, queue and people on this same browser are never read or touched. */
@@ -15,7 +17,7 @@
   w.J2PLAY.store = { get: JC.get, set: JC.set, del: JC.del };
   function wipeStore() { try { var i, k, drop = []; for (i = 0; i < w.localStorage.length; i++) { k = w.localStorage.key(i); if (k.indexOf(PREFIX) === 0) { drop.push(k); } } for (i = 0; i < drop.length; i++) { w.localStorage.removeItem(drop[i]); } } catch (e) {} }
   /* the app thinks it is signed in on a shared tablet; people sign in with a PIN as always */
-  JC.set('pos.session', { access_token: 'play-token', refresh_token: 'play', expires_at: Date.now() + 3e11, email: 'pos@josiescafe.com' });
+  JC.set('pos.session', { access_token: 'sandbox-token', refresh_token: 'play', expires_at: Date.now() + 3e11, email: 'pos@josiescafe.com' });
   if (!JC.get('pos.device', null)) { JC.set('pos.device', { code: 'A', mode: 'register', lang: 'en' }); }
 
   /* ───────── a little cover while the café is set up ───────── */
@@ -77,7 +79,7 @@
   /* handle(method, path, query, body, authed) -> Promise<{status, json}> */
   function handle(method, path, query, body, authed) {
     var m;
-    if ((m = /^\/auth\/v1\/token/.exec(path))) { return Promise.resolve({ status: 200, json: { access_token: 'play-token', refresh_token: 'play', expires_in: 3e9, user: { email: 'pos@josiescafe.com' } } }); }
+    if ((m = /^\/auth\/v1\/token/.exec(path))) { return Promise.resolve({ status: 200, json: { access_token: 'sandbox-token', refresh_token: 'play', expires_in: 3e9, user: { email: 'pos@josiescafe.com' } } }); }
     if ((m = /^\/rest\/v1\/rpc\/([a-z0-9_]+)$/.exec(path)) && method === 'POST') {
       return isVoid(m[1]).then(function (isv) {
         return run(rpcSql(m[1], body, isv), authed).then(function (r) { return isv ? { status: 204, json: null } : { status: 200, json: r.rows[0].j }; });
@@ -206,12 +208,14 @@
     if (old) { old.parentNode.removeChild(old); return; }
     el = d.createElement('div'); el.id = 'playguest';
     el.setAttribute('style', 'position:fixed;z-index:84;' + (wide ? 'right:18px;bottom:14px;width:390px;height:min(780px,calc(100vh - 40px))' : 'left:0;right:0;bottom:0;top:0'));
-    el.innerHTML = '<div style="position:absolute;left:0;top:0;right:0;bottom:0;background:#fff;overflow:hidden;box-shadow:0 0 0 4px #F5B5C8,0 20px 50px rgba(142,63,89,.4);border-radius:' + (wide ? '26px' : '0') + '"><iframe src="/?play=guest" title="Guest website" style="border:0;width:100%;height:100%"></iframe></div>' +
+    el.innerHTML = '<div style="position:absolute;left:0;top:0;right:0;bottom:0;background:#fff;overflow:hidden;box-shadow:0 0 0 4px #F5B5C8,0 20px 50px rgba(142,63,89,.4);border-radius:' + (wide ? '26px' : '0') + '"><iframe src="/play/guest/" title="Guest website" style="border:0;width:100%;height:100%"></iframe></div>' +
       '<button type="button" aria-label="Close" style="position:absolute;right:' + (wide ? '-10px' : '8px') + ';top:' + (wide ? '-10px' : '8px') + ';z-index:2;width:36px;height:36px;border-radius:50%;background:#B55573;color:#fff;font-size:24px;line-height:34px;box-shadow:0 3px 10px rgba(0,0,0,.3)">&times;</button>';
     el.lastChild.addEventListener('click', function () { el.parentNode.removeChild(el); });
     d.body.appendChild(el);
   }
-  w.J2PLAY.autopin = function () { ['1', '2', '3', '4'].forEach(function (k, ix) { w.setTimeout(function () { var kb = d.querySelector('.key[data-arg="' + k + '"]'); if (kb) { kb.click(); } }, 160 + ix * 70); }); };
+  /* picking a person types the PIN for them: everyone here is 1234 */
+  function autopin() { ['1', '2', '3', '4'].forEach(function (k, ix) { w.setTimeout(function () { var kb = d.querySelector('.key[data-arg="' + k + '"]'); if (kb) { kb.click(); } }, 260 + ix * 70); }); }
+  d.addEventListener('click', function (e) { var t = e.target; while (t && t !== d.body) { if (t.classList && t.classList.contains('person')) { autopin(); return; } t = t.parentNode; } }, false);
   function switchTo(name) {
     var J = w.J2; if (!J) { return; }
     function tryPick(n) {

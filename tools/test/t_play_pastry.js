@@ -2,7 +2,7 @@ var H = require('./harness');
 function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.exitCode = 1; } }
 (async function () {
   var h = await H.start({ reset: true });
-  var p = await h.page('/pos/?play', { viewport: { width: 1180, height: 820 } });
+  var p = await h.page('/play/app/', { viewport: { width: 1180, height: 820 } });
   await p.waitForSelector('.person', { timeout: 90000 });
   await p.click('.person:has-text("Josie")'); await p.waitForSelector('.tabs', { timeout: 20000 }); await p.waitForTimeout(1200);
   if (await p.locator('.tour .tavatar').count()) { await p.click('.tour button:has-text("Later")'); }
