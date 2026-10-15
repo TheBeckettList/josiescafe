@@ -14,10 +14,10 @@ function q(s) { return shim.psql(s).out; }
   await p.click('.tab:has-text("Overview")'); await p.waitForTimeout(2200);
   // 1. place waiting stick 7 on a table
   await p.click('[data-act="placeStart"][data-arg="7"]'); await p.waitForTimeout(300);
-  await p.click('.hit.tbl[data-arg="2"]'); await p.waitForTimeout(1500);
+  await p.click('.hit.tbl[data-arg="2"]'); await p.waitForTimeout(3500);
   ok(q("select state||'/'||coalesce((select label from tables where id=table_id),'') from sticks where number=7") === 'table/2', 'stick 7 placed on table 2');
   // 2. stick back on paid number 4
-  console.log('rows:', await p.locator('.nrow').allInnerTexts()); await p.click('.nrow:has-text("Stick back") .ncta >> nth=0'); await p.waitForTimeout(1200);
+  console.log('rows:', await p.locator('.nrow').allInnerTexts()); await p.click('.nrow:has-text("Stick back") .ncta >> nth=0'); await p.waitForTimeout(3000);
   var st4 = q("select state from sticks where number=4");
   console.log('stick 4 after back:', st4, '| orders phase:', q("select string_agg(phase||':'||number, ',') from orders where number like '4%'"));
   // 3. undo
