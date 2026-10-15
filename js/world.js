@@ -314,7 +314,6 @@
     if (c2) { c2.scrollLeft = sl; on2 = c2.querySelector('.cat.on'); if (on2) { if (on2.offsetLeft < c2.scrollLeft) { c2.scrollLeft = on2.offsetLeft - 8; } else if (on2.offsetLeft + on2.offsetWidth > c2.scrollLeft + c2.clientWidth) { c2.scrollLeft = on2.offsetLeft + on2.offsetWidth - c2.clientWidth + 8; } } }
     if (m2 && mh && W.lastAct === 'cat') { m2.style.minHeight = mh + 'px'; }
     if (w.pageYOffset !== sy && W.lastAct !== 'toMenu') { w.scrollTo(0, sy); }
-    d.documentElement.className = (d.documentElement.className || '').replace(/\block\b/g, '').replace(/^\s+|\s+$/g, '') + (phone() && W.sel ? ' lock' : '');
     W.lastAct = null;
     if (val !== null && d.getElementById('gname')) { var el = d.getElementById('gname'); el.value = val; el.focus(); }
   }

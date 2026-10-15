@@ -124,7 +124,6 @@ button { font-family: inherit; border: 0; cursor: pointer; color: inherit; backg
 @keyframes tapbob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 .cats { position: sticky; top: 56px; z-index: 6; background: #FFF; margin: 0 -4px; padding: 6px 4px 10px; border-radius: 28px 28px 0 0; scroll-behavior: auto; overscroll-behavior-x: contain; }
 @media (min-width: 700px) { .cats { top: 64px; } }
-html.lock, html.lock body { overflow: hidden; }
 .dcard.modal { overscroll-behavior: contain; }
 @media (prefers-reduced-motion: reduce) { .mkb.tap, .hit.glow { animation: none; } }
 

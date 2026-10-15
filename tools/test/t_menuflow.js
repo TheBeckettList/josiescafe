@@ -18,8 +18,9 @@ function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.
   var sticky = await p.evaluate(function () { var c = document.querySelector('.cats').getBoundingClientRect(); return Math.round(c.top); });
   ok(sticky >= 52 && sticky <= 62, 'the category row stays under the header while scrolling (top=' + sticky + ')');
   var yb = await p.evaluate(function () { return window.pageYOffset; });
-  await p.click('.mrow >> nth=0'); await p.waitForTimeout(400);
-  ok((await p.locator('.dcard.modal').count()) === 1 && (await p.evaluate(function () { return document.documentElement.className; })).indexOf('lock') >= 0, 'a dish opens as a card and the page behind holds still');
+  var vis = await p.evaluate(function () { var r = document.querySelectorAll('.mrow'), i; for (i = 0; i < r.length; i++) { var b = r[i].getBoundingClientRect(); if (b.top > 150 && b.bottom < window.innerHeight - 20) { return i; } } return 0; });
+  await p.locator('.mrow').nth(vis).click(); await p.waitForTimeout(400);
+  ok((await p.locator('.dcard.modal').count()) === 1, 'a dish opens as a card over the menu');
   await p.click('.dcard [data-act="unpick"], .dcard .big.ghost'); await p.waitForTimeout(300);
   var y1 = await p.evaluate(function () { return window.pageYOffset; });
   ok(Math.abs(y1 - yb) < 4, 'closing it leaves you where you were');
