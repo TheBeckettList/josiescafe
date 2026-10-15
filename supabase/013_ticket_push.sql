@@ -34,7 +34,7 @@ begin
    where i.order_id = p_order and op.station = p_station and i.stopped_at is null) x;
   if body is null then return null; end if;
   if o.note is not null and o.note <> '' then body := body || E'\n' || o.note; end if;
-  return jsonb_build_object('title', title, 'body', body, 'tag', p_order || ':' || p_station, 'url', '/pos2/tickets/#o=' || p_order);
+  return jsonb_build_object('title', title, 'body', body, 'tag', p_order || ':' || p_station, 'url', '/pos/tickets/#o=' || p_order);
 end $$;
 
 -- a stop or change after send
@@ -49,7 +49,7 @@ begin
   who := case when o.stick_number is not null then (case when es then 'Palito ' else 'Stick ' end) || o.stick_number else coalesce(nullif(o.customer_name, ''), o.number) end;
   msg := coalesce(a.text, case when a.kind = 'stop' then (case when es then 'Quítalo. Si ya está hecho, avisa en el mostrador.' else 'Take it off. If it is made, tell the counter.' end) else '' end);
   return jsonb_build_object('title', (case when a.kind = 'stop' then (case when es then 'PARAR · ' else 'STOP · ' end) else (case when es then 'CAMBIO · ' else 'CHANGED · ' end) end) || who,
-    'body', trim(both E'\n ' from coalesce(nm, '') || E'\n' || msg), 'tag', 'alert:' || a.id, 'url', '/pos2/tickets/');
+    'body', trim(both E'\n ' from coalesce(nm, '') || E'\n' || msg), 'tag', 'alert:' || a.id, 'url', '/pos/tickets/');
 end $$;
 
 revoke execute on function public.push_card(uuid, text, text)   from public, anon, authenticated;

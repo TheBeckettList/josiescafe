@@ -4,7 +4,7 @@ var INIT = function () { try { if (!localStorage.getItem('jc.pos.session')) {
   localStorage.setItem('jc.pos.device', JSON.stringify({ code: 'A', mode: 'register', lang: 'en' })); } } catch (e) {} };
 function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.exitCode = 1; } }
 (async function () {
-  var h = await H.start(), p = await h.page('/pos2/', { init: INIT });
+  var h = await H.start(), p = await h.page('/pos/', { init: INIT });
   await p.waitForTimeout(1200);
   await p.click('.person:has-text("Manager")'); for (var k of ['1','2','3','4']) { await p.click('.key[data-arg="' + k + '"]'); }
   await p.waitForTimeout(1500);

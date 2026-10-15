@@ -1,8 +1,8 @@
 {
   "name": "Josie's Tickets",
   "short_name": "Tickets",
-  "start_url": "/pos2/tickets/",
-  "scope": "/pos2/tickets/",
+  "start_url": "/pos/tickets/",
+  "scope": "/pos/tickets/",
   "display": "standalone",
   "background_color": "#FFF7F8",
   "theme_color": "#FCE3E8",

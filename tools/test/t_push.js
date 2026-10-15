@@ -4,7 +4,7 @@ function ok(c, m) { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) { process.
   var h = await H.start({ reset: true }); seed.seed();
   var code = shim.psql("select code from ticket_link where id=1").out;
   shim.psql("insert into push_keys(id,public_key,private_jwk) values (1,'BPubKeyForTestOnlyBPubKeyForTestOnlyBPubKeyForTestOnlyBPubKeyForTestOnlyBPubKeyForTestOnly','{}') on conflict do nothing");
-  var p = await h.page('/pos2/tickets/', { viewport: { width: 390, height: 780 }, touch: true, mobile: true, init: function () {
+  var p = await h.page('/pos/tickets/', { viewport: { width: 390, height: 780 }, touch: true, mobile: true, init: function () {
     try { localStorage.clear(); } catch (e) {}
     var sub = { endpoint: 'https://push.example.test/abc', keys: { p256dh: 'BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM', auth: 'tBHItJI5svbpez7KI4CCXg' } };
     var reg = { pushManager: { getSubscription: function () { return Promise.resolve(null); }, subscribe: function () { return Promise.resolve(sub); } } };

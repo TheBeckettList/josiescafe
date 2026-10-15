@@ -5,7 +5,7 @@ var INIT = function () { try { if (!localStorage.getItem('jc.pos.session')) {
   localStorage.setItem('jc.pos.device', JSON.stringify({ code: 'P', mode: 'inventory', lang: 'en' })); localStorage.setItem('jc.p2.tourSeen.x', '1'); } } catch (e) {} };
 (async function () {
   var h = await H.start({ reset: true });
-  var p = await h.page('/pos2/', { init: INIT, viewport: { width: 390, height: 780 }, touch: true, mobile: true });
+  var p = await h.page('/pos/', { init: INIT, viewport: { width: 390, height: 780 }, touch: true, mobile: true });
   await p.waitForTimeout(1200);
   await p.click('.person:has-text("Manager")'); for (var k of ['1','2','3','4']) { await p.click('.key[data-arg="' + k + '"]'); }
   await p.waitForTimeout(1500);

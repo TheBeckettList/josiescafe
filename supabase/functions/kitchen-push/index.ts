@@ -1,4 +1,4 @@
-// kitchen-push · sends "new ticket" alerts to the kitchen and bar phones (josiescafe.com/pos2/tickets).
+// kitchen-push · sends "new ticket" alerts to the kitchen and bar phones (josiescafe.com/pos/tickets).
 // v2: the text comes from public.push_card (stick first, chips written out, ADD-ON), stops/changes arrive as {alert_id}.
 // Orders from the old register (no pieces) fall back to the old text, so nothing goes quiet during the changeover.
 //
@@ -90,7 +90,7 @@ async function orderAlert(orderId: string) {
       return `${i.qty}× ${nm}${i.note ? ' → ' + i.note : ''}`;
     });
     if (o.note) lines.push(`${w(lang, 'note')}: ${o.note}`);
-    return { title: head.join(' · '), body: lines.join('\n'), tag: `${o.id}:${s.station}`, url: `/pos2/tickets/#o=${o.id}` };
+    return { title: head.join(' · '), body: lines.join('\n'), tag: `${o.id}:${s.station}`, url: `/pos/tickets/#o=${o.id}` };
   }, String(o.id).replace(/-/g, '').slice(0, 32));
   return { sent: statuses.filter((x) => x >= 200 && x < 300).length, statuses };
 }
@@ -115,7 +115,7 @@ async function testAlert(endpoint: string, code: string, lang: string) {
   const subs = (await sql`select endpoint, p256dh, auth, station, lang from public.push_subs where endpoint = ${endpoint}`) as unknown as Sub[];
   if (!subs.length) return json({ error: 'not signed up' }, 404);
   const l = lang === 'en' ? 'en' : 'es';
-  const statuses = await deliver(subs, () => ({ title: w(l, 'testT'), body: w(l, 'testB'), tag: 'test', url: '/pos2/tickets/' }));
+  const statuses = await deliver(subs, () => ({ title: w(l, 'testT'), body: w(l, 'testB'), tag: 'test', url: '/pos/tickets/' }));
   return json({ statuses });
 }
 

@@ -7,7 +7,7 @@ var INIT = function () { try { if (!localStorage.getItem('jc.pos.session')) {
   var h = await H.start({ reset: true }); seed.seed();
   shim.psql("insert into people(name,role,station,pin_hash,rate) values ('Ana','staff','register','x',60)");
   shim.psql("insert into shifts(person_id,in_at,out_at) select id, now()-interval '3 hours', now() from people where name='Ana'");
-  var p = await h.page('/pos2/', { init: INIT, viewport: { width: 1024, height: 768 } });
+  var p = await h.page('/pos/', { init: INIT, viewport: { width: 1024, height: 768 } });
   await p.waitForTimeout(1200);
   await p.click('.person:has-text("Manager")'); for (var k of ['1','2','3','4']) { await p.click('.key[data-arg="' + k + '"]'); }
   await p.waitForTimeout(1200);

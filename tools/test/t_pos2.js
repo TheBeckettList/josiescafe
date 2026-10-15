@@ -9,7 +9,7 @@ var INIT = function () {
 };
 (async function () {
   var h = await H.start();
-  var p = await h.page('/pos2/', { init: INIT });
+  var p = await h.page('/pos/', { init: INIT });
   await p.waitForTimeout(1500);
   console.log('errors after load:', p.errors);
   await p.screenshot({ path: '/tmp/claude-0/shots/pos2_signin.png' });

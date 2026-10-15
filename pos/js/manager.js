@@ -28,7 +28,7 @@
     J.call('tickets_phones', {}, function (e, c) { if (!e && c) { M.phones = c; J.changed(); } });
   }
   function phonesCard() {
-    var link = 'https://josiescafe.com/pos2/tickets/';
+    var link = 'https://josiescafe.com/pos/tickets/';
     return '<div class="pcard mphones"><h3>' + esc(t('phones')) + '</h3><p class="psub">' + esc(t('phoneLink')) + '</p><div class="plink">' + esc(link.replace('https://', '')) + '</div>' +
       '<div class="pcode"><small>' + esc(t('phoneCode')) + '</small><b>' + esc(M.code || '······') + '</b></div>' +
       '<p class="psub">' + esc(t('phoneHow')) + '</p><p class="psub"><b>' + (M.phones ? M.phones.kitchen : 0) + '</b> ' + esc(t('kitchen2')) + ' · <b>' + (M.phones ? M.phones.bar : 0) + '</b> ' + esc(t('bar2')) + ' — ' + esc(t('phoneCount')) + '</p>' +
@@ -89,8 +89,8 @@
     var p;
     switch (act) {
       case 'phShare':
-        if (w.navigator.share) { try { w.navigator.share({ title: "Josie's Tickets", url: 'https://josiescafe.com/pos2/tickets/' }); } catch (e) {} }
-        else if (w.navigator.clipboard) { w.navigator.clipboard.writeText('https://josiescafe.com/pos2/tickets/'); }
+        if (w.navigator.share) { try { w.navigator.share({ title: "Josie's Tickets", url: 'https://josiescafe.com/pos/tickets/' }); } catch (e) {} }
+        else if (w.navigator.clipboard) { w.navigator.clipboard.writeText('https://josiescafe.com/pos/tickets/'); }
         return true;
       case 'phNew': if (w.confirm(t('newCodeAsk'))) { J.call('tickets_new_code', {}, function (e, c) { if (!e && c) { M.code = c; M.phones = { kitchen: 0, bar: 0 }; J.changed(); } }); } return true;
       case 'mgrPay': M.view = 'pay'; M.pay = null; M.off = 0; J.changed(); return true;
