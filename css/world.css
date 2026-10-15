@@ -106,7 +106,7 @@ button { font-family: inherit; border: 0; cursor: pointer; color: inherit; backg
 
 /* hours: live status, vertical week */
 .pill { border: 0; font-family: inherit; cursor: pointer; text-align: start; display: inline-flex; flex-direction: column; justify-content: center; line-height: 1.12; padding: 4px 12px; min-width: 0; } .pill b { font-size: 13.5px; } .pill small { font-size: 11.5px; font-weight: 800; opacity: .9; }
-.hours.ph { width: 200px; padding: 10px 8px; } .hours b.sm { font-size: 24px; white-space: normal; } .hours.ph b { font-size: 28px; }
+.hours.ph { width: 200px; padding: 10px 8px; } .hours b.sm { font-size: 24px; white-space: normal; } .hours.ph b { font-size: 22px; } .hours.ph b.sm { font-size: 20px; }
 .hstat { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 18px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; margin: 4px 0 12px; }
 .hstat i { width: 16px; height: 16px; border-radius: 50%; flex: none; } .hstat.open { background: #D9F0E8; color: #2F6B58; } .hstat.open i { background: #3C9A78; } .hstat.closed { background: #F9D6D6; color: #8E2F3F; } .hstat.closed i { background: #D2455D; }
 .hweek .hr { display: flex; justify-content: space-between; gap: 12px; padding: 9px 12px; border-radius: 14px; font-weight: 800; font-size: 17px; } .hweek .hr.today { background: #FDEDF1; box-shadow: inset 0 0 0 3px #F5B5C8; } .hweek .hr.off { color: #86606B; font-weight: 700; }
