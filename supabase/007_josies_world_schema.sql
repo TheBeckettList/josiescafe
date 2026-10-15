@@ -335,7 +335,7 @@ end $$;
 create table if not exists public.tables (
   id    uuid primary key default gen_random_uuid(),
   label text    not null,
-  area  text    not null default 'inside' check (area in ('inside','deck','outside','schoolhouse')),
+  area  text    not null default 'inside' check (area in ('inside','deck','outside','schoolhouse','bar')),
   x     numeric not null default 0,           -- map position, 0..100
   y     numeric not null default 0,
   seats int,
