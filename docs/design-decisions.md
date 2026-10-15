@@ -64,3 +64,10 @@ Do not build the placeholders.
 - People: Manager (josie role), Dorcas, Martha (staff). Rates and real PINs are not set yet.
 - Hours are Mon-Sat 6:15-14:30, closed Sunday; online cutoff 14:00.
 - The live v1.2 POS, ticket phones and website were not changed and keep working.
+
+## Adding ingredients to a menu item (the gear side of a dish)
+- On a dish's gear/setup card: one button, **Ingredients**. It opens a checklist popup of every ingredient (icon + name),
+  already ticked for what the dish has. Tick or untick, press **Done**. That is the whole flow.
+- A **+ New ingredient** line sits at the top of the checklist: type a name, it is added (element by default) and ticked.
+- A long-press (or the small star) on a ticked ingredient marks it the dish's core ("the bacon is the dish").
+- Saves with one `catalog_write` call (`dish_ingredients` for that dish). Marking a dish Out never touches this list.
