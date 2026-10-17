@@ -53,28 +53,6 @@ Security with everyone on one network: Postgres listens only on the Pi itself; o
 device login or the kitchen code; and the Pi's admin login uses keys, not the default password. A separate network for the Pi is
 optional and most home routers can't do one.
 
-### Update: a spare used phone
-
-Good fit as a **helper**, poor fit as the **server**.
-
-**1. Cellular uplink for the Pi (best use).** Plug the phone into the Pi by USB and turn on USB tethering (Android; Linux sees it as a
-normal network port). That replaces the LTE modem: the phone brings the SIM and its own battery, and the Pi charges it. The Pi uses it only for
-the small sync traffic (early upload, pausing online orders, nightly backup), never for the tablets. Needs a prepaid data SIM (test signal at
-the cafe first; usage is tiny, tens of MB a day). Phone must have a healthy battery; set "stay connected" and disable battery optimization for tethering.
-
-**2. Kitchen and bar ticket screens.** An old phone per station on the wall, screen kept on while charging, tickets page open. This is
-already how tickets are shown. One small change needed: in an outage there is no push buzz, so the tickets page should **play a chime when a new ticket
-arrives**. I have not checked whether the page does that; it is a small addition if not.
-
-**3. Not as the server or the hotspot.** Reasons:
-- Android kills background apps; Postgres + PostgREST + Caddy inside Termux/proot is fragile and unproven, and phone updates can break it.
-- A phone's hotspot hands out its own DNS, so `pos.josiescafe.com` can't point at the Pi when there is no internet. The Pi's own Wi-Fi (dnsmasq) fixes that.
-- Phones kept at 100 % on a charger 24/7 swell their batteries over time. Fine for hours-a-day screens, not for an always-on box in a closed cabinet.
-- The repo has a JS stand-in for the server (`play/engine-sim.js`, used for testing). It is a second copy of the rules, not the real migrations, so I would not
-  run the cafe's money on it.
-
-Cost: $0 (spare phone) to ~$40 (used one) + prepaid data. The Pi stays the server.
-
 ### What the MVP does
 Power goes out → tablets switch to the Pi → orders, payments, completing numbers, 86'ing, stock and staff sign-in
 keep working → **kitchen and bar tickets print** → when power or internet returns, everything uploads to the cloud.
