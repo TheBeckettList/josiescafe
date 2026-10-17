@@ -8,6 +8,73 @@ Numbers marked *(verify)* are ballpark figures or product facts to check before 
 
 ---
 
+## MVP (decided Oct 17): Pi 4, a few hours, cheap
+
+Decisions from Richard: **outage cover is a few hours at most** (if the day is gone, the cafe closes, because the
+espresso machines are electric), **Pi 4**, **target ~US$150**, printers already planned. Everything below overrides
+the bigger "full version" in sections 7 and 8, which stay as the later upgrade path.
+
+### What the MVP does
+Power goes out → tablets switch to the Pi → orders, payments, completing numbers, 86'ing, stock and staff sign-in
+keep working → **kitchen and bar tickets print** → when power or internet returns, everything uploads to the cloud.
+
+### What the MVP leaves out (on purpose)
+| Left out | Instead |
+|---|---|
+| LTE modem / second Wi-Fi radio | Pi 4's one radio is the tablets' network **only while power is out**. Normal days it is on Ethernet to the router. Optional free uplink: a phone plugged into the Pi by USB (tethering) so sync can happen early |
+| Router and ISP modem on the battery | A power cut usually takes the ISP too. The Pi makes its own Wi-Fi (`josies-pos`) so nothing else needs power. Saves ~20 W, which is about half the battery cost |
+| Pi UPS HAT | The small UPS has a USB port; the Pi reads it with NUT: "on battery" starts backup mode, "low battery" shuts down cleanly |
+| Phase 2 (printing every day), dashboards, Tailscale | later |
+| Receipts printer / cash drawer | add if wanted: same printer code |
+
+Kept, because they are the point: the same database rules on the Pi (section 4), the outbox and catch-up, `pos.josiescafe.com`
+with a real certificate (section 5), and `printd` for the bar and kitchen printers (section 6).
+
+### Network in the MVP
+- **Power on:** Pi on Ethernet to the router (DHCP reservation, router hands out the Pi as DNS). Wi-Fi AP is off.
+- **Power cut:** the UPS signal turns the Pi's AP on (`josies-pos`, own DHCP+DNS). Tablets have it saved as a second
+  network. The app's failover (section 5, client changes) picks the Pi.
+- If tablets don't hop networks by themselves on an iPad, staff tap the network once; the band on the register says so.
+
+### Shopping list (ballpark US$, *verify*)
+| Item | Cheap | Notes |
+|---|---|---|
+| Raspberry Pi 4, 2 GB (4 GB if the price gap is small) | ~$45–55 | Postgres + PostgREST + Caddy run fine in 2 GB |
+| Official 5 V/3 A USB-C supply | ~$10 | |
+| Case with fan/heatsink | ~$10 | hot, humid cafe |
+| Boot/data drive | USB SSD 120–250 GB ~$20–25 **(recommended)**, or a high-endurance microSD ~$12 | plain SD cards die from the power cuts this project exists for. With SD only: nightly backup to the cloud and a cloned spare card |
+| RTC module (DS3231) | ~$5 | Pi 4 has no clock; offline boots would have the wrong time |
+| Ethernet cable | ~$3 | |
+| **Pi build subtotal** | **~$95–110** | |
+| Line-interactive UPS, 600–1000 VA with USB | ~$80–120 new (cheaper used or with new batteries) | Pi + printers only |
+| **Total with UPS** | **~$175–230** | printers not included |
+
+So ~$150 buys the **Pi build plus a bare minimum of power**. Two ways to land near $150: (a) a used or refurbished UPS with new
+batteries, SD instead of SSD (~$130–150 total), or (b) pay ~$200 and have an SSD and a new UPS. I'd take (b); the drive is the
+part that fails first on an island grid.
+
+### Runtime on a small UPS (Pi 4 + 2 printers ≈ 25 W)
+A 600–1000 VA UPS holds about 100 Wh usable (lead-acid, ~50 % depth; check the maker's runtime chart for your model).
+| Load | Runtime |
+|---|---|
+| Pi + 2 printers, ~25 W | ~3.5–4 h |
+| the same plus router/modem, ~45 W | ~2 h |
+| tablets: each runs on its own battery (8–10 h), so they are not on the UPS | |
+Do **not** put the espresso machine or fridges on it: even a big UPS would last minutes.
+Cheap UPSes output a stepped sine; Pi and printer supplies are fine with that *(verify the printer's supply)*.
+Thermal printer peaks (~60 W for a moment) are well inside a 600 W UPS.
+
+### MVP build order
+1. Database on the Pi 4 (Postgres + PostgREST + auth shim + migrations 001–021) passing `tools/test` scenarios.
+2. Client failover and `pos.josiescafe.com` HTTPS (one CNAME at GoDaddy for the certificate).
+3. `022_pi_sync.sql`, outbox wrappers, catch-up. Test with a simulated 2-hour outage.
+4. `printd` for two printers.
+5. Install: UPS, NUT, AP on power loss, monthly pull-the-plug test.
+
+Open for the MVP: **printer models** (LAN or USB), and **how many tablets** and whether iPads hop to `josies-pos` on their own.
+
+---
+
 ## 1. What in the database decides the design
 
 Read from `supabase/` and `pos/js/core.js`:
@@ -225,7 +292,7 @@ The hard part is not the database. It is making a **tablet on `https://josiescaf
 
 ---
 
-## 7. Hardware (build list)
+## 7. Hardware (full version; the MVP list is at the top)
 
 | Item | Spec | Notes |
 |---|---|---|
@@ -246,7 +313,7 @@ printer ~$150–350 each; switch ~$25.
 
 ---
 
-## 8. Backup power
+## 8. Backup power (full version; the MVP uses a small UPS, see the top)
 
 ### Load budget (assumptions; measure on site with a watt meter)
 
