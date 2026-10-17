@@ -14,6 +14,45 @@ Decisions from Richard: **outage cover is a few hours at most** (if the day is g
 espresso machines are electric), **Pi 4**, **target ~US$150**, printers already planned. Everything below overrides
 the bigger "full version" in sections 7 and 8, which stay as the later upgrade path.
 
+### Update (Oct 17, later): SD card, power bank, phones, her router
+
+**Devices.** One main POS tablet; **phones are everything else**, including kitchen and bar. Kitchen/bar phones already poll
+`tickets2_feed` every 4 s with the 6-digit code (no login), so they work against the Pi too, with the same failover as the
+register. Web Push does not work offline, so in an outage the phone must have the tickets page open on screen.
+**Because the phones show tickets, printers are not needed for the Pi to be useful in an outage.** Printers (Ethernet or USB, both
+fine) are an add-on and the only part that needs real AC power.
+
+**SD card:** fine. Use a **high-endurance** card (the ones sold for dashcams), 32–64 GB, keep a cloned spare, and let the Pi
+upload a nightly database backup to the cloud. Postgres stays on default safe settings (`fsync` on).
+
+**Used power bank as the Pi's UPS: yes, but only a bank that can charge and power at the same time without a blip.**
+- Many banks cut output for a moment when the charger is plugged in or pulled. The Pi reboots, which is exactly what we are avoiding.
+  Look for "pass-through charging" or "UPS function" and **test it**: run the Pi, pull the wall plug, then plug it back in, 5 times.
+- Pi 4 needs a bank that gives a steady 5 V/3 A (15 W) on USB-C. Pi 4 + SD draws about 4–6 W.
+- Size: a 20,000 mAh bank is ~74 Wh nominal, ~50 Wh real, so the Pi alone runs **~8 h**. That covers "a few hours" on its own.
+- Safety: used lithium banks can be worn or swollen. Skip any that is puffy or hot, keep it in a vented spot, never under a cover.
+- Cleaner alternative, ~$20–30: a small Pi UPS board with 18650 cells (built for this, reports power-lost to the Pi). Either works.
+- Shut-down: a bank can't tell the Pi it is running low. Fix: the Pi watches an input (a $5 power-sense module, or "ping
+  the router"), starts backup mode when the wall power drops, and does a clean `shutdown` after 4 h on battery.
+- It will NOT run the printers (24 V) or the router. To print during an outage you need the small UPS from before, or a
+  tiny AC power station, for the printers only.
+- **Power plan: Pi on the bank (~$0 if you have one) + phones/tablet on their own batteries = whole POS for hours.
+  Printers on a UPS only if you want paper.** This puts the ~$150 target within reach: Pi 4 + case + supply + SD + clock ≈ $75–90.
+
+**Piggybacking her router: yes, that is the normal-day setup already (Pi on Ethernet, same Wi-Fi as everyone).** No special
+port is needed: any LAN port works, and phones/tablet stay on the usual Wi-Fi. What it needs from the router:
+1. **A DHCP reservation** so the Pi always gets the same address.
+2. **DNS:** `pos.josiescafe.com` has to resolve to the Pi even when the internet is down. Easiest: set the router's DHCP DNS to the Pi
+   (secondary 1.1.1.1). If the router won't let you, the Pi can't help phones on the normal Wi-Fi in an internet-only outage; they
+   then need the Pi's own Wi-Fi.
+3. **No "client isolation" / "AP isolation"** on the main Wi-Fi (guest networks usually have it), or phones can't reach the Pi.
+4. **Her okay** to change those router settings.
+Her router is **not** on the battery in this plan, so in a **power** cut the Pi starts its own `josies-pos` Wi-Fi and the phones
+join it; in an **internet-only** cut (power fine) nothing changes for staff: everything keeps working through the router.
+Security with everyone on one network: Postgres listens only on the Pi itself; only HTTPS (443) is open; every call needs the
+device login or the kitchen code; and the Pi's admin login uses keys, not the default password. A separate network for the Pi is
+optional and most home routers can't do one.
+
 ### What the MVP does
 Power goes out → tablets switch to the Pi → orders, payments, completing numbers, 86'ing, stock and staff sign-in
 keep working → **kitchen and bar tickets print** → when power or internet returns, everything uploads to the cloud.
@@ -156,10 +195,10 @@ traffic. A flaky LTE link must not slow the register.
 
 | Class | Tables | Flow | Rule |
 |---|---|---|---|
-| **A. Config** | `settings`, `fx_rates`, `categories`, `items`, `ingredients`, `dish_ingredients`, `swaps`, `diets`, `diet_marks`, `tables`, `pos_users`, `people` (with `pin_hash`) | cloud → Pi | full snapshot; small (45 items, 46 ingredients, 151 dish links). No `updated_at` on most tables, so don't bother with deltas |
+| **A. Config** | `settings`, `fx_rates`, `categories`, `items`, `ingredients`, `dish_ingredients`, `swaps`, `diets`, `diet_marks`, `tables`, `pos_users`, `people` (with `pin_hash`), `ticket_link` (the 6-digit code the kitchen/bar phones type) | cloud → Pi | full snapshot; small (45 items, 46 ingredients, 151 dish links). No `updated_at` on most tables, so don't bother with deltas |
 | **B. Shift state** | `ingredients.light`, `items.available`, `items.stock`, `sticks`, `shifts`, `people.fail_count/locked_until` | both ways | snapshot down **only in Standby with an empty outbox**; changes made on the Pi go up as events or rows (below) |
 | **C. Transactions** | `orders`, `order_items`, `order_pieces`, `payments`, `ticket_alerts`, `ingredient_log` | Pi → cloud | append-only in practice; replay by id |
-| **D. Cloud only** | `payroll_periods/lines`, `owner_invites`, `owner_guard`, `push_subs`, `push_keys`, `ticket_link`, web-guest views | none | schema exists on the Pi (so migrations run) but stays empty; payroll and owner sign-in say "needs the internet" in Island mode (the client already does this for `sign_in_owner`) |
+| **D. Cloud only** | `payroll_periods/lines`, `owner_invites`, `owner_guard`, `push_subs`, `push_keys`, web-guest views | none | schema exists on the Pi (so migrations run) but stays empty; payroll and owner sign-in say "needs the internet" in Island mode (the client already does this for `sign_in_owner`) |
 
 Counted pastry `items.stock` lives in class B on purpose. It changes by deltas inside `sync_order2`, so replay is
 correct, but a snapshot overwrite while orders are unsent would erase sales.
