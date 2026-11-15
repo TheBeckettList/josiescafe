@@ -71,3 +71,11 @@ Do not build the placeholders.
 - A **+ New ingredient** line sits at the top of the checklist: type a name, it is added (element by default) and ticked.
 - A long-press (or the small star) on a ticked ingredient marks it the dish's core ("the bacon is the dish").
 - Saves with one `catalog_write` call (`dish_ingredients` for that dish). Marking a dish Out never touches this list.
+
+## Added Nov 14, 2026
+- **The cashier is the runner.** One person at the register rings up, places the stick, delivers, and takes it back.
+  No separate runner role or screen.
+- **Tablet and computer behave identically**, touch vs click, like a cross-platform game (a stick drag is a finger drag
+  or a mouse drag). A phone shows the same screen full size. A screen is its data and actions; the popup look on large
+  screens is a skin, not different logic.
+- Kitchen tickets are not dimmed by age. A ticket stays until its number completes, then leaves 10 minutes later.
