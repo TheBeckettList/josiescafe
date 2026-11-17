@@ -3,7 +3,7 @@ import sys, numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 from scipy import ndimage as ndi
 SRC,OUT=sys.argv[1],sys.argv[2]; MARK=len(sys.argv)>3
-SS=3; CS=0.72; CA=9; VS=1.0; CAFE=0.88; WID=1500; AX,AY=870,735
+SS=3; CS=0.66; CA=9; VS=1.0; XS=1.12; CAFE=0.88; WID=1500; AX,AY=848,752
 LOGO=(255,162,200); ROSE=(181,85,115); COL=LOGO if MARK else ROSE
 im=Image.open(SRC).convert('RGBA'); A=np.array(im); al=A[:,:,3]
 lab,n=ndi.label(al>200)
@@ -23,11 +23,11 @@ g['o']=g['o'].resize((round(g['o'].width*g['c'].height/g['o'].height*1.06),round
 def bold(img,b):
     a=img.split()[3].filter(ImageFilter.MaxFilter(b*2+1)).filter(ImageFilter.GaussianBlur(SS*2)).point(lambda v:max(0,min(255,int((v-128)*6))))
     o=Image.new('RGBA',img.size,COL+(0,)); o.putalpha(a); return o
-def word(txt,sc,b,gap=3):
+def word(txt,sc,b,gap=1):
     ps=[]
     for ch in txt:
         gl=g[ch]; pad=b*SS+2; gl=Image.fromarray(np.pad(np.array(gl),((pad,pad),(pad,pad),(0,0))),'RGBA')
-        gl=gl.resize((round(gl.width*sc*SS),round(gl.height*sc*SS*VS)),Image.LANCZOS); ps.append(bold(gl,round(b*SS*sc)))
+        gl=gl.resize((round(gl.width*sc*SS*XS),round(gl.height*sc*SS*VS)),Image.LANCZOS); ps.append(bold(gl,round(b*SS*sc)))
     H=int(max(p.height for p in ps)*1.2)+40*SS; base=H-20*SS
     pl_=[base-p.height+int(b*SS*sc)+(int(p.height*0.16) if ch=='f' else 0) for p,ch in zip(ps,txt)]; xs=[20*SS]
     for i in range(1,len(ps)):
