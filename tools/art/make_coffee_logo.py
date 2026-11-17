@@ -3,7 +3,7 @@ import sys, os, numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 from scipy import ndimage as ndi
 SRC,OUT=sys.argv[1],sys.argv[2]; MARK=len(sys.argv)>3
-SS=3; CS=0.66; CA=float(os.environ.get('CA',11)); VS=1.0; XS=1.12; CAFE=0.88; WID=1500; import os
+SS=3; CS=0.66; CA=float(os.environ.get('CA',20)); VS=1.0; XS=1.12; CAFE=0.88; WID=1500; import os
 REFX,REFY=786,740
 LOGO=(255,162,200); ROSE=(181,85,115); COL=LOGO if MARK else ROSE
 im=Image.open(SRC).convert('RGBA'); A=np.array(im); al=A[:,:,3]
