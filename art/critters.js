@@ -4,7 +4,7 @@
    J2CRIT.play(name) = do it. Needs art/critters.css. Plain ES5. */
 (function (w, d) {
   'use strict';
-  var C = w.J2CRIT = { MAP: '/img/world/map.png?v=2', active: {} };
+  var C = w.J2CRIT = { MAP: '/img/world/map.png?v=3', active: {} };
   var DUR = { tree: 1.7, iguana: 3.4, crab1: 4, crab2: 4, crab3: 4, ray: 2.4, tuk: 2.6, sail: 1.4, octopus: 1.6, fish: 1.8, buoy: 1.6, diveboat: 1.8 };
   var SAND = '#F6DCC0', HEAD = '#6FA3B8';
 

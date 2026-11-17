@@ -216,7 +216,7 @@ svg { display: block; }
 .mapcol { -webkit-box-flex: 1; -webkit-flex: 1 1 auto; flex: 1 1 auto; min-width: 0; min-height: 0; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: start; -webkit-align-items: flex-start; align-items: flex-start; -webkit-box-pack: center; -webkit-justify-content: center; justify-content: center; }
 .mapbox { position: relative; overflow: hidden; border-radius: 26px; background: #F6DCC0; box-shadow: 0 6px 18px rgba(181,85,115,.14); }
 .mapscale { position: absolute; left: 0; top: 0; width: 1440px; height: 1240px; -webkit-transform-origin: 0 0; transform-origin: 0 0; }
-.mapimg { position: absolute; left: 0; top: 0; width: 1440px; height: 1240px; background: url(../../img/world/map.png?v=2) no-repeat 0 0; -webkit-background-size: 1440px 1240px; background-size: 1440px 1240px; }
+.mapimg { position: absolute; left: 0; top: 0; width: 1440px; height: 1240px; background: url(../../img/world/map.png?v=3) no-repeat 0 0; -webkit-background-size: 1440px 1240px; background-size: 1440px 1240px; }
 .hit { position: absolute; z-index: 8; background: transparent; border-radius: 22px; padding: 0; }
 .hit.on { box-shadow: 0 0 0 8px #B55573; background: rgba(255,255,255,.12); }
 .hit.tbl.pick { box-shadow: 0 0 0 8px rgba(181,85,115,.5), 0 0 0 16px rgba(245,181,200,.5); background: rgba(255,255,255,.18); }
