@@ -12,17 +12,22 @@ def comp(i,pad=3):
     return Image.fromarray(out,'RGBA')
 g={'c':comp(12),'a':comp(11),'f':comp(9),'e':comp(10),'o':comp(8)}
 g['o']=g['o'].resize((round(g['o'].width*g['c'].height/g['o'].height*1.06),round(g['c'].height*1.06)),Image.LANCZOS)
+import os
 PINK=(243,168,200)
+TEAL=(95,184,178)
+COL=PINK if os.environ.get('COL')=='pink' else TEAL
+VS=float(os.environ.get('VS','1.25'))
+CSH=float(os.environ.get('CAFE','0.88'))
 def bold(img,b):
     if b<=0: return img
     a=img.split()[3].filter(ImageFilter.MaxFilter(b*2+1)).filter(ImageFilter.GaussianBlur(max(1,SS))).point(lambda v: max(0,min(255,int((v-115)*4))))
-    o=Image.new('RGBA',img.size,PINK+(0,)); o.putalpha(a); return o
+    o=Image.new('RGBA',img.size,COL+(0,)); o.putalpha(a); return o
 def word(txt,sc,b,kern,strike=False,gap=7):
     ps=[]
     for ch in txt:
         gl=g[ch]; pad=b*SS+2
         gl=Image.fromarray(np.pad(np.array(gl),((pad,pad),(pad,pad),(0,0))),'RGBA')
-        gl=gl.resize((round(gl.width*sc*SS),round(gl.height*sc*SS)),Image.LANCZOS)
+        gl=gl.resize((round(gl.width*sc*SS),round(gl.height*sc*SS*VS)),Image.LANCZOS)
         ps.append(bold(gl,round(b*SS*sc)))
     H=int(max(p.height for p in ps))+40*SS; base=H-20*SS
     place_=[]; xs=[20*SS]
@@ -46,10 +51,18 @@ def place(img,s,ang,anchor,ax,ay):
     x=ax-(bb[0] if anchor[0]=='l' else bb[2]); y=ay-(bb[1] if anchor[1]=='t' else bb[3])
     img.alpha_composite(r,(x,y)); return (x+bb[0],y+bb[1],x+bb[2],y+bb[3])
 
-KS=float(sys.argv[1]); CS=float(sys.argv[2]); CA=float(sys.argv[3]); LX=int(sys.argv[4]); LY=int(sys.argv[5])
 
 CS=float(sys.argv[1]); CA=float(sys.argv[2]); LX=int(sys.argv[3]); LY=int(sys.argv[4]); WID=int(sys.argv[5])
-can=Image.new('RGBA',(WID,1024),BGc+(255,)); can.alpha_composite(im.convert('RGBA'),(0,0))
+# shrink cafe in place
+cm=np.zeros(G.shape,bool)
+for i in (9,10,11,12): cm|=ndi.binary_dilation(lab==i,iterations=3)
+base=A.copy(); base[cm]=BGc
+imb=Image.fromarray(base.astype(np.uint8)).convert('RGBA')
+ys,xs=np.where(cm); y0,y1,x0,x1=ys.min(),ys.max()+1,xs.min(),xs.max()+1
+cf=np.zeros((y1-y0,x1-x0,4),np.uint8); al=np.clip((250-G)/70,0,1)*cm; cf[:,:,:3]=A[y0:y1,x0:x1].astype(np.uint8); cf[:,:,3]=(al[y0:y1,x0:x1]*255).astype(np.uint8)
+cf=Image.fromarray(cf,'RGBA'); cw,ch=round(cf.width*CSH),round(cf.height*CSH); cf=cf.resize((cw,ch),Image.LANCZOS)
+cx,cy=(x0+x1)//2,(y0+y1)//2
+can=Image.new('RGBA',(WID,1024),BGc+(255,)); can.alpha_composite(imb,(0,0)); can.alpha_composite(cf,(cx-cw//2,cy-ch//2))
 d=ImageDraw.Draw(can); LC=(181,85,115); P=[(552,316),(700,300),(810,280),(940,250)]
 d.line(P,fill=LC,width=14,joint='curve')
 for x,y in (P[0],P[-1]): d.ellipse([x-7,y-7,x+7,y+7],fill=LC)
