@@ -14,7 +14,7 @@ g={'c':comp(12),'a':comp(11),'f':comp(9),'e':comp(10),'o':comp(8)}
 g['o']=g['o'].resize((round(g['o'].width*g['c'].height/g['o'].height*1.06),round(g['c'].height*1.06)),Image.LANCZOS)
 import os
 PINK=(243,168,200)
-TEAL=(95,184,178)
+TEAL=(181,85,115)
 COL=PINK if os.environ.get('COL')=='pink' else TEAL
 VS=float(os.environ.get('VS','1.25'))
 CSH=float(os.environ.get('CAFE','0.88'))
@@ -64,7 +64,7 @@ cf=Image.fromarray(cf,'RGBA'); cw,ch=round(cf.width*CSH),round(cf.height*CSH); c
 cx,cy=(x0+x1)//2,(y0+y1)//2
 can=Image.new('RGBA',(WID,1024),BGc+(255,)); can.alpha_composite(imb,(0,0)); can.alpha_composite(cf,(cx-cw//2,cy-ch//2))
 d=ImageDraw.Draw(can); LC=(181,85,115); P=[(552,316),(700,300),(810,280),(940,250)]
-d.line(P,fill=LC,width=14,joint='curve')
-for x,y in (P[0],P[-1]): d.ellipse([x-7,y-7,x+7,y+7],fill=LC)
+d.line(P,fill=LC,width=28,joint='curve')
+for x,y in (P[0],P[-1]): d.ellipse([x-14,y-14,x+14,y+14],fill=LC)
 print('coffee',place(can,word('coffee',CS,4,0),CA,'lb',LX,LY))
 can.convert('RGB').save('logo2.png')
