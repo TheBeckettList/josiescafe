@@ -3,7 +3,7 @@ import sys, numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 from scipy import ndimage as ndi
 SRC,OUT=sys.argv[1],sys.argv[2]; MARK=len(sys.argv)>3
-SS=3; CS=0.72; CA=9; VS=1.25; CAFE=0.88; WID=1500; AX,AY=870,735
+SS=3; CS=0.72; CA=9; VS=1.0; CAFE=0.88; WID=1500; AX,AY=870,735
 LOGO=(255,162,200); ROSE=(181,85,115); COL=LOGO if MARK else ROSE
 im=Image.open(SRC).convert('RGBA'); A=np.array(im); al=A[:,:,3]
 lab,n=ndi.label(al>200)
@@ -21,15 +21,15 @@ print(IDS)
 g={k:comp(v) for k,v in IDS.items()}
 g['o']=g['o'].resize((round(g['o'].width*g['c'].height/g['o'].height*1.06),round(g['c'].height*1.06)),Image.LANCZOS)
 def bold(img,b):
-    a=img.split()[3].filter(ImageFilter.MaxFilter(b*2+1)).filter(ImageFilter.GaussianBlur(SS)).point(lambda v:max(0,min(255,int((v-115)*4))))
+    a=img.split()[3].filter(ImageFilter.MaxFilter(b*2+1)).filter(ImageFilter.GaussianBlur(SS*2)).point(lambda v:max(0,min(255,int((v-128)*6))))
     o=Image.new('RGBA',img.size,COL+(0,)); o.putalpha(a); return o
-def word(txt,sc,b,gap=7):
+def word(txt,sc,b,gap=3):
     ps=[]
     for ch in txt:
         gl=g[ch]; pad=b*SS+2; gl=Image.fromarray(np.pad(np.array(gl),((pad,pad),(pad,pad),(0,0))),'RGBA')
         gl=gl.resize((round(gl.width*sc*SS),round(gl.height*sc*SS*VS)),Image.LANCZOS); ps.append(bold(gl,round(b*SS*sc)))
-    H=int(max(p.height for p in ps))+40*SS; base=H-20*SS
-    pl_=[base-p.height+int(b*SS*sc) for p in ps]; xs=[20*SS]
+    H=int(max(p.height for p in ps)*1.2)+40*SS; base=H-20*SS
+    pl_=[base-p.height+int(b*SS*sc)+(int(p.height*0.16) if ch=='f' else 0) for p,ch in zip(ps,txt)]; xs=[20*SS]
     for i in range(1,len(ps)):
         a1=np.array(ps[i-1].split()[3])>128; a2=np.array(ps[i].split()[3])>128; need=-1e9
         for y in range(H):
@@ -51,8 +51,8 @@ can=Image.new('RGBA',(WID,im.height),(0,0,0,0)); can.alpha_composite(Image.froma
 can.alpha_composite(cf,((x0+x1)//2-cw//2,(y0+y1)//2-ch//2))
 # crossout, same weight as coffee strokes
 d=ImageDraw.Draw(can); P=[(566,562),(724,542),(845,519),(983,481)]
-d.line(P,fill=COL+(255,),width=30,joint='curve')
-for x,y in (P[0],P[-1]): d.ellipse([x-15,y-15,x+15,y+15],fill=COL+(255,))
-s=word('coffee',CS,4); r=s.rotate(CA,resample=Image.BICUBIC,expand=True); r=r.resize((r.width//SS,r.height//SS),Image.LANCZOS); bb=r.getbbox()
+d.line(P,fill=COL+(255,),width=24,joint='curve')
+for x,y in (P[0],P[-1]): d.ellipse([x-12,y-12,x+12,y+12],fill=COL+(255,))
+s=word('coffee',CS,2); r=s.rotate(CA,resample=Image.BICUBIC,expand=True); r=r.resize((r.width//SS,r.height//SS),Image.LANCZOS); bb=r.getbbox()
 can.alpha_composite(r,(AX-bb[0],AY-bb[3])); print('coffee',bb)
 can.save(OUT)
