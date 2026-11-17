@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFilter
 from scipy import ndimage as ndi
 SRC,OUT=sys.argv[1],sys.argv[2]; MARK=len(sys.argv)>3
 SS=3; CS=0.66; CA=float(os.environ.get('CA',11)); VS=1.0; XS=1.12; CAFE=0.88; WID=1500; import os
-AX,AY=int(os.environ.get('AX',786)),int(os.environ.get('AY',740))
+REFX,REFY=786,740
 LOGO=(255,162,200); ROSE=(181,85,115); COL=LOGO if MARK else ROSE
 im=Image.open(SRC).convert('RGBA'); A=np.array(im); al=A[:,:,3]
 lab,n=ndi.label(al>200)
@@ -40,6 +40,8 @@ def word(txt,sc,b,gap=1):
         xs.append(need)
     W=int(xs[-1]+ps[-1].width)+20*SS; s=Image.new('RGBA',(W,H),(0,0,0,0))
     for i,p in enumerate(ps): s.alpha_composite(p,(int(xs[i]),pl_[i]))
+    global PIV
+    PIV=(xs[0]+ps[0].width/2, pl_[0]+ps[0].height/2)
     return s
 # base: logo with cafe lifted out, redrawn smaller in place
 cm=np.zeros(al.shape,bool)
@@ -54,8 +56,20 @@ can.alpha_composite(cf,((x0+x1)//2-cw//2,(y0+y1)//2-ch//2))
 d=ImageDraw.Draw(can); P=[(566,562),(724,542),(845,519),(983,481)]
 d.line(P,fill=COL+(255,),width=24,joint='curve')
 for x,y in (P[0],P[-1]): d.ellipse([x-12,y-12,x+12,y+12],fill=COL+(255,))
-s=word('coffee',CS,2); r=s.rotate(CA,resample=Image.BICUBIC,expand=True); r=r.resize((r.width//SS,r.height//SS),Image.LANCZOS); bb=r.getbbox()
+import math
+s=word('coffee',CS,2)
+def rot(a):
+    r=s.rotate(a,resample=Image.BICUBIC,expand=True)
+    dx,dy=PIV[0]-s.width/2,PIV[1]-s.height/2; t=math.radians(a)
+    px=r.width/2+dx*math.cos(t)+dy*math.sin(t); py=r.height/2-dx*math.sin(t)+dy*math.cos(t)
+    return r,px/SS,py/SS
+# reference: pivot position when the word is anchored lb at (REFX,REFY) with REFA degrees
+r0,px0,py0=rot(float(os.environ.get('REFA',9))); r0s=r0.resize((r0.width//SS,r0.height//SS),Image.LANCZOS); b0=r0s.getbbox()
+TX=REFX-b0[0]+px0; TY=REFY-b0[3]+py0+(0)
+TX=REFX-b0[0]+px0; TY=REFY-b0[3]+py0
+r,px,py=rot(CA); rs=r.resize((r.width//SS,r.height//SS),Image.LANCZOS); bb=rs.getbbox()
+ox=round(TX-px); oy=round(TY-py)
 if os.environ.get('DUMP'):
-    np.save('cof.npy',np.array(r.split()[3])[bb[1]:bb[3],bb[0]:bb[2]]); np.save('rest.npy',np.array(can.split()[3]))
-can.alpha_composite(r,(AX-bb[0],AY-bb[3])); print('coffee',bb)
+    np.save('cof.npy',np.array(rs.split()[3])); np.save('rest.npy',np.array(can.split()[3])); open('off.txt','w').write('%d %d'%(ox,oy))
+can.alpha_composite(rs,(ox,oy)); print('coffee pivot',TX,TY)
 can.save(OUT)
