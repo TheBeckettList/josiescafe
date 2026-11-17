@@ -85,3 +85,12 @@
 .bc-moray.on { -webkit-animation: bcPeek 1.6s ease-in-out both; animation: bcPeek 1.6s ease-in-out both; -webkit-transform-origin: 50% 85%; transform-origin: 50% 85%; }
 @-webkit-keyframes bcPeek { 0%, 100% { -webkit-transform: scale(1); } 40% { -webkit-transform: scale(1.22) rotate(-5deg); } }
 @keyframes bcPeek { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.22) rotate(-5deg); } }
+
+/* coffee: the sack wiggles when tapped (it is always visible, so no hidden state), the NEW! tag bobs a little */
+.cr-sack { -webkit-transform-origin: 50% 100%; transform-origin: 50% 100%; }
+.cr-sack.on { -webkit-animation: crSack 1.2s ease-in-out both; animation: crSack 1.2s ease-in-out both; }
+@-webkit-keyframes crSack { 0%, 100% { -webkit-transform: rotate(0) scale(1,1); } 18% { -webkit-transform: rotate(-6deg) scale(1.04,.96); } 38% { -webkit-transform: rotate(5deg) scale(.97,1.04); } 58% { -webkit-transform: rotate(-3deg); } 78% { -webkit-transform: rotate(1.500deg); } }
+@keyframes crSack { 0%, 100% { transform: rotate(0) scale(1,1); } 18% { transform: rotate(-6deg) scale(1.04,.96); } 38% { transform: rotate(5deg) scale(.97,1.04); } 58% { transform: rotate(-3deg); } 78% { transform: rotate(1.500deg); } }
+.cr-new { -webkit-transform-origin: 0 50%; transform-origin: 0 50%; -webkit-animation: crNew 3.2s ease-in-out infinite; animation: crNew 3.2s ease-in-out infinite; }
+@-webkit-keyframes crNew { 0%, 100% { -webkit-transform: rotate(-4deg); } 50% { -webkit-transform: rotate(5deg); } }
+@keyframes crNew { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(5deg); } }

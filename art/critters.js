@@ -5,7 +5,7 @@
 (function (w, d) {
   'use strict';
   var C = w.J2CRIT = { MAP: '/img/world/map.png?v=3', active: {} };
-  var DUR = { tree: 1.7, iguana: 3.4, crab1: 4, crab2: 4, crab3: 4, ray: 2.4, tuk: 2.6, sail: 1.4, octopus: 1.6, fish: 1.8, buoy: 1.6, diveboat: 1.8 };
+  var DUR = { tree: 1.7, iguana: 3.4, crab1: 4, crab2: 4, crab3: 4, ray: 2.4, tuk: 2.6, sack: 1.3, sail: 1.4, octopus: 1.6, fish: 1.8, buoy: 1.6, diveboat: 1.8 };
   var SAND = '#F6DCC0', HEAD = '#6FA3B8';
 
   function on(name) { return C.active[name] ? ' on' : ''; }
@@ -78,7 +78,7 @@
 
   /* a map object (not a critter): the pastry stand with its glass dome, on the register counter, beside the printer */
   C.stand = function () {
-    return C.board() + '<svg class="mapobj" viewBox="0 0 76 76" style="position:absolute;left:676px;top:184px;width:62px;height:62px;pointer-events:none;z-index:4" aria-hidden="true">' +
+    return C.board() + C.coffee() + '<svg class="mapobj" viewBox="0 0 76 76" style="position:absolute;left:676px;top:184px;width:62px;height:62px;pointer-events:none;z-index:4" aria-hidden="true">' +
       '<ellipse cx="38" cy="70" rx="24" ry="3" fill="#3B2925" opacity=".1"/><ellipse cx="38" cy="67" rx="21" ry="5" fill="#F5B5C8"/><rect x="35" y="57" width="6" height="10" fill="#EE95B3"/><ellipse cx="38" cy="57" rx="28" ry="5" fill="#FFFFFF" stroke="#F1D3DD" stroke-width="1.500"/>' +
       '<path d="M15 54 L29 54 L27.500 46 Q22 43 16.500 46 Z" fill="#F5B5C8"/><path d="M13.500 47 Q14 36 22 35 Q30 36 30.500 47 Z" fill="#E2A66A"/><circle cx="19" cy="41" r="1.200" fill="#B98050"/><circle cx="25" cy="40" r="1.200" fill="#B98050"/>' +
       '<circle cx="39" cy="48" r="8.500" fill="#D9A15F"/><circle cx="39" cy="48" r="7" fill="#E5B677"/><g fill="#5A3626"><circle cx="36" cy="46" r="1.300"/><circle cx="42" cy="48" r="1.300"/><circle cx="38" cy="51" r="1.300"/></g>' +
@@ -95,15 +95,50 @@
       '<circle cx="19" cy="58" r="6.500" fill="#FBE3D0"/><circle cx="21" cy="57" r="2.500" fill="#5A3626"/><rect x="33" y="55" width="24" height="4" rx="2" fill="#5B3843"/><rect x="33" y="62" width="16" height="3.500" rx="1.750" fill="#F5B5C8"/>' +
       '<circle cx="19" cy="78" r="7" fill="#D9A15F"/><circle cx="19" cy="78" r="2.600" fill="#FFFFFF"/><rect x="33" y="75" width="24" height="4" rx="2" fill="#5B3843"/><rect x="33" y="82" width="16" height="3.500" rx="1.750" fill="#F5B5C8"/></g></svg>';
   };
+
+  /* coffee: a wooden shelf against the wall (left of the menu board) with bags of Josie's coffee, a little outlined showcase with a NEW! tag,
+     and a burlap sack on the floor by the order counter. Bags: white (the usual, pink logo), pink and black (white logo). */
+  var FONT = "font-family:'Baloo 2',Nunito,sans-serif;font-weight:800;";
+  function bag(x, y, kind, wd) {
+    var body = kind === 'pink' ? '#F5B5C8' : kind === 'black' ? '#3B2A2E' : '#FFFFFF', ink = kind === 'white' ? '#E07B9B' : '#FFFFFF', edge = kind === 'white' ? '#F1D3DD' : 'none', h = Math.round(wd * 1.3);
+    return '<g transform="translate(' + x + ' ' + y + ')"><path d="M.5 ' + h + ' L2 3 L' + (wd - 2) + ' 3 L' + (wd - .5) + ' ' + h + ' Z" fill="' + body + '" stroke="' + edge + '" stroke-width=".8"/>' +
+      '<rect x="1.500" y=".5" width="' + (wd - 3) + '" height="4" rx="1.500" fill="' + (kind === 'black' ? '#8A5668' : '#B55573') + '"/>' +
+      '<text x="' + (wd / 2) + '" y="' + (h * .6).toFixed(1) + '" text-anchor="middle" style="' + FONT + 'font-size:' + (wd * .29).toFixed(1) + 'px" fill="' + ink + '">Josie\'s</text>' +
+      '<text x="' + (wd / 2) + '" y="' + (h * .84).toFixed(1) + '" text-anchor="middle" style="' + FONT + 'font-size:' + (wd * .27).toFixed(1) + 'px" fill="' + (kind === 'white' ? '#B55573' : ink) + '">coffee</text></g>';
+  }
+  C.coffee = function () {
+    var shelf = '<svg class="mapobj" viewBox="0 0 74 96" style="position:absolute;left:398px;top:94px;width:74px;height:96px;pointer-events:none;z-index:3" aria-hidden="true">' +
+      '<ellipse cx="37" cy="93" rx="35" ry="2.500" fill="#3B2925" opacity=".12"/>' +
+      '<rect x="3" y="2" width="68" height="86" rx="3" fill="#F9ECDD"/><rect x="1" y="2" width="5" height="88" rx="2" fill="#C79468"/><rect x="68" y="2" width="5" height="88" rx="2" fill="#C79468"/>' +
+      '<rect x="1" y="38" width="72" height="5" rx="1.500" fill="#D9A877"/><rect x="1" y="38" width="72" height="1.600" fill="#EDC79F"/>' +
+      '<rect x="1" y="64" width="72" height="5" rx="1.500" fill="#D9A877"/><rect x="1" y="64" width="72" height="1.600" fill="#EDC79F"/>' +
+      '<rect x="1" y="88" width="72" height="5" rx="2" fill="#B98050"/>' +
+      bag(10, 43 - 0 + 0, 'white', 16) + bag(29, 43, 'white', 16) + bag(48, 43, 'white', 16) +
+      bag(10, 69.500, 'white', 14) + bag(28, 69.500, 'pink', 14) + bag(46, 69.500, 'black', 14) +
+      '<rect x="19" y="6" width="36" height="32" rx="5" fill="#FFFFFF" fill-opacity=".55" stroke="#E07B9B" stroke-width="1.600" stroke-dasharray="4 2.600" stroke-linecap="round"/>' +
+      bag(27, 8.500, 'white', 20) + '</svg>' +
+      '<svg class="mapobj cr-new" viewBox="0 0 40 24" style="position:absolute;left:450px;top:92px;width:40px;height:24px;pointer-events:none;z-index:5" aria-hidden="true">' +
+      '<path d="M2 12 L9 2 H36 Q38 2 38 4 V20 Q38 22 36 22 H9 Z" fill="#B55573"/><circle cx="9" cy="12" r="2" fill="#FFF6F1"/>' +
+      '<text x="24" y="16.500" text-anchor="middle" style="' + FONT + 'font-size:11px" fill="#FFFFFF">NEW!</text></svg>';
+    var sack = '<svg class="mapobj cr-sack" viewBox="0 0 56 66" style="position:absolute;left:724px;top:274px;width:56px;height:66px;pointer-events:none;z-index:4" aria-hidden="true">' +
+      '<ellipse cx="28" cy="61" rx="25" ry="4.500" fill="#3B2925" opacity=".14"/>' +
+      '<path d="M10 58 Q3 44 7 30 Q10 20 19 16 L37 16 Q46 20 49 30 Q53 44 46 58 Q28 64 10 58 Z" fill="#CFA56F"/>' +
+      '<path d="M19 16 Q15 8 18 3 Q22 6 25 12 Q28 4 33 3 Q35 9 31 16 Z" fill="#B98C57"/>' +
+      '<path d="M18 17 Q28 22 38 17" fill="none" stroke="#7A4F34" stroke-width="3" stroke-linecap="round"/><path d="M26 18 q-3 5 -1 8 M30 19 q3 4 2 7" fill="none" stroke="#7A4F34" stroke-width="1.600" stroke-linecap="round"/>' +
+      '<g stroke="#B58A55" stroke-width="1" opacity=".8" fill="none"><path d="M12 30 Q10 42 14 54"/><path d="M20 28 V56"/><path d="M36 28 V56"/><path d="M44 30 Q46 42 42 54"/><path d="M10 38 H46 M10 48 H46"/></g>' +
+      '<g><rect x="19" y="33" width="18" height="12" rx="3" fill="#FFF6F1" fill-opacity=".9"/><text x="28" y="43" text-anchor="middle" style="' + FONT + 'font-size:8px" fill="#B55573">Josie\'s</text></g>' +
+      '<ellipse cx="9" cy="61" rx="3" ry="2" fill="#5A3626" transform="rotate(-20 9 61)"/><ellipse cx="50" cy="62" rx="3" ry="2" fill="#5A3626" transform="rotate(25 50 62)"/><ellipse cx="45" cy="64.500" rx="2.500" ry="1.700" fill="#5A3626"/></svg>';
+    return shelf + sack;
+  };
   C.cafe = function () { return treeHtml() + iguanaHtml() + crabsHtml() + rayHtml() + tukHtml(); };
   C.hits = function () {
-    var H = [['tree', 560, 640, 265, 230], ['iguana', 478, 888, 190, 66], ['crab1', 858, 966, 66, 56], ['crab2', 950, 992, 62, 56], ['crab3', 1041, 960, 52, 46], ['ray', 392, 1144, 200, 98], ['tuk', 96, 340, 170, 240]], i, h = '';
+    var H = [['sack', 722, 270, 62, 74], ['tree', 560, 640, 265, 230], ['iguana', 478, 888, 190, 66], ['crab1', 858, 966, 66, 56], ['crab2', 950, 992, 62, 56], ['crab3', 1041, 960, 52, 46], ['ray', 392, 1144, 200, 98], ['tuk', 96, 340, 170, 240]], i, h = '';
     for (i = 0; i < H.length; i++) { h += '<button type="button" class="hit crit" data-act="crit" data-arg="' + H[i][0] + '" style="left:' + H[i][1] + 'px;top:' + H[i][2] + 'px;width:' + H[i][3] + 'px;height:' + H[i][4] + 'px;z-index:7" aria-label="' + H[i][0] + '"></button>'; }
     return h;
   };
 
   /* what each name wakes up (cafe overlays are found by class, bay things by data-crit) */
-  var GROUPS = { tree: ['.cr-tree', '.cr-leaf'], iguana: ['.cr-igpatch', '.cr-ig', '.cr-wink', '.cr-mouth'], crab1: [], crab2: [], crab3: [], ray: ['.cr-ray', '.cr-flow', '.cr-rip'], tuk: ['.cr-puff'] };
+  var GROUPS = { tree: ['.cr-tree', '.cr-leaf'], iguana: ['.cr-igpatch', '.cr-ig', '.cr-wink', '.cr-mouth'], crab1: [], crab2: [], crab3: [], ray: ['.cr-ray', '.cr-flow', '.cr-rip'], tuk: ['.cr-puff'], sack: ['.cr-sack'] };
   function kick(els) { var i; for (i = 0; i < els.length; i++) { els[i].classList.remove('on'); els[i].style.animationDelay = ''; els[i].style.webkitAnimationDelay = ''; } void d.body.offsetWidth; for (i = 0; i < els.length; i++) { els[i].classList.add('on'); } }
   C.play = function (name, root) {
     root = root || d; var els = [], sel = GROUPS[name], i, k, list;
