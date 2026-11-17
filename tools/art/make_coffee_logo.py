@@ -3,7 +3,8 @@ import sys, numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 from scipy import ndimage as ndi
 SRC,OUT=sys.argv[1],sys.argv[2]; MARK=len(sys.argv)>3
-SS=3; CS=0.66; CA=9; VS=1.0; XS=1.12; CAFE=0.88; WID=1500; AX,AY=848,752
+SS=3; CS=0.66; CA=9; VS=1.0; XS=1.12; CAFE=0.88; WID=1500; import os
+AX,AY=int(os.environ.get('AX',786)),int(os.environ.get('AY',740))
 LOGO=(255,162,200); ROSE=(181,85,115); COL=LOGO if MARK else ROSE
 im=Image.open(SRC).convert('RGBA'); A=np.array(im); al=A[:,:,3]
 lab,n=ndi.label(al>200)
@@ -54,5 +55,7 @@ d=ImageDraw.Draw(can); P=[(566,562),(724,542),(845,519),(983,481)]
 d.line(P,fill=COL+(255,),width=24,joint='curve')
 for x,y in (P[0],P[-1]): d.ellipse([x-12,y-12,x+12,y+12],fill=COL+(255,))
 s=word('coffee',CS,2); r=s.rotate(CA,resample=Image.BICUBIC,expand=True); r=r.resize((r.width//SS,r.height//SS),Image.LANCZOS); bb=r.getbbox()
+if os.environ.get('DUMP'):
+    np.save('cof.npy',np.array(r.split()[3])[bb[1]:bb[3],bb[0]:bb[2]]); np.save('rest.npy',np.array(can.split()[3]))
 can.alpha_composite(r,(AX-bb[0],AY-bb[3])); print('coffee',bb)
 can.save(OUT)
